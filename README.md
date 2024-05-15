@@ -31,7 +31,7 @@ To get started with CanvasX, follow these steps:
 
 1. **Clone the Repository**:
     ```bash
-    git clone [https://github.com/yourusername/canvasx.git](https://github.com/boardx/canvasx.git)
+    git clone https://github.com/boardx/canvasx.git
     cd canvasx
     ```
 
