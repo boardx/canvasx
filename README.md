@@ -3,6 +3,7 @@
 ## Introduction
 
 Welcome to **CanvasX**! CanvasX is an open-source collaborative canvas tool designed to empower individuals and teams to work together seamlessly. Forked from Fabric.js, CanvasX aims to enhance the collaborative experience by providing robust features that support real-time interaction, visual collaboration, and integration with AI-driven tools.
+![Screenshot 2024-05-15 at 11 28 47 AM](https://github.com/boardx/canvasx/assets/2325074/48756376-fdcc-4d1f-9952-f23538ca6114)
 
 ## Table of Contents
 
