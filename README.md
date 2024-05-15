@@ -31,7 +31,7 @@ To get started with CanvasX, follow these steps:
 
 1. **Clone the Repository**:
     ```bash
-    git clone https://github.com/yourusername/canvasx.git
+    git clone [https://github.com/yourusername/canvasx.git](https://github.com/boardx/canvasx.git)
     cd canvasx
     ```
 
@@ -59,7 +59,7 @@ Here's a quick guide to help you get started with CanvasX:
 
 ## Documentation
 
-For detailed documentation on how to use CanvasX, visit the [CanvasX Documentation](https://github.com/yourusername/canvasx/wiki).
+For detailed documentation on how to use CanvasX, visit the [CanvasX Documentation](https://github.com/boardx/canvasx/wiki).
 
 ## Contributing
 
@@ -90,13 +90,13 @@ CanvasX is licensed under the MIT License. See the [LICENSE](LICENSE) file for m
 
 Join our community to stay updated and collaborate with other CanvasX users and developers:
 
-- [Discussion Forum](https://forum.boardx.com)
+- [Discussion Forum](https://forum.boardx.us)
 - [Slack Channel](https://boardx.slack.com)
-- [GitHub Issues](https://github.com/yourusername/canvasx/issues)
+- [GitHub Issues](https://github.com/boardx/canvasx/issues)
 
 ## Contact
 
-For any questions or inquiries, please contact us at [support@boardx.com](mailto:support@boardx.com).
+For any questions or inquiries, please contact us at [support@boardx.us](mailto:support@boardx.us).
 
 ---
 
