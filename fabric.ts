@@ -110,7 +110,7 @@ export type {
   SerializedTextboxProps,
   TextboxProps,
 } from './src/shapes/Textbox';
-export { Textbox } from './src/shapes/Textbox';
+// export { Textbox } from './src/shapes/Textbox';
 export type {
   CompleteTextStyleDeclaration,
   TextStyleDeclaration,
@@ -170,3 +170,13 @@ export { Control } from './src/controls/Control';
 export * as controlsUtils from './src/controls';
 
 export * from './src/filters';
+
+export {
+  RectNotes,
+  CircleNotes,
+  Textbox,
+  ShapeNotes,
+  alignmentGuideLines,
+} from './src/shapes/canvasx';
+
+export { WBCanvas } from './src/canvas/canvasx/bx-canvas';

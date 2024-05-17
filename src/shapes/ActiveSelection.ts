@@ -20,6 +20,10 @@ export interface ActiveSelectionOptions extends GroupProps {
 const activeSelectionDefaultValues: Partial<TClassProperties<ActiveSelection>> =
   {
     multiSelectionStacking: 'canvas-stacking',
+    cornerStyle: 'circle',
+    cornerColor: 'white',
+    cornerStrokeColor: 'gray',
+    transparentCorners: false,
   };
 
 /**

@@ -1,7 +1,10 @@
 import * as fabric from 'fabric';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import MiniCanvas from './preview/MiniCanvas';
 
 const DEV_MODE = process.env.NODE_ENV === 'development';
+
+import { initializeCanvasEvents } from './initializeCanvasEvents';
 
 declare global {
   var canvas: fabric.Canvas | undefined;
@@ -12,13 +15,29 @@ export const Canvas = React.forwardRef<
   { onLoad?(canvas: fabric.Canvas): void }
 >(({ onLoad }, ref) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [canvas, setCanvas] = useState(null);
 
   useEffect(() => {
     if (!canvasRef.current) {
       return;
     }
 
-    const canvas = new fabric.Canvas(canvasRef.current);
+    const canvas = new fabric.Canvas(canvasRef.current, {
+      backgroundColor: '#f0f0f0',
+      height: window.innerHeight,
+      width: window.innerWidth - 60,
+    });
+    setCanvas(canvas);
+    const alignmentGuidelines = new fabric.alignmentGuideLines(canvas);
+    alignmentGuidelines.initializeEvents();
+    initializeCanvasEvents(canvas);
+    const handleResize = () => {
+      canvas.setHeight(window.innerHeight - 60);
+      canvas.setWidth(window.innerWidth);
+      canvas.renderAll();
+    };
+
+    window.addEventListener("resize", handleResize);
 
     DEV_MODE && (window.canvas = canvas);
 
@@ -49,5 +68,8 @@ export const Canvas = React.forwardRef<
     };
   }, [canvasRef, onLoad]);
 
-  return <canvas ref={canvasRef} />;
+  return <>
+    <canvas ref={canvasRef} />
+    <MiniCanvas canvas={canvas} />
+  </>
 });

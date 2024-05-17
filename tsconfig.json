@@ -102,5 +102,8 @@
     "skipLibCheck": true /* Skip type checking all .d.ts files. */
   },
   "exclude": ["dist", "test", "e2e"],
-  "include": ["src", "fabric.ts", "index.ts", "index.node.ts"]
+  "include": ["src", "fabric.ts", "index.ts", "index.node.ts"],
+  "resolve": {
+    "extensions": [".tsx", ".ts", ".js"]
+  }
 }
