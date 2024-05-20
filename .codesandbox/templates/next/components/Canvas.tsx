@@ -27,6 +27,8 @@ export const Canvas = React.forwardRef<
       height: window.innerHeight,
       width: window.innerWidth - 60,
     });
+    canvas.setTargetFindTolerance(5)
+
     setCanvas(canvas);
     const alignmentGuidelines = new fabric.alignmentGuideLines(canvas);
     alignmentGuidelines.initializeEvents();

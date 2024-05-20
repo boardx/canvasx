@@ -229,6 +229,7 @@ export class InteractiveFabricObject<
    * @return {Record<string, TOCoord>}
    */
   calcOCoords(): Record<string, TOCoord> {
+    console.log('!!calcOcoords');
     const vpt = this.getViewportTransform(),
       center = this.getCenterPoint(),
       tMatrix = createTranslateMatrix(center.x, center.y),

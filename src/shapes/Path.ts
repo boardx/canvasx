@@ -273,9 +273,34 @@ export class Path<
     this.setBoundingBox();
   }
 
+  TransformPointFromCanvasToObject = (mMatix, point) => {
+    // window.invertTransform = invertTransform;
+    //   const mCanvas = object.getViewportTransform();
+    //   const matrix = multiplyTransformMatrices(mCanvas, mObject);
+    // const invertedMatrix = invertTransform(mMatix);
+    const transformedPoint = point.transform(mMatix);
+    return transformedPoint;
+  };
   setBoundingBox(adjustPosition?: boolean) {
-    const { width, height, pathOffset } = this._calcDimensions();
-    this.set({ width, height, pathOffset });
+    const preMatrix = this.calcTransformMatrix();
+    const { left, top, width, height, pathOffset } = this._calcDimensions();
+
+    const newLeftTop = this.TransformPointFromCanvasToObject(
+      preMatrix,
+      new Point(left, top)
+    );
+
+    // pathOffset.x = 0;
+    // pathOffset.y = 0;
+
+    console.log('!!this', newLeftTop, preMatrix);
+    this.set({
+      left: newLeftTop.x,
+      top: newLeftTop.y,
+      width,
+      height,
+      pathOffset,
+    });
     // using pathOffset because it match the use case.
     // if pathOffset change here we need to use left + width/2 , top + height/2
     adjustPosition && this.setPositionByOrigin(pathOffset, CENTER, CENTER);
@@ -346,7 +371,10 @@ export class Path<
           break;
       }
     }
-    return makeBoundingBoxFromPoints(bounds);
+    console.log('!!bounds', JSON.stringify(bounds));
+    const tm = makeBoundingBoxFromPoints(bounds);
+    console.log('!!tm', tm);
+    return tm;
   }
 
   /**
@@ -355,13 +383,15 @@ export class Path<
   _calcDimensions(): IPathBBox {
     const bbox = this._calcBoundsFromPath();
 
-    return {
+    const result = {
       ...bbox,
       pathOffset: new Point(
         bbox.left + bbox.width / 2,
         bbox.top + bbox.height / 2
       ),
     };
+    console.log('!!result', result);
+    return result;
   }
 
   /**

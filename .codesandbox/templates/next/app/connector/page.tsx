@@ -22,27 +22,41 @@ const IndexPage: NextPage = () => {
 
             // Create 10 RectNotes
 
-            // const rectNote = new fabric.RectNotes(textValue, {
-            //     originX: 'center',
-            //     top: 220,
-            //     left: 200,
-            //     textAlign: 'center',
-            //     textValue,
-            //     backgroundColor: 'lightblue',
-            //     _id: Math.random().toString(36).substr(2, 9),
-            // });
-            // canvas.add(rectNote);
+            const rectNote1 = new fabric.RectNotes(textValue, {
+                originX: 'center',
+                top: 220,
+                left: 200,
+                textAlign: 'center',
+                textValue,
+                backgroundColor: 'lightblue',
+                _id: Math.random().toString(36).substr(2, 9),
+            });
+            canvas.add(rectNote1);
 
-            // const rectNote2 = new fabric.RectNotes(textValue, {
-            //     originX: 'center',
-            //     top: 520,
-            //     left: 500,
-            //     textAlign: 'center',
-            //     textValue,
-            //     backgroundColor: 'lightblue',
-            //     _id: Math.random().toString(36).substr(2, 9),
-            // });
-            // canvas.add(rectNote2);
+            const rectNote2 = new fabric.RectNotes(textValue, {
+                originX: 'center',
+                top: 520,
+                left: 500,
+                textAlign: 'center',
+                textValue,
+                backgroundColor: 'lightblue',
+                _id: Math.random().toString(36).substr(2, 9),
+            });
+            canvas.add(rectNote2);
+
+            const point1 = rectNote1.getPointByOrigin('right', 'center');
+            const point2 = rectNote2.getPointByOrigin('left', 'center');
+
+            // Calculate the control points for connecting two points
+            const cp1 = {
+                x: point1.x + (point2.x - point1.x) / 2,
+                y: point1.y,
+            };
+
+            const cp2 = {
+                x: point2.x - (point2.x - point1.x) / 2,
+                y: point2.y,
+            };
 
 
             const x1 = -50, y1 = -50;
@@ -60,8 +74,7 @@ const IndexPage: NextPage = () => {
                 hasBorders: true,
                 hasControls: true,
                 selectable: true,
-                // originX: 'center',
-                // originY: 'center',
+                perPixelTargetFind: true,
             });
 
             canvas.add(curve);

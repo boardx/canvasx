@@ -1,16 +1,13 @@
 import { Path } from '../Path';
 import { Control } from '../../controls/Control';
-import {
-  invertTransform,
-  makeBoundingBoxFromPoints,
-  multiplyTransformMatrices,
-  sendPointToPlane,
-} from '../../util';
+import { invertTransform, multiplyTransformMatrices } from '../../util';
 import { Point, XY } from '../../Point';
 import { transformPoint } from '../../util';
 import { TMat2D } from '../../typedefs';
 import { InteractiveFabricObject } from '../Object/InteractiveObject';
-import { CENTER } from '../../constants';
+import { createObjectDefaultControls } from '../../controls/commonControls';
+import { Transform } from '../../EventTypeDefs';
+import { FabricObject } from '../Object/Object';
 
 const getPath = (
   x1: number,
@@ -22,10 +19,13 @@ const getPath = (
   controlPoint2X: number,
   controlPoint2Y: number,
   offset: XY,
-  style: any
+  style: any,
+  isMoving = false
 ) => {
-  let path;
-  //   offset = { x: -offset.x, y: -offset.y };
+  let path: string = '';
+  if (!isMoving) {
+    offset = { x: -1, y: -1 };
+  }
   if (style === 'straight') {
     path = `M ${x1} ${y1} L ${x2} ${y2}`;
   } else if (style === 'curved') {
@@ -38,24 +38,37 @@ const getPath = (
     const midX = (x1 + x2) / 2;
     path = `M ${x1} ${y1} L ${midX} ${controlPoint1Y} L ${x2} ${y2}`;
   }
-  console.log('!!path', path);
   return new Path(path).path;
 };
 
 class X_Connector extends Path {
-  constructor(
-    x1,
-    y1,
-    x2,
-    y2,
-    controlPoint1X,
-    controlPoint1Y,
-    controlPoint2X,
-    controlPoint2Y,
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  controlPoint1X: number;
+  controlPoint1Y: number;
+  controlPoint2X: number;
+  controlPoint2Y: number;
+  offset: XY;
+  style: any;
+  prevLeft: number;
+  prevTop: number;
+  preCenter: Point;
+  preTransform: TMat2D | null;
 
-    left,
-    top,
-    style,
+  constructor(
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number,
+    controlPoint1X: number,
+    controlPoint1Y: number,
+    controlPoint2X: number,
+    controlPoint2Y: number,
+    left: number,
+    top: number,
+    style: any,
     options = {}
   ) {
     const path = getPath(
@@ -90,6 +103,7 @@ class X_Connector extends Path {
     });
 
     this.controls = {
+      ...createObjectDefaultControls,
       start: new Control({
         x: 0,
         y: 0,
@@ -101,7 +115,7 @@ class X_Connector extends Path {
         // positionHandler: this._positionStartControl.bind(this),
         actionHandler: this.dragActionHandler.bind(this, 'start'),
         cursorStyle: 'crosshair',
-        render: this._renderControl,
+        render: this._renderControl.bind(this, 'start'),
       }),
       end: new Control({
         x: 0,
@@ -113,7 +127,7 @@ class X_Connector extends Path {
         positionHandler: this._positionControl.bind(this),
         actionHandler: this.dragActionHandler.bind(this, 'end'),
         cursorStyle: 'crosshair',
-        render: this._renderControl,
+        render: this._renderControl.bind(this, 'end'),
       }),
       control1: new Control({
         x: 0,
@@ -125,7 +139,7 @@ class X_Connector extends Path {
         positionHandler: this._positionControl.bind(this),
         actionHandler: this.dragActionHandler.bind(this, 'control1'),
         cursorStyle: 'crosshair',
-        render: this._renderControl,
+        render: this._renderControl.bind(this, 'control1'),
       }),
       control2: new Control({
         x: 0,
@@ -137,71 +151,37 @@ class X_Connector extends Path {
         positionHandler: this._positionControl.bind(this),
         actionHandler: this.dragActionHandler.bind(this, 'control2'),
         cursorStyle: 'crosshair',
-        render: this._renderControl,
+        render: this._renderControl.bind(this, 'control2'),
       }),
     };
-
-    // this.on('moving', this._onMoving.bind(this));
-
-    // this.updatePath();
   }
 
-  //   _onMoving(event) {
-  //     const target = event.transform.target;
-  //     const deltaX = target.left - target.prevLeft;
-  //     const deltaY = target.top - target.prevTop;
-  //     this.set({
-  //       x1: this.x1 + deltaX,
-  //       y1: this.y1 + deltaY,
-  //       x2: this.x2 + deltaX,
-  //       y2: this.y2 + deltaY,
-  //     });
-  //   }
-  /**
-   * @private
-   * @param {Object} [options] Options
-   */
-  /**
-   * @private
-   * @param {Object} [options] Options
-   */
-  _setWidthHeight() {
-    const { x1, y1, x2, y2 } = this;
-    this.width = Math.abs(x2 - x1);
-    this.height = Math.abs(y2 - y1);
-    const { left, top, width, height } = makeBoundingBoxFromPoints([
-      { x: x1, y: y1 },
-      { x: x2, y: y2 },
-    ]);
-    const position = new Point(left + width / 2, top + height / 2);
-    this.setPositionByOrigin(position, CENTER, CENTER);
-  }
-  _mouseDownControl(eventData, transform, x, y) {
-    console.log('###mouseDownControl###');
-    transform.target.prevLeft = transform.target.left;
-    transform.target.prevTop = transform.target.top;
-    transform.target.preCenter = transform.target.getCenterPoint();
-    transform.target.preTransform = transform.target.calcTransformMatrix();
-    console.log('###preTransform:', transform.target.preCenter);
+  _mouseDownControl(
+    eventData: any,
+    transform: Transform,
+    x: number,
+    y: number
+  ) {
+    this.prevLeft = transform.target.left;
+    this.prevTop = transform.target.top;
+    this.preCenter = transform.target.getCenterPoint();
+    this.preTransform = transform.target.calcTransformMatrix();
   }
 
-  _mouseUpControl(eventData, transform, x, y) {
-    // transform.target.setDimensions();
+  _mouseUpControl(eventData: any, transform: Transform, x: number, y: number) {
+    this.updatePath(false);
+    this.setBoundingBox(false);
     transform.target.setCoords();
-
-    console.log('###mouseUpControl###', transform.target.getCenterPoint());
-
     const offset = {
-      x: transform.target.getCenterPoint().x - transform.target.preCenter.x,
-      y: transform.target.getCenterPoint().y - transform.target.preCenter.y,
+      x: transform.target.getCenterPoint().x - this.preCenter.x,
+      y: transform.target.getCenterPoint().y - this.preCenter.y,
     };
-    console.log('###offset:', offset);
     // loop all the controls and update the offset
     this.updateControlOffsets(transform.target, new Point(offset));
-    delete transform.target.prevLeft;
-    delete transform.target.prevTop;
-    delete transform.target.preCenter;
-    delete transform.target.preTransform;
+    this.prevLeft = 0;
+    this.prevTop = 0;
+    this.preCenter = new Point(0, 0);
+    this.preTransform = null;
   }
 
   _positionControl(
@@ -218,10 +198,30 @@ class X_Connector extends Path {
     return result;
   }
 
+  onStartPointMoving(
+    eventData: any,
+    transform: Transform,
+    x: number,
+    y: number
+  ) {}
+
+  onEndPointMoving(
+    eventData: any,
+    transform: Transform,
+    x: number,
+    y: number
+  ) {}
+
   //responding to control movement
   //control is the control being moved
   //eventData is the mouse event
-  dragActionHandler(controlType, eventData, transform, x, y) {
+  dragActionHandler(
+    controlType: string,
+    eventData: any,
+    transform: Transform,
+    x: number,
+    y: number
+  ) {
     const target = transform.target;
     // const relevantPoint = getLocalPoint(transform, 'center', 'top', x, y);
 
@@ -232,15 +232,6 @@ class X_Connector extends Path {
 
     relevantPoint.x = parseInt(relevantPoint.x.toString());
     relevantPoint.y = parseInt(relevantPoint.y.toString());
-
-    // console.log(
-    //   '###!! canvas point:',
-    //   x,
-    //   y,
-    //   '### object point:',
-    //   relevantPoint.x,
-    //   relevantPoint.y
-    // );
 
     switch (controlType) {
       case 'start':
@@ -273,16 +264,11 @@ class X_Connector extends Path {
         break;
     }
 
-    target.updatePath();
-
-    //reset the left/top of the target to the current left/top
-    // target.setBoundingBox(true);
-
-    // this._setWidthHeight();
-    // target.setDimensions();
+    const isMoving = true;
+    this.updatePath(isMoving);
 
     target.dirty = true;
-    target.canvas.requestRenderAll();
+    target.canvas?.requestRenderAll();
 
     return true;
   }
@@ -313,18 +299,34 @@ class X_Connector extends Path {
     target.controlPoint2Y = target.controlPoint2Y - offsetY;
   }
 
-  _renderControl(ctx, left, top, styleOverride, fabricObject) {
+  _renderControl(
+    controlType: string,
+    ctx: any,
+    left: number,
+    top: number,
+    styleOverride: any,
+    fabricObject: FabricObject
+  ) {
+    let color = 'white';
+    if (controlType === 'start' || controlType === 'end') {
+      color = 'white';
+    }
+    if (controlType === 'control1' || controlType === 'control2') {
+      color = 'blue';
+    }
+
     ctx.save();
-    ctx.fillStyle = 'red';
-    ctx.strokeStyle = 'red';
+    ctx.fillStyle = color;
+    ctx.strokeStyle = 'gray';
     ctx.beginPath();
     ctx.arc(left, top, 5, 0, Math.PI * 2, false);
     ctx.closePath();
     ctx.fill();
+    ctx.stroke();
     ctx.restore();
   }
 
-  updatePath() {
+  updatePath(isMoving = false) {
     const path = getPath(
       this.x1,
       this.y1,
@@ -335,10 +337,24 @@ class X_Connector extends Path {
       this.controlPoint2X,
       this.controlPoint2Y,
       this.pathOffset,
-      this.style
+      this.style,
+      isMoving
     );
     this.set({ path });
     this.dirty = true;
+  }
+  setBoundingBox(adjustPosition?: boolean) {
+    const preMatrix = this.calcTransformMatrix();
+    const { left, top, width, height, pathOffset } = this._calcDimensions();
+    //the new left/top after transformation
+    const newLeftTop = new Point(left, top).transform(preMatrix);
+    this.set({
+      left: newLeftTop.x,
+      top: newLeftTop.y,
+      width,
+      height,
+      pathOffset,
+    });
   }
 }
 
@@ -352,29 +368,9 @@ const TransformPointFromObjectToCanvas = (object, point) => {
   return transformedPoint;
 };
 
-window.sendPointToPlane = sendPointToPlane;
-window.Point = Point;
-
-const TransformPointFromCanvasToObject = (object, point) => {
-  //   const result = sendPointToPlane(
-  //     point,
-  //     object.canvas.viewportTransform,
-  //     object.calcTransformMatrix()
-  //   );
-  //   return result;
-  //   return new Point(point).transform(
-  //     invertTransform(
-  //       multiplyTransformMatrices(
-  //         object.getViewportTransform(),
-  //         object.calcTransformMatrix()
-  //       )
-  //     )
-  //   );
+export const TransformPointFromCanvasToObject = (object, point) => {
   const mObject = object.calcTransformMatrix();
-  //   const mCanvas = object.getViewportTransform();
-  //   const matrix = multiplyTransformMatrices(mCanvas, mObject);
   const invertedMatrix = invertTransform(mObject);
   const transformedPoint = point.transform(invertedMatrix);
   return transformedPoint;
 };
-window.TransformPointFromCanvasToObject = TransformPointFromCanvasToObject;
