@@ -50,7 +50,7 @@ const Homepage = () => {
                 <Grid item xs={12} md={4} component="div" >
                     <Card variant="outlined">
                         <Box textAlign="center" p={2}>
-                            <Typography level="h2">Arrow</Typography>
+                            <Typography level="h2">Connector</Typography>
                             <Button variant="solid" onClick={() => { router.push('/connector') }} >
                                 Connector
                             </Button>

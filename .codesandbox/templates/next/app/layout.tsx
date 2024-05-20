@@ -58,13 +58,13 @@ export default function MyApp({ children }: { children: React.ReactNode }) {
                             </Link>
                             <Divider orientation="vertical" />
                             <Link
-                                href=" /"
+                                href="/connector"
                             >
                                 CONNECTOR
                             </Link>
                             <Divider orientation="vertical" />
                             <Link
-                                href=" /align"
+                                href="/align"
                             >
                                 ALIGNMENT
                             </Link>
@@ -73,6 +73,12 @@ export default function MyApp({ children }: { children: React.ReactNode }) {
                                 href=" /draw"
                             >
                                 DRAW
+                            </Link>
+                            <Divider orientation="vertical" />
+                            <Link
+                                href=" /polygon"
+                            >
+                                POLYGON
                             </Link>
                         </Sheet>
                     </Container>

@@ -1,4 +1,4 @@
-import * as fabric from 'fabric';
+import * as fabric from '../../../../fabric';
 import React, { useEffect, useRef, useState } from 'react';
 import MiniCanvas from './preview/MiniCanvas';
 

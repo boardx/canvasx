@@ -180,3 +180,4 @@ export {
 } from './src/shapes/canvasx';
 
 export { WBCanvas } from './src/canvas/canvasx/bx-canvas';
+export { X_Connector } from './src/shapes/canvasx/X_Connector';

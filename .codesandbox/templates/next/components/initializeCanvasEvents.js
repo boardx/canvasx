@@ -780,11 +780,9 @@ function checkNonMacTrackpad(e, isFirefox) {
 // let timer = null;
 
 export function mouseWheelListener(e) {
-  console.log('mouseWheelListener', e.ctrlKey)
   e.preventDefault();
   e.stopPropagation();
   const isTrackpad = checkIsTrackpad(e) && !e.ctrlKey;
-  console.log('isTrackpad', isTrackpad)
 
   if (e.buttons !== 0) {
     // console.log('e.buttons !== 0', e)
@@ -813,7 +811,7 @@ export function mouseWheelListener(e) {
 
   if (isTrackpad) {
 
-    console.log(e.deltaX, e.deltaY);
+
 
     const delta = { x: 0, y: 0 };
     delta.x -= e.deltaX;
@@ -826,7 +824,7 @@ export function mouseWheelListener(e) {
     canvas.isEnablePanMoving = true;
 
     // canvas.relativePan(canvas.mouse.delta);
-    console.log('delta', delta)
+    // console.log('delta', delta)
     canvas.relativePan(delta)
 
     // canvas.updateViewportToLocalStorage(canvas.viewportTransform);
