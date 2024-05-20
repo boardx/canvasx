@@ -2,6 +2,7 @@ import { Path } from '../Path';
 import { Control } from '../../controls/Control';
 import {
   invertTransform,
+  makeBoundingBoxFromPoints,
   multiplyTransformMatrices,
   sendPointToPlane,
 } from '../../util';
@@ -9,6 +10,7 @@ import { Point, XY } from '../../Point';
 import { transformPoint } from '../../util';
 import { TMat2D } from '../../typedefs';
 import { InteractiveFabricObject } from '../Object/InteractiveObject';
+import { CENTER } from '../../constants';
 
 const getPath = (
   x1: number,
@@ -159,18 +161,21 @@ class X_Connector extends Path {
    * @private
    * @param {Object} [options] Options
    */
-  //   _setWidthHeight() {
-  //     const { x1, y1, x2, y2 } = this;
-  //     this.width = Math.abs(x2 - x1);
-  //     this.height = Math.abs(y2 - y1);
-  //     const { left, top, width, height } = makeBoundingBoxFromPoints([
-  //       { x: x1 + this.left, y: y1 + this.top },
-  //       { x: x2 + this.left, y: y2 + this.top },
-  //     ]);
-  //     const position = new Point(left + width / 2, top + height / 2);
-  //     this.setPositionByOrigin(position, CENTER, CENTER);
-  //   }
-
+  /**
+   * @private
+   * @param {Object} [options] Options
+   */
+  _setWidthHeight() {
+    const { x1, y1, x2, y2 } = this;
+    this.width = Math.abs(x2 - x1);
+    this.height = Math.abs(y2 - y1);
+    const { left, top, width, height } = makeBoundingBoxFromPoints([
+      { x: x1, y: y1 },
+      { x: x2, y: y2 },
+    ]);
+    const position = new Point(left + width / 2, top + height / 2);
+    this.setPositionByOrigin(position, CENTER, CENTER);
+  }
   _mouseDownControl(eventData, transform, x, y) {
     console.log('###mouseDownControl###');
     transform.target.prevLeft = transform.target.left;
@@ -181,8 +186,9 @@ class X_Connector extends Path {
   }
 
   _mouseUpControl(eventData, transform, x, y) {
-    transform.target.setDimensions();
+    // transform.target.setDimensions();
     transform.target.setCoords();
+
     console.log('###mouseUpControl###', transform.target.getCenterPoint());
 
     const offset = {
