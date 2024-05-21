@@ -25,7 +25,7 @@ WBCanvas.prototype.removeById = function (id) {
 
 WBCanvas.prototype.findById = function (id: string) {
   const canvas = this;
-  const obj = canvas?.getObjects().filter((widget: any) => widget._id === id);
+  const obj = canvas?.getObjects().filter((widget: any) => widget.id === id);
   if (obj.length === 0) return null;
   return obj[0];
 };
@@ -191,7 +191,7 @@ WBCanvas.prototype.captureThumbnail = function () {
 WBCanvas.prototype.getObjectByID = function (id) {
   const self = this;
 
-  const objs = self.getObjects().filter((obj:any) => obj._id === id);
+  const objs = self.getObjects().filter((obj: any) => obj._id === id);
 
   if (objs.length > 0) return objs[0];
 

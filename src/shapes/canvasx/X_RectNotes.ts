@@ -3,7 +3,10 @@
 import { classRegistry } from '../../ClassRegistry';
 import { Textbox } from './X_Textbox';
 import { createRectNotesDefaultControls } from '../../controls/X_commonControls';
-import type { TClassProperties } from '../../typedefs';
+import type { TBBox, TClassProperties } from '../../typedefs';
+import { Point } from '../../Point';
+import { X_Connector } from './X_Connector';
+import { invertTransform } from '../../util';
 
 // this will be a separated effort
 export const rectNotesDefaultValues: Partial<TClassProperties<RectNotes>> = {
@@ -44,7 +47,8 @@ export class RectNotes extends Textbox {
 
   declare zIndex: number;
   declare maxHeight: number;
-  declare lines: object[];
+  declare connectors: object[];
+  declare id: string;
 
   public extendPropeties = [
     'obj_type',
@@ -88,6 +92,146 @@ export class RectNotes extends Textbox {
       controls: createRectNotesDefaultControls(),
       ...RectNotes.ownDefaults,
     };
+  }
+  constructor(
+    text: string,
+    options: Partial<TClassProperties<RectNotes>> = {}
+  ) {
+    super(text, options);
+    this.initializeEvent();
+  }
+
+  findById(id: string) {
+    const canvas = this.canvas;
+    const obj = canvas?.getObjects().filter((widget: any) => widget.id === id);
+    if (obj.length === 0) return null;
+    return obj[0];
+  }
+
+  calculateControlPoint(boundingBox: TBBox, connectingPoint: Point): Point {
+    const left = boundingBox.left;
+    const top = boundingBox.top;
+    const width = boundingBox.width;
+    const height = boundingBox.height;
+
+    const right = left + width;
+    const bottom = top + height;
+
+    const connectingX = connectingPoint.x;
+    const connectingY = connectingPoint.y;
+
+    let controlX: number;
+    let controlY: number;
+
+    // Find the nearest border and calculate the control point outside the bounding box
+    const distances = [
+      { side: 'left', distance: Math.abs(connectingX - left) },
+      { side: 'right', distance: Math.abs(connectingX - right) },
+      { side: 'top', distance: Math.abs(connectingY - top) },
+      { side: 'bottom', distance: Math.abs(connectingY - bottom) },
+    ];
+
+    const nearestBorder = distances.reduce((min, current) =>
+      current.distance < min.distance ? current : min
+    );
+
+    switch (nearestBorder.side) {
+      case 'left':
+        controlX = left - 220;
+        controlY = connectingY;
+        break;
+      case 'right':
+        controlX = right + 220;
+        controlY = connectingY;
+        break;
+      case 'top':
+        controlX = connectingX;
+        controlY = top - 220;
+        break;
+      case 'bottom':
+        controlX = connectingX;
+        controlY = bottom + 220;
+        break;
+    }
+
+    return { x: controlX, y: controlY };
+  }
+
+  updateConnector(point, connector: X_Connector, type: string) {
+    const controlPoint = this.calculateControlPoint(
+      this.getBoundingRect(),
+      new Point(point.x, point.y)
+    );
+
+    //if the connector is from the object, then the startpoint should be updated
+    //if the connector is to the object, then the endpoint should be updated
+
+    //recalculate the startpoint or endpoint of the connector, and also the ControlPoint
+    if (type === 'from') {
+      connector.startPoint = point;
+      connector.control1 = controlPoint;
+      connector.update({
+        fromPoint: point,
+        control1: controlPoint,
+      });
+    }
+    if (type === 'to') {
+      connector.endPoint = point;
+      connector.control2 = controlPoint;
+      connector.update({
+        toPoint: point,
+        control2: controlPoint,
+      });
+    }
+  }
+
+  initializeEvent() {
+    this.on('moving', function (e) {
+      //get the canvas point accordin gto the event
+      const canvas = this.canvas;
+
+      //if there is a connector, move the connector
+      if (this.connectors?.length === 0) return;
+      this.connectors.forEach((connector) => {
+        const pointConnector = connector.point;
+
+        //get canvas point of the connector point
+        const point = new Point(pointConnector.x, pointConnector.y);
+
+        const transformedPoint = TransformPointFromObjectToCanvas(this, point);
+
+        //use the connectorId to find the connector and then update the connector
+        const connectorObj = this.findById(connector.connectorId);
+        console.log(
+          '!!point currentWidget:',
+          this.id,
+          'connector',
+          connector,
+          'target Connector:',
+          connectorObj.id,
+          'from:',
+          connectorObj.fromId,
+          'to',
+          connectorObj.toId,
+          pointConnector,
+          transformedPoint
+        );
+
+        if (!connectorObj) return;
+        console.log('connectorObj', connectorObj);
+
+        if (this.id === connectorObj.fromId) {
+          this.updateConnector(transformedPoint, connectorObj, 'from');
+        }
+
+        if (this.id === connectorObj.toId) {
+          this.updateConnector(transformedPoint, connectorObj, 'to');
+        }
+      });
+
+      console.log('moving', e);
+      console.log('moving', this);
+    });
   }
 
   /**
@@ -639,3 +783,28 @@ export class RectNotes extends Textbox {
 
 classRegistry.setClass(RectNotes);
 classRegistry.setSVGClass(RectNotes, 'RectNotes');
+
+const TransformPointFromObjectToCanvas = (
+  object: FabricObject,
+  point: Point
+) => {
+  const mObject = object.calcOwnMatrix();
+  // const mCanvas = object.getViewportTransform();
+  // const matrix = multiplyTransformMatrices(mCanvas, mObject);
+  const transformedPoint = point.transform(mObject); // transformPoint(point, matrix);
+  return transformedPoint;
+};
+
+export const TransformPointFromCanvasToObject = (
+  object: FabricObject,
+  point: Point
+) => {
+  const mObject = object.calcOwnMatrix();
+  // const mCanvas = object.canvas!.viewportTransform;
+  // const matrix = multiplyTransformMatrices(mCanvas, mObject);
+  const invertedMatrix = invertTransform(mObject);
+  const transformedPoint = point.transform(invertedMatrix);
+  return transformedPoint;
+};
+window.TransformPointFromObjectToCanvas = TransformPointFromObjectToCanvas;
+window.TransformPointFromCanvasToObject = TransformPointFromCanvasToObject;

@@ -40,10 +40,12 @@ const IndexPage: NextPage = () => {
                         left: 200 + j * 900,
                         textAlign: 'center',
                         textValue,
+                        connectors: [],
                         backgroundColor: 'lightblue',
-                        _id: Math.random().toString(36).substr(2, 9),
+                        id: Math.random().toString(36).substr(2, 9),
                     });
                     canvas.add(rectNoteA);
+
 
                     rectNoteB = new fabric.RectNotes(textValue, {
                         originX: 'center',
@@ -51,8 +53,9 @@ const IndexPage: NextPage = () => {
                         left: 700 + j * 900,
                         textAlign: 'center',
                         textValue,
+                        connectors: [],
                         backgroundColor: 'lightblue',
-                        _id: Math.random().toString(36).substr(2, 9),
+                        id: Math.random().toString(36).substr(2, 9),
                     });
                     canvas.add(rectNoteB);
                     console.log('points combine: ', connectDock1[i], connectDock2[j]);
@@ -88,8 +91,8 @@ const IndexPage: NextPage = () => {
                     let cp1 = { x: 0, y: 0 }, cp2 = { x: 0, y: 0 };
 
 
-                    cp1 = calculateControlPoint(rectNoteA.getBoundingRect(), point1);
-                    cp2 = calculateControlPoint(rectNoteB.getBoundingRect(), point2);
+                    cp1 = rectNoteA.calculateControlPoint(rectNoteA.getBoundingRect(), point1);
+                    cp2 = rectNoteB.calculateControlPoint(rectNoteB.getBoundingRect(), point2);
 
 
                     const style = 'curved';
@@ -102,10 +105,21 @@ const IndexPage: NextPage = () => {
                         hasBorders: false,
                         hasControls: true,
                         selectable: true,
+                        fromId: null,
+                        toId: null,
                         perPixelTargetFind: true,
+                        id: Math.random().toString(36).substr(2, 9),
                     });
 
                     canvas.add(curve);
+
+
+                    //add connecter id to rectNote's field connectors as an object, {connectorId: string, point: {x: number, y: number}} the point shouldb be t he local point to the rectNote.
+                    rectNoteA.connectors.push({ connectorId: curve.id, point: { x: point1.x - rectNoteA.left, y: point1.y - rectNoteA.top } });
+                    rectNoteB.connectors.push({ connectorId: curve.id, point: { x: point2.x - rectNoteB.left, y: point2.y - rectNoteB.top } });
+                    //add rectNote's id to the connector's field connectedRectNotes as an array of string
+                    curve.fromId = rectNoteA.id;
+                    curve.toId = rectNoteB.id;
 
                 }
             }
@@ -325,68 +339,5 @@ const IndexPage: NextPage = () => {
 
 export default IndexPage;
 
-interface BoundingBox {
-    left: number;
-    top: number;
-    width: number;
-    height: number;
-}
 
-interface Point {
-    x: number;
-    y: number;
-}
 
-function calculateControlPoint(boundingBox: BoundingBox, connectingPoint: Point): Point {
-    const left = boundingBox.left;
-    const top = boundingBox.top;
-    const width = boundingBox.width;
-    const height = boundingBox.height;
-
-    const right = left + width;
-    const bottom = top + height;
-
-    const connectingX = connectingPoint.x;
-    const connectingY = connectingPoint.y;
-
-    let controlX: number;
-    let controlY: number;
-
-    // Find the nearest border and calculate the control point outside the bounding box
-    const distances = [
-        { side: 'left', distance: Math.abs(connectingX - left) },
-        { side: 'right', distance: Math.abs(connectingX - right) },
-        { side: 'top', distance: Math.abs(connectingY - top) },
-        { side: 'bottom', distance: Math.abs(connectingY - bottom) }
-    ];
-
-    const nearestBorder = distances.reduce((min, current) => current.distance < min.distance ? current : min);
-
-    switch (nearestBorder.side) {
-        case 'left':
-            controlX = left - 220;
-            controlY = connectingY;
-            break;
-        case 'right':
-            controlX = right + 220;
-            controlY = connectingY;
-            break;
-        case 'top':
-            controlX = connectingX;
-            controlY = top - 220;
-            break;
-        case 'bottom':
-            controlX = connectingX;
-            controlY = bottom + 220;
-            break;
-    }
-
-    return { x: controlX, y: controlY };
-}
-
-// Example usage
-const boundingBox: BoundingBox = { left: 1884.5, top: 2850.5, width: 231, height: 139 };
-const connectingPoint: Point = { x: 2115.5, y: 2920 };
-
-const controlPoint = calculateControlPoint(boundingBox, connectingPoint);
-console.log(controlPoint);

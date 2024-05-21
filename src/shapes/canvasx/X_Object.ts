@@ -23,7 +23,7 @@ FabricObject.prototype.minScaleLimit = 0.01;
 FabricObject.prototype.cornerColor = 'black';
 FabricObject.prototype.cornerStrokeColor = 'black';
 FabricObject.prototype.cornerStyle = 'circle';
-FabricObject.prototype._id = '';
+FabricObject.prototype.id = '';
 
 FabricObject.prototype.getText = function () {
   return this.text ? this.text : '';
@@ -652,6 +652,9 @@ FabricObject.prototype.initialize = function (options) {
     } else {
       self.hoverCursor = 'default';
     }
+  });
+  self.on('moving', (e) => {
+    console.log(e);
   });
 };
 

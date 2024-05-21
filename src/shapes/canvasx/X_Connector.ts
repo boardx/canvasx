@@ -5,7 +5,6 @@ import { Point, XY } from '../../Point';
 import { TMat2D } from '../../typedefs';
 import { InteractiveFabricObject } from '../Object/InteractiveObject';
 import { createObjectDefaultControls } from '../../controls/commonControls';
-import { Transform } from '../../EventTypeDefs';
 import { FabricObject } from '../Object/Object';
 
 const getPath = (
@@ -42,6 +41,9 @@ class X_Connector extends Path {
   prevTop: number;
   preCenter: Point;
   preTransform: TMat2D | null;
+  fromObjectId: string;
+  toObjectId: string;
+  id: string;
 
   constructor(
     fromPoint: XY,
@@ -80,6 +82,15 @@ class X_Connector extends Path {
       this,
       new Point(control2)
     );
+    // if (!this.canvas) return;
+    // let from = new Point(fromPoint).transform(this.canvas!.viewportTransform);
+    // let to = new Point(toPoint).transform(this.canvas!.viewportTransform);
+    // let control11 = new Point(control1).transform(
+    //   this.canvas!.viewportTransform
+    // );
+    // let control21 = new Point(control2).transform(
+    //   this.canvas!.viewportTransform
+    // );
 
     this.set({
       fromPoint: localFromPoint,
@@ -154,6 +165,170 @@ class X_Connector extends Path {
     });
   }
 
+  update({ fromPoint, toPoint, control1, control2, style }: any) {
+    let localFromPoint, localToPoint, localControl1, localControl2;
+
+    let newFrom, newTo, newControl1, newControl2;
+
+    if (fromPoint) {
+      newFrom = fromPoint;
+      localFromPoint = TransformPointFromCanvasToObject(
+        this,
+        new Point(fromPoint)
+      );
+    } else {
+      localFromPoint = this.fromPoint;
+      newFrom = TransformPointFromObjectToCanvas(
+        this,
+        new Point(this.fromPoint)
+      );
+    }
+
+    if (toPoint) {
+      newTo = toPoint;
+      localToPoint = TransformPointFromCanvasToObject(this, new Point(toPoint));
+      //   this.toPoint = localToPoint;
+    } else {
+      localToPoint = this.toPoint;
+      newTo = TransformPointFromObjectToCanvas(this, new Point(this.toPoint));
+    }
+    if (control1) {
+      newControl1 = control1;
+      localControl1 = TransformPointFromCanvasToObject(
+        this,
+        new Point(control1)
+      );
+    } else {
+      localControl1 = this.control1;
+      newControl1 = TransformPointFromObjectToCanvas(
+        this,
+        new Point(this.control1)
+      );
+    }
+
+    if (control2) {
+      newControl2 = control2;
+      localControl2 = TransformPointFromCanvasToObject(
+        this,
+        new Point(control2)
+      );
+    } else {
+      localControl2 = this.control2;
+      newControl2 = TransformPointFromObjectToCanvas(
+        this,
+        new Point(this.control2)
+      );
+    }
+    if (style) {
+      this.style = style;
+    }
+
+    Object.assign(this, {
+      fromPoint: newFrom,
+      toPoint: newTo,
+      control1: newControl1,
+      control2: newControl2,
+      style,
+    });
+    console.log(
+      'fromPoint',
+      newFrom,
+      'toPoint',
+      newTo,
+      'control1',
+      newControl1,
+      'control2',
+      newControl2,
+      'style',
+      style
+    );
+    this.updatePath(false);
+
+    this.set({
+      fromPoint: localFromPoint,
+      toPoint: localToPoint,
+      control1: localControl1,
+      control2: localControl2,
+      style,
+    });
+
+    this.updateControlOffsets(this, new Point(0, 0));
+    // const path = getPath(
+    //   fromPoint
+    //     ? fromPoint
+    //     : TransformPointFromObjectToCanvas(this, new Point(this.fromPoint)),
+    //   toPoint
+    //     ? toPoint
+    //     : TransformPointFromObjectToCanvas(this, new Point(this.toPoint)),
+    //   control1
+    //     ? control1
+    //     : TransformPointFromObjectToCanvas(this, new Point(this.control1)),
+    //   control2
+    //     ? control2
+    //     : TransformPointFromObjectToCanvas(this, new Point(this.control2)),
+    //   { x: 0, y: 0 },
+    //   style
+    // );
+    // console.log('path', path);
+    // this.set({ path });
+
+    // this.initialize();
+    this.canvas?.renderAll();
+    // this.controls = {
+    //   ...createObjectDefaultControls,
+    //   start: new Control({
+    //     x: 0,
+    //     y: 0,
+    //     offsetX: this.fromPoint.x,
+    //     offsetY: this.fromPoint.y,
+    //     mouseDownHandler: this._mouseDownControl.bind(this),
+    //     mouseUpHandler: this._mouseUpControl.bind(this),
+    //     positionHandler: this._positionControl.bind(this),
+    //     actionHandler: this.dragActionHandler.bind(this, 'start'),
+    //     cursorStyle: 'crosshair',
+    //     render: this._renderControl.bind(this, 'start'),
+    //   }),
+    //   end: new Control({
+    //     x: 0,
+    //     y: 0,
+    //     offsetX: this.toPoint.x,
+    //     offsetY: this.toPoint.y,
+    //     mouseDownHandler: this._mouseDownControl.bind(this),
+    //     mouseUpHandler: this._mouseUpControl.bind(this),
+    //     positionHandler: this._positionControl.bind(this),
+    //     actionHandler: this.dragActionHandler.bind(this, 'end'),
+    //     cursorStyle: 'crosshair',
+    //     render: this._renderControl.bind(this, 'end'),
+    //   }),
+    //   control1: new Control({
+    //     x: 0,
+    //     y: 0,
+    //     offsetX: this.control1.x,
+    //     offsetY: this.control1.y,
+    //     mouseDownHandler: this._mouseDownControl.bind(this),
+    //     mouseUpHandler: this._mouseUpControl.bind(this),
+    //     positionHandler: this._positionControl.bind(this),
+    //     actionHandler: this.dragActionHandler.bind(this, 'control1'),
+    //     cursorStyle: 'crosshair',
+    //     render: this._renderControl.bind(this, 'control1'),
+    //   }),
+    //   control2: new Control({
+    //     x: 0,
+    //     y: 0,
+    //     offsetX: this.control2.x,
+    //     offsetY: this.control2.y,
+    //     mouseDownHandler: this._mouseDownControl.bind(this),
+    //     mouseUpHandler: this._mouseUpControl.bind(this),
+    //     positionHandler: this._positionControl.bind(this),
+    //     actionHandler: this.dragActionHandler.bind(this, 'control2'),
+    //     cursorStyle: 'crosshair',
+    //     render: this._renderControl.bind(this, 'control2'),
+    //   }),
+    // };
+
+    // this.updatePath();
+  }
+
   _mouseDownControl(
     eventData: any,
     transform: Transform,
@@ -188,7 +363,7 @@ class X_Connector extends Path {
     fabricObject: InteractiveFabricObject,
     currentControl: Control
   ) {
-    const result = TransformPointFromObjectToCanvas(
+    const result = TransformPointFromObjectToCanvas2(
       fabricObject,
       new Point({
         x: currentControl.offsetX,
@@ -308,7 +483,7 @@ class X_Connector extends Path {
     }
 
     const drawDottedLine = (targetControl: string) => {
-      const point = TransformPointFromObjectToCanvas(
+      const point = TransformPointFromObjectToCanvas2(
         fabricObject,
         new Point({
           x: this.controls[targetControl].offsetX,
@@ -380,10 +555,10 @@ const TransformPointFromObjectToCanvas = (
   object: FabricObject,
   point: Point
 ) => {
-  const mObject = object.calcTransformMatrix();
-  const mCanvas = object.canvas!.viewportTransform;
-  const matrix = multiplyTransformMatrices(mCanvas, mObject);
-  const transformedPoint = point.transform(matrix); // transformPoint(point, matrix);
+  const mObject = object.calcOwnMatrix();
+  // const mCanvas = object.getViewportTransform();
+  // const matrix = multiplyTransformMatrices(mCanvas, mObject);
+  const transformedPoint = point.transform(mObject); // transformPoint(point, matrix);
   return transformedPoint;
 };
 
@@ -391,8 +566,23 @@ export const TransformPointFromCanvasToObject = (
   object: FabricObject,
   point: Point
 ) => {
-  const mObject = object.calcTransformMatrix();
+  const mObject = object.calcOwnMatrix();
+  // const mCanvas = object.canvas!.viewportTransform;
+  // const matrix = multiplyTransformMatrices(mCanvas, mObject);
   const invertedMatrix = invertTransform(mObject);
   const transformedPoint = point.transform(invertedMatrix);
+  return transformedPoint;
+};
+window.TransformPointFromObjectToCanvas = TransformPointFromObjectToCanvas;
+window.TransformPointFromCanvasToObject = TransformPointFromCanvasToObject;
+
+const TransformPointFromObjectToCanvas2 = (
+  object: FabricObject,
+  point: Point
+) => {
+  const mObject = object.calcTransformMatrix();
+  const mCanvas = object.canvas!.viewportTransform;
+  const matrix = multiplyTransformMatrices(mCanvas, mObject);
+  const transformedPoint = point.transform(matrix); // transformPoint(point, matrix);
   return transformedPoint;
 };
