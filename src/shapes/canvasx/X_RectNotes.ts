@@ -160,9 +160,18 @@ export class RectNotes extends Textbox {
   updateConnector(point, connector: X_Connector, type: string) {
     const controlPoint = this.calculateControlPoint(
       this.getBoundingRect(),
-      new Point(point.x, point.y)
+      new Point(point.x, point.y),
+      type === 'from' ? connector.control1 : connector.control2
     );
 
+    console.log(
+      'updateConnector: point:',
+      point,
+      'control point:',
+      controlPoint,
+      connector,
+      type
+    );
     //if the connector is from the object, then the startpoint should be updated
     //if the connector is to the object, then the endpoint should be updated
 
@@ -185,52 +194,40 @@ export class RectNotes extends Textbox {
     }
   }
 
+  moveOrScaleHandler(e: any) {
+    //if there is a connector, move the connector
+    if (this.connectors?.length === 0) return;
+    this.connectors?.forEach((connector) => {
+      const pointConnector = connector.point;
+
+      //get canvas point of the connector point
+      const point = new Point(pointConnector.x, pointConnector.y);
+
+      const transformedPoint = this.transformPointToCanvas(point);
+
+      //use the connectorId to find the connector and then update the connector
+      const connectorObj = this.findById(connector.connectorId);
+
+      if (!connectorObj) return;
+      console.log('connectorObj', connectorObj);
+
+      if (this.id === connectorObj.fromId) {
+        this.updateConnector(transformedPoint, connectorObj, 'from');
+      }
+
+      if (this.id === connectorObj.toId) {
+        this.updateConnector(transformedPoint, connectorObj, 'to');
+      }
+    });
+  }
+
   initializeEvent() {
-    this.on('moving', function (e) {
-      //get the canvas point accordin gto the event
-      const canvas = this.canvas;
+    this.on('moving', (e) => {
+      this.moveOrScaleHandler(e);
+    });
 
-      //if there is a connector, move the connector
-      if (this.connectors?.length === 0) return;
-      this.connectors.forEach((connector) => {
-        const pointConnector = connector.point;
-
-        //get canvas point of the connector point
-        const point = new Point(pointConnector.x, pointConnector.y);
-
-        const transformedPoint = TransformPointFromObjectToCanvas(this, point);
-
-        //use the connectorId to find the connector and then update the connector
-        const connectorObj = this.findById(connector.connectorId);
-        console.log(
-          '!!point currentWidget:',
-          this.id,
-          'connector',
-          connector,
-          'target Connector:',
-          connectorObj.id,
-          'from:',
-          connectorObj.fromId,
-          'to',
-          connectorObj.toId,
-          pointConnector,
-          transformedPoint
-        );
-
-        if (!connectorObj) return;
-        console.log('connectorObj', connectorObj);
-
-        if (this.id === connectorObj.fromId) {
-          this.updateConnector(transformedPoint, connectorObj, 'from');
-        }
-
-        if (this.id === connectorObj.toId) {
-          this.updateConnector(transformedPoint, connectorObj, 'to');
-        }
-      });
-
-      console.log('moving', e);
-      console.log('moving', this);
+    this.on('scaling', (e) => {
+      this.moveOrScaleHandler(e);
     });
   }
 

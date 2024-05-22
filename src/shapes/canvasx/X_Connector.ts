@@ -20,14 +20,14 @@ const getPath = (
   if (!isMoving) {
     offset = { x: -1, y: -1 };
   }
+
   path = `M ${fromPoint.x + offset.x} ${fromPoint.y + offset.y} C ${
     control1.x + offset.x
   }, ${control1.y + offset.y}, ${control2.x + offset.x} ${
     control2.y + offset.y
   }, ${toPoint.x + offset.x} ${toPoint.y + offset.y}`;
 
-  console.log('path', path);
-  return new Path(path).path;
+  return path;
 };
 
 class X_Connector extends Path {
@@ -159,16 +159,24 @@ class X_Connector extends Path {
     const { left, top, width, height, pathOffset } = this._calcDimensions();
     console.log(' path initialize ', left, top, width, height, pathOffset);
     this.set({
+      left,
+      top,
       width,
       height,
       pathOffset,
     });
+    this.canvas?.renderAll();
   }
 
   update({ fromPoint, toPoint, control1, control2, style }: any) {
     let localFromPoint, localToPoint, localControl1, localControl2;
 
     let newFrom, newTo, newControl1, newControl2;
+
+    this.prevLeft = this.left;
+    this.prevTop = this.top;
+    this.preCenter = this.getCenterPoint();
+    this.preTransform = this.calcTransformMatrix();
 
     if (fromPoint) {
       newFrom = fromPoint;
@@ -231,7 +239,7 @@ class X_Connector extends Path {
       style,
     });
     console.log(
-      'fromPoint',
+      'update path fromPoint',
       newFrom,
       'toPoint',
       newTo,
@@ -243,6 +251,17 @@ class X_Connector extends Path {
       style
     );
     this.updatePath(false);
+    // const path = getPath(
+    //   newFrom,
+    //   newTo,
+    //   newControl1,
+    //   newControl2,
+    //   { x: 0, y: 0 },
+    //   style,
+    //   false
+    // );
+    // this.path = new Path(path).path;
+    // console.log('path', JSON.stringify(this.path));
 
     this.set({
       fromPoint: localFromPoint,
@@ -251,8 +270,24 @@ class X_Connector extends Path {
       control2: localControl2,
       style,
     });
+    // this.initialize();
+    // this.updateControlOffsets(new Point(0, 0));
 
-    this.updateControlOffsets(this, new Point(0, 0));
+    this.updatePath(false);
+    this.setBoundingBox(false);
+    this.setCoords();
+    const offset = {
+      x: this.getCenterPoint().x - this.preCenter.x,
+      y: this.getCenterPoint().y - this.preCenter.y,
+    };
+    // loop all the controls and update the offset
+    this.updateControlOffsets(new Point(offset));
+    this.prevLeft = 0;
+    this.prevTop = 0;
+    this.preCenter = new Point(0, 0);
+    this.preTransform = null;
+
+    // this.setBoundingBox(false);
     // const path = getPath(
     //   fromPoint
     //     ? fromPoint
@@ -274,59 +309,6 @@ class X_Connector extends Path {
 
     // this.initialize();
     this.canvas?.renderAll();
-    // this.controls = {
-    //   ...createObjectDefaultControls,
-    //   start: new Control({
-    //     x: 0,
-    //     y: 0,
-    //     offsetX: this.fromPoint.x,
-    //     offsetY: this.fromPoint.y,
-    //     mouseDownHandler: this._mouseDownControl.bind(this),
-    //     mouseUpHandler: this._mouseUpControl.bind(this),
-    //     positionHandler: this._positionControl.bind(this),
-    //     actionHandler: this.dragActionHandler.bind(this, 'start'),
-    //     cursorStyle: 'crosshair',
-    //     render: this._renderControl.bind(this, 'start'),
-    //   }),
-    //   end: new Control({
-    //     x: 0,
-    //     y: 0,
-    //     offsetX: this.toPoint.x,
-    //     offsetY: this.toPoint.y,
-    //     mouseDownHandler: this._mouseDownControl.bind(this),
-    //     mouseUpHandler: this._mouseUpControl.bind(this),
-    //     positionHandler: this._positionControl.bind(this),
-    //     actionHandler: this.dragActionHandler.bind(this, 'end'),
-    //     cursorStyle: 'crosshair',
-    //     render: this._renderControl.bind(this, 'end'),
-    //   }),
-    //   control1: new Control({
-    //     x: 0,
-    //     y: 0,
-    //     offsetX: this.control1.x,
-    //     offsetY: this.control1.y,
-    //     mouseDownHandler: this._mouseDownControl.bind(this),
-    //     mouseUpHandler: this._mouseUpControl.bind(this),
-    //     positionHandler: this._positionControl.bind(this),
-    //     actionHandler: this.dragActionHandler.bind(this, 'control1'),
-    //     cursorStyle: 'crosshair',
-    //     render: this._renderControl.bind(this, 'control1'),
-    //   }),
-    //   control2: new Control({
-    //     x: 0,
-    //     y: 0,
-    //     offsetX: this.control2.x,
-    //     offsetY: this.control2.y,
-    //     mouseDownHandler: this._mouseDownControl.bind(this),
-    //     mouseUpHandler: this._mouseUpControl.bind(this),
-    //     positionHandler: this._positionControl.bind(this),
-    //     actionHandler: this.dragActionHandler.bind(this, 'control2'),
-    //     cursorStyle: 'crosshair',
-    //     render: this._renderControl.bind(this, 'control2'),
-    //   }),
-    // };
-
-    // this.updatePath();
   }
 
   _mouseDownControl(
@@ -350,7 +332,7 @@ class X_Connector extends Path {
       y: transform.target.getCenterPoint().y - this.preCenter.y,
     };
     // loop all the controls and update the offset
-    this.updateControlOffsets(transform.target, new Point(offset));
+    this.updateControlOffsets(new Point(offset));
     this.prevLeft = 0;
     this.prevTop = 0;
     this.preCenter = new Point(0, 0);
@@ -363,13 +345,11 @@ class X_Connector extends Path {
     fabricObject: InteractiveFabricObject,
     currentControl: Control
   ) {
-    const result = TransformPointFromObjectToCanvas2(
-      fabricObject,
-      new Point({
-        x: currentControl.offsetX,
-        y: currentControl.offsetY,
-      })
-    );
+    const point = {
+      x: currentControl.offsetX,
+      y: currentControl.offsetY,
+    };
+    const result = fabricObject.transformPointToViewport(point);
 
     return result;
   }
@@ -401,13 +381,10 @@ class X_Connector extends Path {
     const target = transform.target;
     // const relevantPoint = getLocalPoint(transform, 'center', 'top', x, y);
 
-    const relevantPoint = TransformPointFromCanvasToObject(
-      target,
-      new Point(x, y)
-    );
-
-    relevantPoint.x = parseInt(relevantPoint.x.toString());
-    relevantPoint.y = parseInt(relevantPoint.y.toString());
+    const relevantPoint = target.transformPointFromCanvas(new Point(x, y));
+    console.log('dragActionHandler', controlType, x, y, relevantPoint);
+    // relevantPoint.x = relevantPoint.x ;
+    // relevantPoint.y = relevantPoint.y ;
 
     switch (controlType) {
       case 'start':
@@ -425,6 +402,7 @@ class X_Connector extends Path {
         target.set({ control1: relevantPoint });
         target.controls['control1'].offsetX = relevantPoint.x;
         target.controls['control1'].offsetY = relevantPoint.y;
+
         break;
       case 'control2':
         target.set({ control2: relevantPoint });
@@ -443,7 +421,8 @@ class X_Connector extends Path {
     return true;
   }
 
-  private updateControlOffsets(target: any, offset: Point = new Point(0, 0)) {
+  private updateControlOffsets(offset: Point = new Point(0, 0)) {
+    const target = this;
     const offsetX = offset.x;
     const offsetY = offset.y;
 
@@ -521,7 +500,7 @@ class X_Connector extends Path {
     ctx.restore();
   }
 
-  updatePath(isMoving = false) {
+  updatePath(isMoving = true) {
     const path = getPath(
       this.fromPoint,
       this.toPoint,
@@ -531,14 +510,19 @@ class X_Connector extends Path {
       this.style,
       isMoving
     );
-    this.set({ path });
+
+    console.log('updatePath', JSON.stringify(path));
+
+    this.path = new Path(path).path;
     this.dirty = true;
   }
   setBoundingBox(adjustPosition?: boolean) {
     const preMatrix = this.calcTransformMatrix();
     const { left, top, width, height, pathOffset } = this._calcDimensions();
+
     //the new left/top after transformation
     const newLeftTop = new Point(left, top).transform(preMatrix);
+
     this.set({
       left: newLeftTop.x,
       top: newLeftTop.y,
@@ -551,7 +535,8 @@ class X_Connector extends Path {
 
 export { X_Connector };
 
-const TransformPointFromObjectToCanvas = (
+// todo: why TransformPointFromObjectToCanvas and TransformPointFromObjectToCanvas2 is different? why it works for one doesn't work for another?
+export const TransformPointFromObjectToCanvas = (
   object: FabricObject,
   point: Point
 ) => {
@@ -576,7 +561,7 @@ export const TransformPointFromCanvasToObject = (
 window.TransformPointFromObjectToCanvas = TransformPointFromObjectToCanvas;
 window.TransformPointFromCanvasToObject = TransformPointFromCanvasToObject;
 
-const TransformPointFromObjectToCanvas2 = (
+export const TransformPointFromObjectToCanvas2 = (
   object: FabricObject,
   point: Point
 ) => {

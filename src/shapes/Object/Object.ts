@@ -1630,5 +1630,16 @@ export class FabricObject<
   }
 }
 
+// import '../canvasx/X_Object';
+
+// FabricObject.prototype.helloWorld = function () {
+//   console.log('Hello World');
+// };
+
+import { FabricObject2 } from '../canvasx/X_Object';
+import { applyMixins } from '../../util/applyMixins';
+applyMixins(FabricObject, [FabricObject2]);
+// Object.assign(FabricObject.prototype, FabricObject2.prototype);
+
 classRegistry.setClass(FabricObject);
 classRegistry.setClass(FabricObject, 'object');

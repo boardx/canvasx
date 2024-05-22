@@ -1,4 +1,3 @@
-import './X_Object';
 import './X_ActiveSelection';
 
 export { alignmentGuideLines } from '../../canvas/canvasx/WBAlignmentGuidelines';

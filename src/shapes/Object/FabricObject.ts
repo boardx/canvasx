@@ -23,6 +23,8 @@ export class FabricObject<
 
 applyMixins(FabricObject, [FabricObjectSVGExportMixin]);
 
+// applyMixins(FabricObject, [FabricObject2]);
+
 classRegistry.setClass(FabricObject);
 classRegistry.setClass(FabricObject, 'object');
 

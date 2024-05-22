@@ -1,3 +1,4 @@
+import { X_Connector } from "../../../../fabric";
 
 
 
@@ -562,6 +563,50 @@ export function initializeCanvasEvents(canvas) {
   //   EventNames.WINDOW_GESTURE_CHANGE,
   //   windowGestureChangeHandler,
   // );
+
+
+
+  // Filter out specific object types during group selection
+  canvas.on('selection:created', function (e) {
+    var activeSelection = canvas.getActiveObject();
+
+    if (activeSelection.type === 'activeselection') {
+      var objects = activeSelection._objects;
+
+      // Filter out the connectors
+      var filteredObjects = objects.filter(function (obj) {
+        return !(obj instanceof X_Connector);
+      });
+
+      if (filteredObjects.length > 0) {
+        // Create a new active selection with the filtered objects
+        var newActiveSelection = new fabric.ActiveSelection(filteredObjects, { canvas: canvas });
+        canvas.setActiveObject(newActiveSelection);
+      } else {
+        canvas.discardActiveObject();
+      }
+
+      canvas.renderAll();
+    }
+  });
+
+  canvas.on('object:moving', function (e) {
+    var activeObject = e.target;
+
+    if (canvas.getActiveObjects().length > 1) {
+      // Multiple objects are selected
+      canvas.getActiveObjects().forEach(function (obj) {
+        if (obj !== activeObject) {
+          // Manually trigger the 'moving' event for each selected object
+          obj.fire('moving', { e: e.e });
+        }
+      });
+    } else {
+      // Single object is moving
+      activeObject.fire('moving', { e: e.e });
+    }
+  });
+
 
   canvas.wrapperEl.addEventListener('wheel', mouseWheelListener, true);
 
