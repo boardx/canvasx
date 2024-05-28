@@ -174,7 +174,7 @@ export * from './src/filters';
 export {
   RectNotes,
   CircleNotes,
-  Textbox,
+  X_Textbox,
   ShapeNotes,
   alignmentGuideLines,
 } from './src/shapes/canvasx';

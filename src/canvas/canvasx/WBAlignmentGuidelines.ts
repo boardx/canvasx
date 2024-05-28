@@ -203,8 +203,8 @@ export class alignmentGuideLines {
     if (
       !this.activeObject ||
       !this.viewportTransform ||
-      this.activeObject.obj_type === 'WBRectPanel' ||
-      this.activeObject.obj_type === 'common' ||
+      this.activeObject.objType === 'WBRectPanel' ||
+      this.activeObject.objType === 'common' ||
       this.activeObject.angle !== 0 ||
       this.activeObject.isPanelTitle
     )
@@ -216,12 +216,12 @@ export class alignmentGuideLines {
     if (
       !currentObject ||
       !currentObject.visible ||
-      currentObject.obj_type === 'WBLine' ||
-      currentObject.obj_type === 'WBArrow' ||
-      currentObject.obj_type === 'common' ||
+      currentObject.objType === 'WBLine' ||
+      currentObject.objType === 'WBArrow' ||
+      currentObject.objType === 'common' ||
       currentObject.group ||
       currentObject === this.activeObject ||
-      currentObject._id === this.activeObject._id ||
+      currentObject.id === this.activeObject.id ||
       !currentObject.isOnScreen()
     ) {
       return true;

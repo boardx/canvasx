@@ -1,4 +1,5 @@
 import { X_Connector } from "../../../../fabric";
+import * as fabric from '../../../../fabric';
 
 
 
@@ -54,7 +55,8 @@ function handleMoving(e, moveSpeeding) {
    */
 
   // Handle when object is near bottom edge
-  if (window.innerHeight - e.y < 50) {
+  if (document.documentElement.clientHeight
+    - e.y < 50) {
     // Move the object down
     canvas.getActiveObject().set('top', canvas.getActiveObject().top + moveSpeeding / canvas.getZoom());
     // Set the object's dirty attribute to true
@@ -84,7 +86,8 @@ function handleMoving(e, moveSpeeding) {
   }
 
   // Handle when object is near right edge
-  if (window.innerWidth - e.x < 50) {
+  if (document.documentElement.clientWidth
+    - e.x < 50) {
     // Move the object to the right
     canvas.getActiveObject().set('left', canvas.getActiveObject().left + moveSpeeding / canvas.getZoom());
     // Set the object's dirty attribute to true
@@ -353,7 +356,7 @@ export function recoverEventsByInteractionMode() {
 //   // Exit the function if an inappropriate mode is selected or a file is being dragged or a click is being processed
 //   if (store.getState().mode.type === 'draw' || store.getState().mode.type === 'line' ||
 //     canvas.isDrawingMode ||
-//     (canvas.getActiveObject() && canvas.getActiveObject().obj_type === 'WBFile') ||
+//     (canvas.getActiveObject() && canvas.getActiveObject().objType === 'WBFile') ||
 //     canvas.mouse.moved
 //   ) {
 //     return;
@@ -364,11 +367,11 @@ export function recoverEventsByInteractionMode() {
 //   // If the target is of a note type and is editable, enter edit mode
 //   if (
 //     target &&
-//     (target.obj_type === 'WBRectNotes' ||
-//       target.obj_type === 'WBCircleNotes' ||
-//       target.obj_type === 'WBTextbox' ||
-//       target.obj_type === 'WBText' ||
-//       target.obj_type === 'WBShapeNotes' ||
+//     (target.objType === 'WBRectNotes' ||
+//       target.objType === 'WBCircleNotes' ||
+//       target.objType === 'WBTextbox' ||
+//       target.objType === 'WBText' ||
+//       target.objType === 'WBShapeNotes' ||
 //       target.type === 'textbox') &&
 //     target.editable &&
 //     !target.isPanel
@@ -380,12 +383,12 @@ export function recoverEventsByInteractionMode() {
 //   // If the target is of a note or image type and is editable, exit the function
 //   if (
 //     target &&
-//     (target.obj_type === 'WBRectNotes' ||
-//       target.obj_type === 'WBCircleNotes' ||
-//       target.obj_type === 'WBUrlImage' ||
-//       target.obj_type === 'WBTextbox' ||
-//       target.obj_type === 'WBText' ||
-//       target.obj_type === 'WBShapeNotes') &&
+//     (target.objType === 'WBRectNotes' ||
+//       target.objType === 'WBCircleNotes' ||
+//       target.objType === 'WBUrlImage' ||
+//       target.objType === 'WBTextbox' ||
+//       target.objType === 'WBText' ||
+//       target.objType === 'WBShapeNotes') &&
 //     target.editable
 //   ) {
 //     return;
@@ -425,7 +428,7 @@ export function recoverEventsByInteractionMode() {
 //     defaultNote.textAlign = nextObject.textAlign;
 //     defaultNote.backgroundColor = nextObject.backgroundColor;
 //     defaultNote.fill = nextObject.fill;
-//     defaultNote.obj_type = nextObject.obj_type;
+//     defaultNote.objType = nextObject.objType;
 //     canvas.changeDefaulNote(defaultNote);
 //   }
 
@@ -434,7 +437,7 @@ export function recoverEventsByInteractionMode() {
 //     // Initialized note properties
 //   }
 
-//   note._id = UtilityService.getInstance().generateWidgetID();
+//   note.id = UtilityService.getInstance().generateWidgetID();
 //   // Create and add widget from note properties
 //   // Rest of the function
 // }
@@ -443,7 +446,7 @@ export function recoverEventsByInteractionMode() {
 function onTextChanged(e) {
   e.target.changed = true;
   //syncObjectChangeToRemote
-  // canvas.syncObjectChangeToRemote(e.target._id, { text: e.target.text });
+  // canvas.syncObjectChangeToRemote(e.target.id, { text: e.target.text });
 }
 
 export function onTextEditingExited(event) {
@@ -452,7 +455,7 @@ export function onTextEditingExited(event) {
   const { target } = event;
 
   // Get the widget with the corresponding id from the widget list
-  const widget = canvas.findById(target._id);
+  const widget = canvas.findById(target.id);
 
   // If the event target hasn't changed, return immediately
   if (!event.target.changed) return;
@@ -964,14 +967,14 @@ export function mouseWheelListener(e) {
         })
       }
       //deal with pic
-      if (obj.obj_type === 'WBImage' && zoom > 0.4) {
+      if (obj.objType === 'WBImage' && zoom > 0.4) {
         if (obj.src) {
           let pic = obj.src.replace('smallPic/', 'bigPic/');
           obj.set({ src: pic });
         }
       }
 
-      if (obj.obj_type === 'WBImage' && zoom < 0.4) {
+      if (obj.objType === 'WBImage' && zoom < 0.4) {
         if (obj.src) {
           let pic = obj.src.replace('bigPic/', 'smallPic/');
           obj.set({ src: pic });

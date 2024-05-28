@@ -91,6 +91,8 @@ export type ObjectToCanvasElementOptions = {
   withoutShadow?: boolean;
   /** Account for canvas viewport transform */
   viewportTransform?: boolean;
+
+  id?: string;
   /** Function to create the output canvas to export onto */
   canvasProvider?: <T extends StaticCanvas>(el?: HTMLCanvasElement) => T;
 };

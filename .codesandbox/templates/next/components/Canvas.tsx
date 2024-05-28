@@ -7,39 +7,44 @@ const DEV_MODE = process.env.NODE_ENV === 'development';
 import { initializeCanvasEvents } from './initializeCanvasEvents';
 
 declare global {
-  var canvas: fabric.Canvas | undefined;
+  var canvas: fabric.WBCanvas | undefined;
 }
 
 export const Canvas = React.forwardRef<
-  fabric.Canvas,
-  { onLoad?(canvas: fabric.Canvas): void }
+  fabric.WBCanvas,
+  { onLoad?(canvas: fabric.WBCanvas): void }
 >(({ onLoad }, ref) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [canvas, setCanvas] = useState(null);
+  const [canvas, setCanvas] = useState(null as fabric.WBCanvas | null);
 
   useEffect(() => {
     if (!canvasRef.current) {
       return;
     }
 
-    const canvas = new fabric.Canvas(canvasRef.current, {
+    const canvas = new fabric.WBCanvas(canvasRef.current, {
       backgroundColor: '#f0f0f0',
-      height: window.innerHeight,
-      width: window.innerWidth - 60,
+      height: document.documentElement.clientHeight
+      ,
+      width: document.documentElement.clientWidth
+        - 60,
     });
     canvas.setTargetFindTolerance(5)
 
-    setCanvas(canvas);
+    setCanvas(canvas); // Update the type of the setCanvas argument
+
     const alignmentGuidelines = new fabric.alignmentGuideLines(canvas);
     alignmentGuidelines.initializeEvents();
     initializeCanvasEvents(canvas);
     const handleResize = () => {
-      canvas.setHeight(window.innerHeight - 60);
-      canvas.setWidth(window.innerWidth);
+      canvas.setHeight(document.documentElement.clientHeight - 60);
+      canvas.setWidth(document.documentElement.clientWidth);
       canvas.renderAll();
     };
 
-    window.addEventListener("resize", handleResize);
+    const resizeObserver = new ResizeObserver(handleResize);
+    resizeObserver.observe(document.documentElement);
+
 
     DEV_MODE && (window.canvas = canvas);
 
@@ -54,6 +59,8 @@ export const Canvas = React.forwardRef<
     onLoad?.(canvas);
 
     return () => {
+      resizeObserver.unobserve(document.documentElement);
+      resizeObserver.disconnect();
       DEV_MODE && delete window.canvas;
 
       if (typeof ref === 'function') {

@@ -1,6 +1,6 @@
 
 'use client';
-import * as fabric from '../../../../../fabric';
+import * as fabric from 'canvasx';
 import { NextPage } from 'next';
 import { useRef, useCallback } from 'react';
 import { Canvas } from '../../components/Canvas';
@@ -9,7 +9,7 @@ import '../../../../../src/shapes/canvasx/X_Object';
 
 // import { RectNotes } from '../../../../src/shapes/RectNotes';
 
-import { Box, Typography } from '@mui/joy';
+import { Box } from '@mui/joy';
 
 const IndexPage: NextPage = () => {
     const ref = useRef<fabric.Canvas>(null);
@@ -19,8 +19,10 @@ const IndexPage: NextPage = () => {
     const onLoad = useCallback(
         (canvas: fabric.Canvas) => {
             canvas.setDimensions({
-                width: window.innerWidth,
-                height: window.innerHeight - 60,
+                width: document.documentElement.clientWidth
+                ,
+                height: document.documentElement.clientHeight
+                    - 60,
             });
             const textValue = 'CanvasX Demo';
             const connectDock1 = ['right', 'left', 'center'];
@@ -40,7 +42,7 @@ const IndexPage: NextPage = () => {
                         top: 500 + i * 300,
                         left: 700 + j * 900,
                         textAlign: 'center',
-
+                        originY: 'center',
                         connectors: [],
                         backgroundColor: 'lightblue',
                         id: Math.random().toString(36).substr(2, 9),
@@ -53,7 +55,7 @@ const IndexPage: NextPage = () => {
                         top: 700 + i * 300,
                         left: 1100 + j * 900,
                         textAlign: 'center',
-
+                        originY: 'center',
                         connectors: [],
                         backgroundColor: 'lightblue',
                         id: Math.random().toString(36).substr(2, 9),
@@ -61,10 +63,10 @@ const IndexPage: NextPage = () => {
                     canvas.add(rectNoteB);
                     console.log('points combine: ', connectDock1[i], connectDock2[j]);
 
-                    let origin1A = connectDock1[i];
-                    let origin1B = connectDock2[j];
-                    let origin2A = connectDock1[j];
-                    let origin2B = connectDock2[j];
+                    let origin1A: any = connectDock1[i];
+                    let origin1B: any = connectDock2[j];
+                    let origin2A: any = connectDock1[j];
+                    let origin2B: any = connectDock2[j];
 
                     if (connectBorder[i] === 'left' || connectBorder[i] === 'right') {
                         origin1A = connectBorder[i];
@@ -103,7 +105,7 @@ const IndexPage: NextPage = () => {
                         strokeWidth: 2,
                         fill: '',
                         objectCaching: false,
-                        hasBorders: true,
+                        hasBorders: false,
                         hasControls: true,
                         selectable: true,
                         fromId: null,
@@ -127,107 +129,107 @@ const IndexPage: NextPage = () => {
 
 
 
+            canvas.viewportTransform = [0.36303101943858546, 0, 0, 0.36303101943858546, -126.07004442771398, -105.08589083809863];
+
+            // // // Create 10 RectNotes
+            // const rectNote1 = new fabric.RectNotes(textValue, {
+            //     originX: 'center',
+            //     top: 100,
+            //     left: 100,
+            //     originY: 'center',
+            //     connectors: [],
+            //     textAlign: 'center',
+            //     width: 138,
+            //     backgroundColor: 'red',
+            //     id: Math.random().toString(36).substr(2, 9),
+            // });
+            // canvas.add(rectNote1);
+
+            // const rectNote2 = new fabric.RectNotes(textValue, {
+            //     originX: 'center',
+            //     top: 300,
+            //     left: 300,
+            //     originY: 'center',
+            //     connectors: [],
+            //     textAlign: 'center',
+            //     width: 138,
+            //     backgroundColor: 'lightblue',
+            //     id: Math.random().toString(36).substr(2, 9),
+            // });
+            // canvas.add(rectNote2);
 
 
-            // // Create 10 RectNotes
-            const rectNote1 = new fabric.RectNotes(textValue, {
-                originX: 'center',
-                top: 100,
-                left: 100,
+            // const point1 = rectNote1.getPointByOrigin('right', 'center');
+            // const point2 = rectNote2.getPointByOrigin('left', 'center');
+            // console.log('points:', point1, point2)
 
-                connectors: [],
-                textAlign: 'center',
-                width: 138,
-                backgroundColor: 'red',
-                id: Math.random().toString(36).substr(2, 9),
-            });
-            canvas.add(rectNote1);
-
-            const rectNote2 = new fabric.RectNotes(textValue, {
-                originX: 'center',
-                top: 300,
-                left: 300,
-
-                connectors: [],
-                textAlign: 'center',
-                width: 138,
-                backgroundColor: 'lightblue',
-                id: Math.random().toString(36).substr(2, 9),
-            });
-            canvas.add(rectNote2);
+            // let cp1 = { x: 0, y: 0 }, cp2 = { x: 0, y: 0 };
 
 
-            const point1 = rectNote1.getPointByOrigin('right', 'center');
-            const point2 = rectNote2.getPointByOrigin('left', 'center');
-            console.log('points:', point1, point2)
+            // cp1 = rectNote1.calculateControlPoint(rectNote1.getBoundingRect(), point1);
+            // cp2 = rectNote2.calculateControlPoint(rectNote2.getBoundingRect(), point2);
+            // const curve = new fabric.X_Connector(point1, point2, cp1, cp2, style, {
+            //     stroke: 'black',
+            //     strokeWidth: 2,
+            //     fill: '',
+            //     objectCaching: false,
+            //     hasBorders: false,
+            //     hasControls: true,
+            //     selectable: true,
+            //     fromId: null,
+            //     toId: null,
+            //     perPixelTargetFind: true,
+            //     id: Math.random().toString(36).substr(2, 9),
+            // });
 
-            let cp1 = { x: 0, y: 0 }, cp2 = { x: 0, y: 0 };
-
-
-            cp1 = rectNote1.calculateControlPoint(rectNote1.getBoundingRect(), point1);
-            cp2 = rectNote2.calculateControlPoint(rectNote2.getBoundingRect(), point2);
-            const curve = new fabric.X_Connector(point1, point2, cp1, cp2, style, {
-                stroke: 'black',
-                strokeWidth: 2,
-                fill: '',
-                objectCaching: false,
-                hasBorders: true,
-                hasControls: true,
-                selectable: true,
-                fromId: null,
-                toId: null,
-                perPixelTargetFind: true,
-                id: Math.random().toString(36).substr(2, 9),
-            });
-
-            canvas.add(curve);
+            // canvas.add(curve);
 
 
-            //add connecter id to rectNote's field connectors as an object, {connectorId: string, point: {x: number, y: number}} the point shouldb be t he local point to the rectNote.
-            rectNote1.connectors.push({ connectorId: curve.id, point: { x: point1.x - rectNote1.left, y: point1.y - rectNote1.top } });
-            rectNote2.connectors.push({ connectorId: curve.id, point: { x: point2.x - rectNote2.left, y: point2.y - rectNote2.top } });
-            //add rectNote's id to the connector's field connectedRectNotes as an array of string
-            curve.fromId = rectNote1.id;
-            curve.toId = rectNote2.id;
+            // //add connecter id to rectNote's field connectors as an object, {connectorId: string, point: {x: number, y: number}} the point shouldb be t he local point to the rectNote.
+            // rectNote1.connectors.push({ connectorId: curve.id, point: { x: point1.x - rectNote1.left, y: point1.y - rectNote1.top } });
+            // rectNote2.connectors.push({ connectorId: curve.id, point: { x: point2.x - rectNote2.left, y: point2.y - rectNote2.top } });
+            // //add rectNote's id to the connector's field connectedRectNotes as an array of string
+            // curve.fromId = rectNote1.id;
+            // curve.toId = rectNote2.id;
 
 
-            //add measure for debugging
-            const positions = [
-                { left: 0, top: 0 },
-                { left: 0, top: 100 },
-                { left: 0, top: 200 },
-                { left: 0, top: 300 },
-                { left: 0, top: 400 },
-                { left: 0, top: 500 },
-                { left: 100, top: 0 },
-                { left: 200, top: 0 },
-                { left: 300, top: 0 },
-                { left: 400, top: 0 },
-                { left: 500, top: 0 },
+            // //add measure for debugging
+            // const positions = [
+            //     { left: 0, top: 0 },
+            //     { left: 0, top: 100 },
+            //     { left: 0, top: 200 },
+            //     { left: 0, top: 300 },
+            //     { left: 0, top: 400 },
+            //     { left: 0, top: 500 },
+            //     { left: 100, top: 0 },
+            //     { left: 200, top: 0 },
+            //     { left: 300, top: 0 },
+            //     { left: 400, top: 0 },
+            //     { left: 500, top: 0 },
 
-            ];
+            // ];
 
-            positions.forEach(({ left, top }) => {
-                canvas.add(new fabric.Circle({
-                    radius: 5,
-                    fill: 'black',
-                    left,
-                    top,
-                    originX: 'center',
-                    originY: 'center',
-                    selectable: false,
-                    evented: false,
-                }));
-            });
+            // positions.forEach(({ left, top }) => {
+            //     canvas.add(new fabric.Circle({
+            //         radius: 5,
+            //         fill: 'black',
+            //         left,
+            //         top,
+            //         originX: 'center',
+            //         originY: 'center',
+            //         selectable: false,
+            //         evented: false,
+            //     }));
+            // });
 
-            canvas.add(new fabric.Textbox(' (0,0)', {
-                left: 0,
-                top: 0,
-                fontSize: 20,
-                evented: false,
-                selectable: false,
-                width: 500,
-            }));
+            // canvas.add(new fabric.X_Textbox(' (0,0)', {
+            //     left: 0,
+            //     top: 0,
+            //     fontSize: 20,
+            //     evented: false,
+            //     selectable: false,
+            //     width: 500,
+            // }));
 
 
 
@@ -263,8 +265,10 @@ const IndexPage: NextPage = () => {
                 //add message to show the current mouse position on Active Object if any
                 textMessage.push('3. Active Object:')
                 if (canvas.getActiveObject()) {
+                    //@ts-ignore
                     textMessage.push('- matrix:' + getViewportTransformRoundNumber(canvas?.getActiveObject()?.calcTransformMatrix()))
                     const pointer = canvas.getPointer(event.e);
+                    //@ts-ignore
                     const pointOnSelectedObject = canvas.getActiveObject()?.transformPointFromCanvas(pointer);
                     textMessage.push(`(${pointOnSelectedObject.x.toFixed(2)}, ${pointOnSelectedObject.y.toFixed(2)})`)
                 } else {
@@ -301,7 +305,7 @@ const IndexPage: NextPage = () => {
             //         textAlign: 'center',
             //         textValue,
             //         backgroundColor: 'yellow',
-            //         _id: Math.random().toString(36).substr(2, 9),
+            //         id: Math.random().toString(36).substr(2, 9),
             //     });
             //     canvas.add(circleNote);
             // }
@@ -317,7 +321,7 @@ const IndexPage: NextPage = () => {
             //         textAlign: 'center',
             //         textValue,
             //         backgroundColor: 'lightgreen',
-            //         _id: Math.random().toString(36).substr(2, 9),
+            //         id: Math.random().toString(36).substr(2, 9),
             //     });
             //     canvas.add(rectNote);
             // }
@@ -328,13 +332,13 @@ const IndexPage: NextPage = () => {
     return (
         <Box className="position-relative">
             <Canvas ref={ref} onLoad={onLoad} />
-            <Typography level='body-md' style={{ backgroundColor: 'white', position: 'absolute', width: 500, right: 10, top: 10 }}>
+            {/* <Typography level='body-md' style={{ backgroundColor: 'white', position: 'absolute', width: 500, right: 10, top: 10 }}>
                 {mouseInfo.map((info) => (
                     <Box key={info}>
                         <p>{info}</p>
                     </Box>
                 ))}
-            </Typography>
+            </Typography> */}
 
         </Box>
     );

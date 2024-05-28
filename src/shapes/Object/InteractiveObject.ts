@@ -47,6 +47,10 @@ export class InteractiveFabricObject<
   extends FabricObject<Props, SProps, EventSpec>
   implements FabricObjectProps
 {
+  //canvasx specific
+  declare id: string;
+  declare objType: string;
+
   declare noScaleCache: boolean;
 
   declare snapAngle?: TDegree;

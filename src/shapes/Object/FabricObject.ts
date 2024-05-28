@@ -5,6 +5,7 @@ import { applyMixins } from '../../util/applyMixins';
 import type { FabricObjectProps } from './types/FabricObjectProps';
 import type { TFabricObjectProps, SerializedObjectProps } from './types';
 import { classRegistry } from '../../ClassRegistry';
+import { FabricObject2 } from '../canvasx/X_Object';
 
 // TODO somehow we have to make a tree-shakeable import
 
@@ -23,7 +24,7 @@ export class FabricObject<
 
 applyMixins(FabricObject, [FabricObjectSVGExportMixin]);
 
-// applyMixins(FabricObject, [FabricObject2]);
+applyMixins(FabricObject, [FabricObject2]);
 
 classRegistry.setClass(FabricObject);
 classRegistry.setClass(FabricObject, 'object');

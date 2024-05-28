@@ -60,6 +60,7 @@ export interface SerializedGroupProps
 
 export interface GroupProps extends FabricObjectProps, GroupOwnProps {
   layoutManager: LayoutManager;
+  zIndex: number;
 }
 
 export const groupDefaultValues: Partial<TClassProperties<Group>> = {

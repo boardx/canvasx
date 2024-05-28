@@ -82,7 +82,7 @@ export async function createCodeSandbox(appPath) {
   fs.readdirSync(appPath).forEach(processFile);
   try {
     const {
-      data: { sandbox_id },
+      data: { sandboxid },
     } = await Axios.post(
       'https://codesandbox.io/api/v1/sandboxes/define?json=1',
       {
@@ -92,7 +92,7 @@ export async function createCodeSandbox(appPath) {
         files,
       }
     );
-    return `https://codesandbox.io/s/${sandbox_id}`;
+    return `https://codesandbox.io/s/${sandboxid}`;
   } catch (error) {
     throw error.response?.data || error;
   }

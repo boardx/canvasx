@@ -3,17 +3,18 @@ import { IText } from '../IText/IText';
 import { classRegistry } from '../../ClassRegistry';
 import { createTextboxDefaultControls } from '../../controls/X_commonControls';
 import { EventName, TextAlign, WidgetType, Origin } from './types';
+import { Textbox } from '../Textbox';
+
+import { isTransformCentered, getLocalPoint } from '../../controls/util';
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
 // regexes, list of properties that are not suppose to change by instances, magic consts.
 // this will be a separated effort
-export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
+export const textboxDefaultValues: Partial<TClassProperties<X_Textbox>> = {
   minWidth: 20,
   dynamicMinWidth: 2,
-  lockScalingFlip: true,
-  noScaleCache: false,
   // _wordJoiners: /[ \t\r]/,
   splitByGrapheme: true,
-  obj_type: 'WBTextbox',
+  objType: 'X_Textbox',
 };
 
 /**
@@ -22,7 +23,7 @@ export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
  * user can only change width. Height is adjusted automatically based on the
  * wrapping of lines.
  */
-export class Textbox extends IText {
+export class X_Textbox extends Textbox {
   /**
    * Minimum width of textbox, in pixels.
    * @type Number
@@ -31,7 +32,7 @@ export class Textbox extends IText {
   declare minWidth: number;
 
   /* boardx cusotm function */
-  declare obj_type: string;
+  declare objType: string;
 
   declare hasNoText: boolean;
   /**
@@ -62,51 +63,45 @@ export class Textbox extends IText {
     return {
       ...super.getDefaults(),
       controls: createTextboxDefaultControls(),
-      ...Textbox.ownDefaults,
+      ...X_Textbox.ownDefaults,
     };
   }
   constructor(text: string, options: any) {
     super(text, options);
-    // if (this.obj_type !== 'WBText' && this.obj_type !== 'WBTextbox') {
+    // if (this.objType !== 'WBText' && this.objType !== 'WBTextbox') {
     // this.addControls();
     // }
     this.InitializeEvent();
     this.resetResizeControls();
   }
 
-  _getTotalLineHeights() {
-    return this._textLines.reduce(
-      (total, _line, index) => total + this.getHeightOfLine(index),
-      0
-    );
-  }
-  /**
-   * Unlike superclass's version of this function, Textbox does not update
-   * its width.
-   * @private
-   * @override
-   */
-  initDimensions() {
-    if (!this.initialized) {
-      return;
-    }
-    this.isEditing && this.initDelayedCursor();
-    this._clearCache();
-    // clear dynamicMinWidth as it will be different after we re-wrap line
-    this.dynamicMinWidth = 0;
-    // wrap lines
-    this._styleMap = this._generateStyleMap(this._splitText());
-    // if after wrapping, the width is smaller than dynamicMinWidth, change the width and re-wrap
-    if (this.dynamicMinWidth > this.width) {
-      this._set('width', this.dynamicMinWidth);
-    }
-    if (this.textAlign.indexOf('justify') !== -1) {
-      // once text is measured we need to make space fatter to make justified text.
-      this.enlargeSpaces();
-    }
-    // clear cache and re-calculate height
-    this.height = this.calcTextHeight();
-  }
+  // /**
+  //  * Unlike superclass's version of this function, Textbox does not update
+  //  * its width.
+  //  * @private
+  //  * @override
+  //  */
+  // initDimensions() {
+  //   if (!this.initialized) {
+  //     return;
+  //   }
+  //   this.isEditing && this.initDelayedCursor();
+  //   this._clearCache();
+  //   // clear dynamicMinWidth as it will be different after we re-wrap line
+  //   this.dynamicMinWidth = 0;
+  //   // wrap lines
+  //   this._styleMap = this._generateStyleMap(this._splitText());
+  //   // if after wrapping, the width is smaller than dynamicMinWidth, change the width and re-wrap
+  //   if (this.dynamicMinWidth > this.width) {
+  //     this._set('width', this.dynamicMinWidth);
+  //   }
+  //   if (this.textAlign.indexOf('justify') !== -1) {
+  //     // once text is measured we need to make space fatter to make justified text.
+  //     this.enlargeSpaces();
+  //   }
+  //   // clear cache and re-calculate height
+  //   this.height = this.calcTextHeight();
+  // }
 
   /**
    * Generate an object that translates the style object so that it is
@@ -115,11 +110,11 @@ export class Textbox extends IText {
    * which is only sufficient for Text / IText
    * @private
    */
-  _generateStyleMap(textInfo) {
+  _generateStyleMap(textInfo: any) {
     let realLineCount = 0,
       realLineCharCount = 0,
       charCount = 0;
-    const map = {};
+    const map: any = {};
 
     for (let i = 0; i < textInfo.graphemeLines.length; i++) {
       if (textInfo.graphemeText[charCount] === '\n' && i > 0) {
@@ -150,7 +145,7 @@ export class Textbox extends IText {
    * @param {Number} lineIndex
    * @return {Boolean}
    */
-  styleHas(property, lineIndex: number): boolean {
+  styleHas(property: any, lineIndex: number): boolean {
     if (this._styleMap && !this.isWrapping) {
       const map = this._styleMap[lineIndex];
       if (map) {
@@ -169,9 +164,9 @@ export class Textbox extends IText {
     if (!this.styles) {
       return true;
     }
-    let offset = 0,
+    let offset: number = 0,
       nextLineIndex = lineIndex + 1,
-      nextOffset,
+      nextOffset: any,
       shouldLimit = false;
     const map = this._styleMap[lineIndex],
       mapNextLine = this._styleMap[lineIndex + 1];
@@ -188,9 +183,9 @@ export class Textbox extends IText {
       typeof lineIndex === 'undefined'
         ? this.styles
         : { line: this.styles[lineIndex] };
-    for (const p1 in obj) {
-      for (const p2 in obj[p1]) {
-        if (p2 >= offset && (!shouldLimit || p2 < nextOffset)) {
+    for (const p1 in obj as any) {
+      for (const p2 in obj[p1] as any) {
+        if (Number(p2) >= offset && (!shouldLimit || Number(p2) < nextOffset)) {
           // eslint-disable-next-line no-unused-vars
           for (const p3 in obj[p1][p2]) {
             return false;
@@ -201,22 +196,22 @@ export class Textbox extends IText {
     return true;
   }
 
-  /**
-   * @param {Number} lineIndex
-   * @param {Number} charIndex
-   * @private
-   */
-  _getStyleDeclaration(lineIndex: number, charIndex: number) {
-    if (this._styleMap && !this.isWrapping) {
-      const map = this._styleMap[lineIndex];
-      if (!map) {
-        return null;
-      }
-      lineIndex = map.line;
-      charIndex = map.offset + charIndex;
-    }
-    return super._getStyleDeclaration(lineIndex, charIndex);
-  }
+  // /**
+  //  * @param {Number} lineIndex
+  //  * @param {Number} charIndex
+  //  * @private
+  //  */
+  // _getStyleDeclaration(lineIndex: number, charIndex: number) {
+  //   if (this._styleMap && !this.isWrapping) {
+  //     const map = this._styleMap[lineIndex];
+  //     if (!map) {
+  //       return null;
+  //     }
+  //     lineIndex = map.line;
+  //     charIndex = map.offset + charIndex;
+  //   }
+  //   return super._getStyleDeclaration(lineIndex, charIndex);
+  // }
 
   /**
    * @param {Number} lineIndex
@@ -268,24 +263,24 @@ export class Textbox extends IText {
     this.styles[map.line] = {};
   }
 
-  /**
-   * Wraps text using the 'width' property of Textbox. First this function
-   * splits text on newlines, so we preserve newlines entered by the user.
-   * Then it wraps each line using the width of the Textbox by calling
-   * _wrapLine().
-   * @param {Array} lines The string array of text that is split into lines
-   * @param {Number} desiredWidth width you want to wrap to
-   * @returns {Array} Array of lines
-   */
-  _wrapText(lines: Array<any>, desiredWidth: number): Array<any> {
-    const wrapped = [];
-    this.isWrapping = true;
-    for (let i = 0; i < lines.length; i++) {
-      wrapped.push(...this._wrapLine(lines[i], i, desiredWidth));
-    }
-    this.isWrapping = false;
-    return wrapped;
-  }
+  // /**
+  //  * Wraps text using the 'width' property of Textbox. First this function
+  //  * splits text on newlines, so we preserve newlines entered by the user.
+  //  * Then it wraps each line using the width of the Textbox by calling
+  //  * _wrapLine().
+  //  * @param {Array} lines The string array of text that is split into lines
+  //  * @param {Number} desiredWidth width you want to wrap to
+  //  * @returns {Array} Array of lines
+  //  */
+  // _wrapText(lines: Array<any>, desiredWidth: number): Array<any> {
+  //   const wrapped = [];
+  //   this.isWrapping = true;
+  //   for (let i = 0; i < lines.length; i++) {
+  //     wrapped.push(...this._wrapLine(lines[i], i, desiredWidth));
+  //   }
+  //   this.isWrapping = false;
+  //   return wrapped;
+  // }
 
   /**
    * Helper function to measure a string of text, given its lineIndex and charIndex offset
@@ -299,7 +294,7 @@ export class Textbox extends IText {
    * @param {number} charOffset
    * @returns {number}
    */
-  _measureWord(word, lineIndex: number, charOffset = 0): number {
+  _measureWord(word: any, lineIndex: number, charOffset = 0): number {
     let width = 0,
       prevGrapheme;
     const skipLeft = true;
@@ -352,87 +347,87 @@ export class Textbox extends IText {
     return graphemes;
   }
 
-  _wrapLine(
-    _line,
-    lineIndex: number,
-    desiredWidth: number,
-    reservedSpace = 0
-  ): Array<any> {
-    const additionalSpace = this._getWidthOfCharSpacing(),
-      splitByGrapheme = this.splitByGrapheme,
-      graphemeLines = [],
-      words = splitByGrapheme
-        ? this.graphemeSplitForRectNotes(_line)
-        : this.wordSplit(_line),
-      infix = splitByGrapheme ? '' : ' ';
+  // _wrapLine(
+  //   _line: any,
+  //   lineIndex: number,
+  //   desiredWidth: number,
+  //   reservedSpace = 0
+  // ): Array<any> {
+  //   const additionalSpace = this._getWidthOfCharSpacing(),
+  //     splitByGrapheme = this.splitByGrapheme,
+  //     graphemeLines = [],
+  //     words: any = splitByGrapheme
+  //       ? this.graphemeSplitForRectNotes(_line)
+  //       : this.wordSplit(_line),
+  //     infix = splitByGrapheme ? '' : ' ';
 
-    let lineWidth = 0,
-      line = [],
-      // spaces in different languages?
-      offset = 0,
-      infixWidth = 0,
-      largestWordWidth = 0,
-      lineJustStarted = true;
-    // fix a difference between split and graphemeSplit
-    if (words.length === 0) {
-      words.push([]);
-    }
-    desiredWidth -= reservedSpace;
-    // measure words
-    const data = words.map((word) => {
-      // if using splitByGrapheme words are already in graphemes.
-      word = splitByGrapheme ? word : this.graphemeSplitForRectNotes(word);
-      const width = this._measureWord(word, lineIndex, offset);
-      largestWordWidth = Math.max(width, largestWordWidth);
-      offset += word.length + 1;
-      return { word: word, width: width };
-    });
-    const maxWidth = Math.max(
-      desiredWidth,
-      largestWordWidth,
-      this.dynamicMinWidth
-    );
-    // layout words
-    offset = 0;
-    let i;
-    for (i = 0; i < words.length; i++) {
-      const word = data[i].word;
-      const wordWidth = data[i].width;
-      offset += word.length;
+  //   let lineWidth = 0,
+  //     line: any[] = [],
+  //     // spaces in different languages?
+  //     offset = 0,
+  //     infixWidth = 0,
+  //     largestWordWidth = 0,
+  //     lineJustStarted = true;
+  //   // fix a difference between split and graphemeSplit
+  //   if (words.length === 0) {
+  //     words.push([]);
+  //   }
+  //   desiredWidth -= reservedSpace;
+  //   // measure words
+  //   const data = words.map((word: any) => {
+  //     // if using splitByGrapheme words are already in graphemes.
+  //     word = splitByGrapheme ? word : this.graphemeSplitForRectNotes(word);
+  //     const width = this._measureWord(word, lineIndex, offset);
+  //     largestWordWidth = Math.max(width, largestWordWidth);
+  //     offset += word.length + 1;
+  //     return { word: word, width: width };
+  //   });
+  //   const maxWidth = Math.max(
+  //     desiredWidth,
+  //     largestWordWidth,
+  //     this.dynamicMinWidth
+  //   );
+  //   // layout words
+  //   offset = 0;
+  //   let i;
+  //   for (i = 0; i < words.length; i++) {
+  //     const word = data[i].word;
+  //     const wordWidth = data[i].width;
+  //     offset += word.length;
 
-      lineWidth += infixWidth + wordWidth - additionalSpace;
-      if (lineWidth > maxWidth && !lineJustStarted) {
-        graphemeLines.push(line);
-        line = [];
-        lineWidth = wordWidth;
-        lineJustStarted = true;
-      } else {
-        lineWidth += additionalSpace;
-      }
+  //     lineWidth += infixWidth + wordWidth - additionalSpace;
+  //     if (lineWidth > maxWidth && !lineJustStarted) {
+  //       graphemeLines.push(line);
+  //       line = [];
+  //       lineWidth = wordWidth;
+  //       lineJustStarted = true;
+  //     } else {
+  //       lineWidth += additionalSpace;
+  //     }
 
-      if (!lineJustStarted && !splitByGrapheme) {
-        line.push(infix);
-      }
-      if (word.length > 1) {
-        line = line.concat(word.split(''));
-      } else {
-        line = line.concat(word);
-      }
+  //     if (!lineJustStarted && !splitByGrapheme) {
+  //       line.push(infix);
+  //     }
+  //     if (word.length > 1) {
+  //       line = line.concat(word.split(''));
+  //     } else {
+  //       line = line.concat(word);
+  //     }
 
-      infixWidth = splitByGrapheme
-        ? 0
-        : this._measureWord([infix], lineIndex, offset);
-      offset++;
-      lineJustStarted = false;
-    }
+  //     infixWidth = splitByGrapheme
+  //       ? 0
+  //       : this._measureWord([infix], lineIndex, offset);
+  //     offset++;
+  //     lineJustStarted = false;
+  //   }
 
-    i && graphemeLines.push(line);
+  //   i && graphemeLines.push(line);
 
-    if (largestWordWidth + reservedSpace > this.dynamicMinWidth) {
-      this.dynamicMinWidth = largestWordWidth - additionalSpace + reservedSpace;
-    }
-    return graphemeLines;
-  }
+  //   if (largestWordWidth + reservedSpace > this.dynamicMinWidth) {
+  //     this.dynamicMinWidth = largestWordWidth - additionalSpace + reservedSpace;
+  //   }
+  //   return graphemeLines;
+  // }
 
   /**
    * Detect if the text line is ended with an hard break
@@ -457,7 +452,7 @@ export class Textbox extends IText {
    * and counting style.
    * @return Number
    */
-  missingNewlineOffset(lineIndex) {
+  missingNewlineOffset(lineIndex: number) {
     if (this.splitByGrapheme) {
       return this.isEndOfWrapping(lineIndex) ? 1 : 0;
     }
@@ -475,7 +470,7 @@ export class Textbox extends IText {
     const newText = super._splitTextIntoLines(text);
     if (!this.fromCopy) {
       if (
-        (this.obj_type === 'WBText' || this.obj_type === 'WBTextbox') &&
+        (this.objType === 'WBText' || this.objType === 'WBTextbox') &&
         this.textLines &&
         this.textLines.length > 1 &&
         this.isEditing
@@ -488,7 +483,7 @@ export class Textbox extends IText {
       this.oneLine = false;
     }
     if (
-      (this.obj_type === 'WBText' || this.obj_type === 'WBTextbox') &&
+      (this.objType === 'WBText' || this.objType === 'WBTextbox') &&
       newText &&
       newText.lines &&
       this.oneLine &&
@@ -515,19 +510,19 @@ export class Textbox extends IText {
     return Math.max(this.minWidth, this.dynamicMinWidth);
   }
 
-  _removeExtraneousStyles() {
-    const linesToKeep = {};
-    for (const prop in this._styleMap) {
-      if (this._textLines[prop]) {
-        linesToKeep[this._styleMap[prop].line] = 1;
-      }
-    }
-    for (const prop in this.styles) {
-      if (!linesToKeep[prop]) {
-        delete this.styles[prop];
-      }
-    }
-  }
+  // _removeExtraneousStyles() {
+  //   const linesToKeep = {};
+  //   for (const prop in this._styleMap) {
+  //     if (this._textLines[prop]) {
+  //       linesToKeep[this._styleMap[prop].line] = 1;
+  //     }
+  //   }
+  //   for (const prop in this.styles) {
+  //     if (!linesToKeep[prop]) {
+  //       delete this.styles[prop];
+  //     }
+  //   }
+  // }
   // addControls() {
   //   function renderCustomControl(ctx, left, top, fabricObject) {
   //     const styleOverride1 = {
@@ -599,7 +594,7 @@ export class Textbox extends IText {
   //   });
   // }
 
-  controlMousedownProcess(transformData, rx, ry) {
+  controlMousedownProcess(transformData: any, rx: any, ry: any) {
     return;
   }
   /**
@@ -613,7 +608,7 @@ export class Textbox extends IText {
     const object = {};
 
     const keys = [
-      '_id', // string, the id of the object
+      'id', // string, the id of the object
       'angle', //  integer, angle for recording rotating
       'backgroundColor', // string,  background color, works when the image is transparent
       'fill', // the font color
@@ -625,14 +620,13 @@ export class Textbox extends IText {
       'lockMovementX', // boolean, lock the verticle movement
       'lockMovementY', // boolean, lock the horizontal movement
       'lockScalingFlip', // boolean,  make it can not be inverted by pulling the width to the negative side
-      'obj_type', // object type
+      'objType', // object type
       'originX', // string, Horizontal origin of transformation of an object (one of "left", "right", "center") See http://jsfiddle.net/1ow02gea/244/ on how originX/originY affect objects in groups
       'originY', // string, Vertical origin of transformation of an object (one of "top", "bottom", "center") See http://jsfiddle.net/1ow02gea/244/ on how originX/originY affect objects in groups
       'scaleX', // nunber, Object scale factor (horizontal)
       'scaleY', // number, Object scale factor (vertical)
       'selectable', // boolean, When set to `false`, an object can not be selected for modification (using either point-click-based or group-based selection). But events still fire on it.
       'top', // integer, Top position of an object. Note that by default it's relative to object top. You can change this by setting originY={top/center/bottom}
-      'userNo', // string, the unique id for the user, one user id could open mutiple browser, each browser has unique user no
       'userId', // string, user identity
       'whiteboardId', // whiteboard id, string
       'zIndex', // the index for the object on whiteboard, integer
@@ -640,7 +634,7 @@ export class Textbox extends IText {
       'isPanel', // is this a panel, boolean
       'panelObj', // if this is a panel, the id of the panel, string
       'relationship', // array, viewporttransform
-      'subObjList', // ["5H9qYfNGt4vizhcuS"] array list _id for sub objects
+      'subObjList', // ["5H9qYfNGt4vizhcuS"] array list id for sub objects
       'fontFamily', // string, font family
       'fontSize', // integer, font size
       'fontWeight', // integer, font weight
@@ -656,24 +650,26 @@ export class Textbox extends IText {
       'preTop',
     ];
     keys.forEach((key) => {
+      //@ts-ignore
       object[key] = this[key];
     });
     return object;
   }
 
-  toObject(propertiesToInclude: Array<any>): object {
-    return super.toObject(
-      ['minWidth', 'splitByGrapheme'].concat(propertiesToInclude)
-    );
-  }
+  // toObject(propertiesToInclude: Array<any>): object {
+  //   return super.toObject(
+  //     ['minWidth', 'splitByGrapheme'].concat(propertiesToInclude)
+  //   );
+  // }
   /**extend function for fronted */
   checkTextboxChange() {}
   InitializeEvent() {
     const self = this;
+    const canvas = this.canvas;
 
     self.on(EventName.EDITINGENTERED, () => {
       // if it is in draw widget mode, then skip update
-      if (canvas.drawTempWidget) return;
+      // if (canvas.drawTempWidget) return;
 
       self.originX = self.textAlign;
 
@@ -685,7 +681,7 @@ export class Textbox extends IText {
         self.left += (self.width * self.scaleX) / 2;
       }
 
-      if (self.obj_type === WidgetType.WBText) {
+      if (self.objType === WidgetType.WBText) {
         self.originY = 'top';
 
         self.top -= (self.height * self.scaleY) / 2;
@@ -697,26 +693,26 @@ export class Textbox extends IText {
 
           self.text = '';
 
-          self.hiddenTextarea.value = '';
+          // self.hiddenTextarea.value = '';
 
           self.dirty = true;
 
           self.fill = 'rgb(0, 0, 0)';
 
-          canvas.requestRenderAll();
+          canvas?.requestRenderAll();
         }
       }
     });
 
     self.on(EventName.EDITINGEXITED, () => {
       // if it is in draw widget mode, then skip update
-      if (canvas.drawTempWidget) return;
+      // if (canvas.drawTempWidget) return;
 
-      if (self.text === '' && self.obj_type === WidgetType.WBText) {
-        canvas.removeWidget(self);
+      // if (self.text === '' && self.objType === WidgetType.WBText) {
+      //   canvas.removeWidget(self);
 
-        return;
-      }
+      //   return;
+      // }
 
       self.originX = Origin.Center;
 
@@ -730,31 +726,29 @@ export class Textbox extends IText {
         self.left -= (self.width * self.scaleX) / 2;
       }
 
-      if (self.obj_type === WidgetType.WBText) {
+      if (self.objType === WidgetType.WBText) {
         self.top = self.tempTop + (self.height * self.scaleY) / 2;
         self.tempTop = self.top;
       }
     });
 
     self.on(EventName.MODIFIED, () => {
-      self.checkTextboxChange(self);
+      self.checkTextboxChange();
 
-      canvas.requestRenderAll();
+      // canvas.requestRenderAll();
     });
     self.on(EventName.CHANGED, () => {
       if (self.styles[0]) {
         self.styles = {};
 
-        self.canvas.requestRenderAll();
+        // self.canvas.requestRenderAll();
       }
     });
   }
 
-  changeWidth(eventData, transform, x, y) {
-    store.dispatch(handleWidgetMenuDisplay(false));
-
+  changeWidth(eventData: any, transform: any, x: any, y: any) {
     var target = transform.target,
-      localPoint = fabric.controlsUtils.getLocalPoint(
+      localPoint = getLocalPoint(
         transform,
         transform.originX,
         transform.originY,
@@ -776,11 +770,11 @@ export class Textbox extends IText {
 
     target.set('dirty', true);
 
-    if (target.obj_type === 'WBTextbox' || target.obj_type === 'WBText') {
+    if (target.objType === 'WBTextbox' || target.objType === 'WBText') {
       target.set('fixedScaleChange', false);
     }
 
-    if (target.obj_type !== 'WBText') {
+    if (target.objType !== 'WBText') {
       target.saveData('MODIFIED', ['width']);
     }
 
@@ -792,14 +786,14 @@ export class Textbox extends IText {
     const textAlign = self.textAlign;
 
     if (
-      self.obj_type === 'WBText' &&
+      self.objType === 'WBText' &&
       (textAlign === 'left' || textAlign === 'center')
     ) {
       self.setControlVisible('ml', false);
       self.setControlVisible('mr', true);
     }
 
-    if (self.obj_type === 'WBText' && textAlign === 'right') {
+    if (self.objType === 'WBText' && textAlign === 'right') {
       self.setControlVisible('ml', true);
       self.setControlVisible('mr', false);
     }
@@ -808,4 +802,4 @@ export class Textbox extends IText {
 }
 
 classRegistry.setClass(Textbox);
-classRegistry.getSVGClass(Textbox);
+// classRegistry.getSVGClass(Textbox);

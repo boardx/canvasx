@@ -1,7 +1,6 @@
-//@ts-nocheck
 import { TClassProperties } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
-import { Textbox } from '../Textbox';
+import { Textbox, TextboxProps } from '../Textbox';
 import { createRectNotesDefaultControls } from '../../controls/X_commonControls';
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
 // regexes, list of properties that are not suppose to change by instances, magic consts.
@@ -15,18 +14,21 @@ export const circleNotesDefaultValues: Partial<TClassProperties<CircleNotes>> =
     noScaleCache: false,
     _wordJoiners: /[ \t\r]/,
     splitByGrapheme: true,
-    obj_type: 'WBCircleNotes',
+    objType: 'WBCircleNotes',
     height: 138,
     maxHeight: 138,
     width: 138,
     noteType: 'circle',
     radius: 138,
-    breakWords: true,
     cornerStrokeColor: 'gray',
     cornerStyle: 'circle',
     cornerColor: 'white',
     transparentCorners: false,
   };
+
+export interface CircleNotesProps extends TextboxProps {
+  id: string;
+}
 
 /**
  * Textbox class, based on IText, allows the user to resize the text rectangle
@@ -41,11 +43,14 @@ export class CircleNotes extends Textbox {
    * @default
    */
   declare minWidth: number;
+  declare maxHeight: number;
+  declare noteType: string;
+  declare radius: number;
 
   /* boardx cusotm function */
-  declare _id: string;
+  declare id: string;
 
-  declare obj_type: string;
+  declare objType: string;
 
   declare locked: boolean;
 
@@ -68,7 +73,7 @@ export class CircleNotes extends Textbox {
   declare userEmoji: object[];
 
   public extendPropeties = [
-    'obj_type',
+    'objType',
     'whiteboardId',
     'userId',
     'timestamp',
@@ -76,7 +81,7 @@ export class CircleNotes extends Textbox {
     'locked',
     'verticalAlign',
     'lines',
-    '_id',
+    'id',
     'zIndex',
     'relationship',
     'emoj',
@@ -111,6 +116,9 @@ export class CircleNotes extends Textbox {
     };
   }
 
+  constructor(text: string, options: Partial<CircleNotesProps>) {
+    super(text, options);
+  }
   /**
    * Unlike superclass's version of this function, Textbox does not update
    * its width.
@@ -156,11 +164,11 @@ export class CircleNotes extends Textbox {
    * which is only sufficient for Text / IText
    * @private
    */
-  _generateStyleMap(textInfo) {
+  _generateStyleMap(textInfo: any) {
     let realLineCount = 0,
       realLineCharCount = 0,
       charCount = 0;
-    const map = {};
+    const map: any = {};
 
     for (let i = 0; i < textInfo.graphemeLines.length; i++) {
       if (textInfo.graphemeText[charCount] === '\n' && i > 0) {
@@ -186,78 +194,78 @@ export class CircleNotes extends Textbox {
     return map;
   }
 
-  /**
-   * Returns true if object has a style property or has it on a specified line
-   * @param {Number} lineIndex
-   * @return {Boolean}
-   */
-  styleHas(property, lineIndex: number): boolean {
-    if (this._styleMap && !this.isWrapping) {
-      const map = this._styleMap[lineIndex];
-      if (map) {
-        lineIndex = map.line;
-      }
-    }
-    return super.styleHas(property, lineIndex);
-  }
+  // /**
+  //  * Returns true if object has a style property or has it on a specified line
+  //  * @param {Number} lineIndex
+  //  * @return {Boolean}
+  //  */
+  // styleHas(property, lineIndex: number): boolean {
+  //   if (this._styleMap && !this.isWrapping) {
+  //     const map = this._styleMap[lineIndex];
+  //     if (map) {
+  //       lineIndex = map.line;
+  //     }
+  //   }
+  //   return super.styleHas(property, lineIndex);
+  // }
 
-  /**
-   * Returns true if object has no styling or no styling in a line
-   * @param {Number} lineIndex , lineIndex is on wrapped lines.
-   * @return {Boolean}
-   */
-  isEmptyStyles(lineIndex: number): boolean {
-    if (!this.styles) {
-      return true;
-    }
-    let offset = 0,
-      nextLineIndex = lineIndex + 1,
-      nextOffset,
-      shouldLimit = false;
-    const map = this._styleMap[lineIndex],
-      mapNextLine = this._styleMap[lineIndex + 1];
-    if (map) {
-      lineIndex = map.line;
-      offset = map.offset;
-    }
-    if (mapNextLine) {
-      nextLineIndex = mapNextLine.line;
-      shouldLimit = nextLineIndex === lineIndex;
-      nextOffset = mapNextLine.offset;
-    }
-    const obj =
-      typeof lineIndex === 'undefined'
-        ? this.styles
-        : { line: this.styles[lineIndex] };
-    for (const p1 in obj) {
-      for (const p2 in obj[p1]) {
-        if (p2 >= offset && (!shouldLimit || p2 < nextOffset)) {
-          // eslint-disable-next-line no-unused-vars
-          for (const p3 in obj[p1][p2]) {
-            return false;
-          }
-        }
-      }
-    }
-    return true;
-  }
+  // /**
+  //  * Returns true if object has no styling or no styling in a line
+  //  * @param {Number} lineIndex , lineIndex is on wrapped lines.
+  //  * @return {Boolean}
+  //  */
+  // isEmptyStyles(lineIndex: number): boolean {
+  //   if (!this.styles) {
+  //     return true;
+  //   }
+  //   let offset = 0,
+  //     nextLineIndex = lineIndex + 1,
+  //     nextOffset,
+  //     shouldLimit = false;
+  //   const map = this._styleMap[lineIndex],
+  //     mapNextLine = this._styleMap[lineIndex + 1];
+  //   if (map) {
+  //     lineIndex = map.line;
+  //     offset = map.offset;
+  //   }
+  //   if (mapNextLine) {
+  //     nextLineIndex = mapNextLine.line;
+  //     shouldLimit = nextLineIndex === lineIndex;
+  //     nextOffset = mapNextLine.offset;
+  //   }
+  //   const obj =
+  //     typeof lineIndex === 'undefined'
+  //       ? this.styles
+  //       : { line: this.styles[lineIndex] };
+  //   for (const p1 in obj) {
+  //     for (const p2 in obj[p1]) {
+  //       if (p2 >= offset && (!shouldLimit || p2 < nextOffset)) {
+  //         // eslint-disable-next-line no-unused-vars
+  //         for (const p3 in obj[p1][p2]) {
+  //           return false;
+  //         }
+  //       }
+  //     }
+  //   }
+  //   return true;
+  // }
 
-  /**
-   * @param {Number} lineIndex
-   * @param {Number} charIndex
-   * @private
-   */
-  _getStyleDeclaration(lineIndex: number, charIndex: number) {
-    if (this._styleMap && !this.isWrapping) {
-      const map = this._styleMap[lineIndex];
-      if (!map) {
-        return null;
-      }
-      lineIndex = map.line;
-      charIndex = map.offset + charIndex;
-    }
-    return super._getStyleDeclaration(lineIndex, charIndex);
-  }
+  // /**
+  //  * @param {Number} lineIndex
+  //  * @param {Number} charIndex
+  //  * @private
+  //  */
+  // _getStyleDeclaration(lineIndex: number, charIndex: number) {
+  //   if (this._styleMap && !this.isWrapping) {
+  //     const map = this._styleMap[lineIndex];
+  //     if (!map) {
+  //       return null;
+  //     }
+  //     lineIndex = map.line;
+  //     charIndex = map.offset + charIndex;
+  //   }
+  //   return super._getStyleDeclaration(lineIndex, charIndex);
+  // }
 
   /**
    * @param {Number} lineIndex
@@ -309,24 +317,24 @@ export class CircleNotes extends Textbox {
     this.styles[map.line] = {};
   }
 
-  /**
-   * Wraps text using the 'width' property of Textbox. First this function
-   * splits text on newlines, so we preserve newlines entered by the user.
-   * Then it wraps each line using the width of the Textbox by calling
-   * _wrapLine().
-   * @param {Array} lines The string array of text that is split into lines
-   * @param {Number} desiredWidth width you want to wrap to
-   * @returns {Array} Array of lines
-   */
-  _wrapText(lines: Array<any>, desiredWidth: number): Array<any> {
-    const wrapped = [];
-    this.isWrapping = true;
-    for (let i = 0; i < lines.length; i++) {
-      wrapped.push(...this._wrapLine(lines[i], i, desiredWidth));
-    }
-    this.isWrapping = false;
-    return wrapped;
-  }
+  // /**
+  //  * Wraps text using the 'width' property of Textbox. First this function
+  //  * splits text on newlines, so we preserve newlines entered by the user.
+  //  * Then it wraps each line using the width of the Textbox by calling
+  //  * _wrapLine().
+  //  * @param {Array} lines The string array of text that is split into lines
+  //  * @param {Number} desiredWidth width you want to wrap to
+  //  * @returns {Array} Array of lines
+  //  */
+  // _wrapText(lines: Array<any>, desiredWidth: number): Array<any> {
+  //   const wrapped = [];
+  //   this.isWrapping = true;
+  //   for (let i = 0; i < lines.length; i++) {
+  //     wrapped.push(...this._wrapLine(lines[i], i, desiredWidth));
+  //   }
+  //   this.isWrapping = false;
+  //   return wrapped;
+  // }
 
   /**
    * Helper function to measure a string of text, given its lineIndex and charIndex offset
@@ -340,7 +348,7 @@ export class CircleNotes extends Textbox {
    * @param {number} charOffset
    * @returns {number}
    */
-  _measureWord(word, lineIndex: number, charOffset = 0): number {
+  _measureWord(word: any, lineIndex: number, charOffset = 0): number {
     let width = 0,
       prevGrapheme;
     const skipLeft = true;
@@ -397,87 +405,87 @@ export class CircleNotes extends Textbox {
     return graphemes;
   }
 
-  _wrapLine(
-    _line,
-    lineIndex: number,
-    desiredWidth: number,
-    reservedSpace = 0
-  ): Array<any> {
-    const additionalSpace = this._getWidthOfCharSpacing(),
-      splitByGrapheme = this.splitByGrapheme,
-      graphemeLines = [],
-      words = splitByGrapheme
-        ? this.graphemeSplitForRectNotes(_line)
-        : this.wordSplit(_line),
-      infix = splitByGrapheme ? '' : ' ';
+  // _wrapLine(
+  //   _line: any,
+  //   lineIndex: number,
+  //   desiredWidth: number,
+  //   reservedSpace = 0
+  // ): Array<any> {
+  //   const additionalSpace = this._getWidthOfCharSpacing(),
+  //     splitByGrapheme = this.splitByGrapheme,
+  //     graphemeLines = [],
+  //     words = splitByGrapheme
+  //       ? this.graphemeSplitForRectNotes(_line)
+  //       : this.wordSplit(_line),
+  //     infix = splitByGrapheme ? '' : ' ';
 
-    let lineWidth = 0,
-      line = [],
-      // spaces in different languages?
-      offset = 0,
-      infixWidth = 0,
-      largestWordWidth = 0,
-      lineJustStarted = true;
-    // fix a difference between split and graphemeSplit
-    if (words.length === 0) {
-      words.push([]);
-    }
-    desiredWidth -= reservedSpace;
-    // measure words
-    const data = words.map((word) => {
-      // if using splitByGrapheme words are already in graphemes.
-      word = splitByGrapheme ? word : this.graphemeSplitForRectNotes(word);
-      const width = this._measureWord(word, lineIndex, offset);
-      largestWordWidth = Math.max(width, largestWordWidth);
-      offset += word.length + 1;
-      return { word: word, width: width };
-    });
-    const maxWidth = Math.max(
-      desiredWidth,
-      largestWordWidth,
-      this.dynamicMinWidth
-    );
-    // layout words
-    offset = 0;
-    let i;
-    for (i = 0; i < words.length; i++) {
-      const word = data[i].word;
-      const wordWidth = data[i].width;
-      offset += word.length;
+  //   let lineWidth = 0,
+  //     line = [],
+  //     // spaces in different languages?
+  //     offset = 0,
+  //     infixWidth = 0,
+  //     largestWordWidth = 0,
+  //     lineJustStarted = true;
+  //   // fix a difference between split and graphemeSplit
+  //   if (words.length === 0) {
+  //     words.push([]);
+  //   }
+  //   desiredWidth -= reservedSpace;
+  //   // measure words
+  //   const data = words.map((word) => {
+  //     // if using splitByGrapheme words are already in graphemes.
+  //     word = splitByGrapheme ? word : this.graphemeSplitForRectNotes(word);
+  //     const width = this._measureWord(word, lineIndex, offset);
+  //     largestWordWidth = Math.max(width, largestWordWidth);
+  //     offset += word.length + 1;
+  //     return { word: word, width: width };
+  //   });
+  //   const maxWidth = Math.max(
+  //     desiredWidth,
+  //     largestWordWidth,
+  //     this.dynamicMinWidth
+  //   );
+  //   // layout words
+  //   offset = 0;
+  //   let i;
+  //   for (i = 0; i < words.length; i++) {
+  //     const word = data[i].word;
+  //     const wordWidth = data[i].width;
+  //     offset += word.length;
 
-      lineWidth += infixWidth + wordWidth - additionalSpace;
-      if (lineWidth > maxWidth && !lineJustStarted) {
-        graphemeLines.push(line);
-        line = [];
-        lineWidth = wordWidth;
-        lineJustStarted = true;
-      } else {
-        lineWidth += additionalSpace;
-      }
+  //     lineWidth += infixWidth + wordWidth - additionalSpace;
+  //     if (lineWidth > maxWidth && !lineJustStarted) {
+  //       graphemeLines.push(line);
+  //       line = [];
+  //       lineWidth = wordWidth;
+  //       lineJustStarted = true;
+  //     } else {
+  //       lineWidth += additionalSpace;
+  //     }
 
-      if (!lineJustStarted && !splitByGrapheme) {
-        line.push(infix);
-      }
-      if (word.length > 1) {
-        line = line.concat(word.split(''));
-      } else {
-        line = line.concat(word);
-      }
+  //     if (!lineJustStarted && !splitByGrapheme) {
+  //       line.push(infix);
+  //     }
+  //     if (word.length > 1) {
+  //       line = line.concat(word.split(''));
+  //     } else {
+  //       line = line.concat(word);
+  //     }
 
-      infixWidth = splitByGrapheme
-        ? 0
-        : this._measureWord([infix], lineIndex, offset);
-      offset++;
-      lineJustStarted = false;
-    }
+  //     infixWidth = splitByGrapheme
+  //       ? 0
+  //       : this._measureWord([infix], lineIndex, offset);
+  //     offset++;
+  //     lineJustStarted = false;
+  //   }
 
-    i && graphemeLines.push(line);
+  //   i && graphemeLines.push(line);
 
-    if (largestWordWidth + reservedSpace > this.dynamicMinWidth) {
-      this.dynamicMinWidth = largestWordWidth - additionalSpace + reservedSpace;
-    }
-    return graphemeLines;
-  }
+  //   if (largestWordWidth + reservedSpace > this.dynamicMinWidth) {
+  //     this.dynamicMinWidth = largestWordWidth - additionalSpace + reservedSpace;
+  //   }
+  //   return graphemeLines;
+  // }
 
   /**
    * Detect if the text line is ended with an hard break
@@ -497,17 +505,17 @@ export class CircleNotes extends Textbox {
     return false;
   }
 
-  /**
-   * Detect if a line has a linebreak and so we need to account for it when moving
-   * and counting style.
-   * @return Number
-   */
-  missingNewlineOffset(lineIndex) {
-    if (this.splitByGrapheme) {
-      return this.isEndOfWrapping(lineIndex) ? 1 : 0;
-    }
-    return 1;
-  }
+  // /**
+  //  * Detect if a line has a linebreak and so we need to account for it when moving
+  //  * and counting style.
+  //  * @return Number
+  //  */
+  // missingNewlineOffset(lineIndex) {
+  //   if (this.splitByGrapheme) {
+  //     return this.isEndOfWrapping(lineIndex) ? 1 : 0;
+  //   }
+  //   return 1;
+  // }
 
   /**
    * Gets lines of text to render in the Textbox. This function calculates
@@ -532,24 +540,24 @@ export class CircleNotes extends Textbox {
     return Math.max(this.minWidth, this.dynamicMinWidth);
   }
 
-  _removeExtraneousStyles() {
-    const linesToKeep = {};
-    for (const prop in this._styleMap) {
-      if (this._textLines[prop]) {
-        linesToKeep[this._styleMap[prop].line] = 1;
-      }
-    }
-    for (const prop in this.styles) {
-      if (!linesToKeep[prop]) {
-        delete this.styles[prop];
-      }
-    }
-  }
+  // _removeExtraneousStyles() {
+  //   const linesToKeep = {};
+  //   for (const prop in this._styleMap) {
+  //     if (this._textLines[prop]) {
+  //       linesToKeep[this._styleMap[prop].line] = 1;
+  //     }
+  //   }
+  //   for (const prop in this.styles) {
+  //     if (!linesToKeep[prop]) {
+  //       delete this.styles[prop];
+  //     }
+  //   }
+  // }
 
   getObject() {
     const object = {};
     const keys = [
-      '_id', // string, the id of the object
+      'id', // string, the id of the object
       'angle', //  integer, angle for recording rotating
       'backgroundColor', // string,  background color, works when the image is transparent
       'fill', // the font color
@@ -561,7 +569,7 @@ export class CircleNotes extends Textbox {
       'lockMovementX', // boolean, lock the verticle movement
       'lockMovementY', // boolean, lock the horizontal movement
       'lockScalingFlip', // boolean,  make it can not be inverted by pulling the width to the negative side
-      'obj_type', // object type
+      'objType', // object type
       'originX', // string, Horizontal origin of transformation of an object (one of "left", "right", "center") See http://jsfiddle.net/1ow02gea/244/ on how originX/originY affect objects in groups
       'originY', // string, Vertical origin of transformation of an object (one of "top", "bottom", "center") See http://jsfiddle.net/1ow02gea/244/ on how originX/originY affect objects in groups
       'scaleX', // nunber, Object scale factor (horizontal)
@@ -576,7 +584,7 @@ export class CircleNotes extends Textbox {
       'isPanel', // is this a panel, boolean
       'panelObj', // if this is a panel, the id of the panel, string
       'relationship', // array, viewporttransform
-      'subObjList', // ["5H9qYfNGt4vizhcuS"] array list _id for sub objects
+      'subObjList', // ["5H9qYfNGt4vizhcuS"] array list id for sub objects
       'fontFamily', // string, font family
       'fontSize', // integer, font size
       'fontWeight', // integer, font weight
@@ -592,43 +600,44 @@ export class CircleNotes extends Textbox {
       'lastEditedBy', // last edited by
     ];
     keys.forEach((key) => {
+      //@ts-ignore
       object[key] = this[key];
     });
     return object;
   }
 
-  /**
-   * Returns object representation of an instance
-   * @method toObject
-   * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-   * @return {Object} object representation of an instance
-   */
-  toObject(propertiesToInclude: Array<any>): object {
-    return super.toObject(
-      [...this.extendPropeties, 'minWidth', 'splitByGrapheme'].concat(
-        propertiesToInclude
-      )
-    );
-  }
+  // /**
+  //  * Returns object representation of an instance
+  //  * @method toObject
+  //  * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+  //  * @return {Object} object representation of an instance
+  //  */
+  // toObject(propertiesToInclude: Array<any>): object {
+  //   return super.toObject(
+  //     [...this.extendPropeties, 'minWidth', 'splitByGrapheme'].concat(
+  //       propertiesToInclude
+  //     )
+  //   );
+  // }
   /**boardx custom function */
 
   getWidgetMenuList() {
-    if (this.isDraw) {
-      return [
-        'textNote',
-        'borderLineIcon',
-        'backgroundColor',
-        'resetDraw',
-        'switchNoteType',
-        'drawOption',
-        'lineWidth',
-        'noteDrawColor', // strokeColor
-        'emojiMenu',
-        'more',
-        'objectLock',
-        'aiassist',
-      ];
-    }
+    // if (this.isDraw) {
+    //   return [
+    //     'textNote',
+    //     'borderLineIcon',
+    //     'backgroundColor',
+    //     'resetDraw',
+    //     'switchNoteType',
+    //     'drawOption',
+    //     'lineWidth',
+    //     'noteDrawColor', // strokeColor
+    //     'emojiMenu',
+    //     'more',
+    //     'objectLock',
+    //     'aiassist',
+    //   ];
+    // }
     if (this.locked) {
       return ['objectLock'];
     }
@@ -649,9 +658,9 @@ export class CircleNotes extends Textbox {
     ];
   }
   getWidgetMenuTouchList() {
-    if (this.isDraw) {
-      return ['emojiMenu', 'objectLock'];
-    }
+    // if (this.isDraw) {
+    //   return ['emojiMenu', 'objectLock'];
+    // }
     if (this.locked) {
       return ['objectLock'];
     }
@@ -667,13 +676,13 @@ export class CircleNotes extends Textbox {
   }
   getWidgetMenuLength() {
     if (this.locked) return 50;
-    if (this.isDraw) {
-      return 308;
-    }
+    // if (this.isDraw) {
+    //   return 308;
+    // }
     return 420;
   }
   /* caculate cusor positon in the middle of the textbox */
-  getCenteredTop(rectHeight) {
+  getCenteredTop(rectHeight: any) {
     const textHeight = this.height;
     return (rectHeight - textHeight) / 2;
   }
@@ -703,7 +712,7 @@ export class CircleNotes extends Textbox {
     );
   }
 
-  _render(ctx) {
+  _render(ctx: any) {
     const path: any = this.path;
 
     path && !path.isNotVisible() && path._render(ctx);
@@ -714,72 +723,72 @@ export class CircleNotes extends Textbox {
     this._renderTextDecoration(ctx, 'overline');
     this._renderTextDecoration(ctx, 'linethrough');
 
-    const isEmojiExist = !(
-      this.emoji === undefined || this.emoji.join() === '0,0,0,0,0'
-    );
-    if (isEmojiExist) {
-      this.renderEmoji(ctx);
-    }
+    // const isEmojiExist = !(
+    //   this.emoji === undefined || this.emoji.join() === '0,0,0,0,0'
+    // );
+    // if (isEmojiExist) {
+    //   this.renderEmoji(ctx);
+    // }
   }
 
-  renderEmoji(ctx) {
-    if (this.emoji === undefined) {
-      return;
-    }
+  // renderEmoji(ctx) {
+  //   if (this.emoji === undefined) {
+  //     return;
+  //   }
 
-    let width = 0;
-    const imageList = [
-      this.canvas.emoji_thumb,
-      this.canvas.emoji_love,
-      this.canvas.emoji_smile,
-      this.canvas.emoji_shock,
-      this.canvas.emoji_question,
-    ];
-    const imageListArray = [];
-    const emojiList = [];
-    for (let i = 0; i < 5; i++) {
-      if (this.emoji[i] !== 0) {
-        imageListArray.push(imageList[i]);
-        emojiList.push(this.emoji[i]);
-        width += 26.6;
-      }
-    }
+  //   let width = 0;
+  //   const imageList = [
+  //     this.canvas.emoji_thumb,
+  //     this.canvas.emoji_love,
+  //     this.canvas.emoji_smile,
+  //     this.canvas.emoji_shock,
+  //     this.canvas.emoji_question,
+  //   ];
+  //   const imageListArray = [];
+  //   const emojiList = [];
+  //   for (let i = 0; i < 5; i++) {
+  //     if (this.emoji[i] !== 0) {
+  //       imageListArray.push(imageList[i]);
+  //       emojiList.push(this.emoji[i]);
+  //       width += 26.6;
+  //     }
+  //   }
 
-    if (emojiList.length === 0) return;
+  //   if (emojiList.length === 0) return;
 
-    const x = this.width / 2 - width + this.padding / 2;
-    const y = this.height / 2 - 18 + this.padding / 2;
-    ctx.font = '10px Inter ';
-    ctx.lineJoin = 'round';
-    ctx.save();
-    ctx.translate(x - 10, y);
-    this.drawRoundRectPath(ctx, width, 15, 2);
-    ctx.fillStyle = 'rgba(255, 255, 255, 1)';
-    ctx.fill();
-    ctx.restore();
+  //   const x = this.width / 2 - width + this.padding / 2;
+  //   const y = this.height / 2 - 18 + this.padding / 2;
+  //   ctx.font = '10px Inter ';
+  //   ctx.lineJoin = 'round';
+  //   ctx.save();
+  //   ctx.translate(x - 10, y);
+  //   this.drawRoundRectPath(ctx, width, 15, 2);
+  //   ctx.fillStyle = 'rgba(255, 255, 255, 1)';
+  //   ctx.fill();
+  //   ctx.restore();
 
-    //ctx.strokeRect(x - 10, y, width, 16);
-    //ctx.fillRect(x - 10 + 10 / 2, y + 10 / 2, width - 10, 16 - 10);
-    ctx.fillStyle = '#000';
-    const isEmojiThumbExist = !(this.canvas.emoji_thumb === undefined);
-    if (isEmojiThumbExist) {
-      let modifier = 0;
-      for (let i = 0; i < imageListArray.length; i++) {
-        const imageX = this.width / 2 - 33.6 + modifier + 2 + this.padding / 2;
-        const imageY = this.height / 2 - 15 + this.padding / 2;
-        const imageW = 10;
-        const imageH = 10;
-        ctx.drawImage(imageListArray[i], imageX, imageY, imageW, imageH);
-        ctx.fillText(
-          emojiList[i].toString(),
-          this.width / 2 - 20.6 + modifier + 1 + this.padding / 2,
-          y + 12
-        );
-        modifier -= 23.6;
-      }
-    }
-  }
-  _renderBackground(ctx) {
+  //   //ctx.strokeRect(x - 10, y, width, 16);
+  //   //ctx.fillRect(x - 10 + 10 / 2, y + 10 / 2, width - 10, 16 - 10);
+  //   ctx.fillStyle = '#000';
+  //   const isEmojiThumbExist = !(this.canvas.emoji_thumb === undefined);
+  //   if (isEmojiThumbExist) {
+  //     let modifier = 0;
+  //     for (let i = 0; i < imageListArray.length; i++) {
+  //       const imageX = this.width / 2 - 33.6 + modifier + 2 + this.padding / 2;
+  //       const imageY = this.height / 2 - 15 + this.padding / 2;
+  //       const imageW = 10;
+  //       const imageH = 10;
+  //       ctx.drawImage(imageListArray[i], imageX, imageY, imageW, imageH);
+  //       ctx.fillText(
+  //         emojiList[i].toString(),
+  //         this.width / 2 - 20.6 + modifier + 1 + this.padding / 2,
+  //         y + 12
+  //       );
+  //       modifier -= 23.6;
+  //     }
+  //   }
+  // }
+  _renderBackground(ctx: any) {
     if (!this.backgroundColor) {
       return;
     }
@@ -787,7 +796,7 @@ export class CircleNotes extends Textbox {
     ctx.fillStyle = this.backgroundColor;
     ctx.beginPath(); // start new path
     const radius =
-      dim.x / 2 + this.padding / this.scaleX / this.canvas?.getZoom();
+      dim.x / 2 + this.padding / this.scaleX / (this.canvas?.getZoom() ?? 1);
     ctx.arc(0, 0, radius, 0, 2 * Math.PI); // draw circle path
     ctx.closePath(); // close path
     ctx.strokeStyle = this.backgroundColor;
@@ -795,7 +804,7 @@ export class CircleNotes extends Textbox {
     ctx.stroke();
     ctx.fill();
   }
-  _renderText(ctx) {
+  _renderText(ctx: any) {
     ctx.shadowOffsetX = ctx.shadowOffsetY = ctx.shadowBlur = 0;
     ctx.shadowColor = '';
 
@@ -807,13 +816,15 @@ export class CircleNotes extends Textbox {
       this._renderTextStroke(ctx);
     }
   }
-  _renderTextCommon(ctx, method) {
+  _renderTextCommon(ctx: any, method: any) {
     ctx.save();
     let lineHeights = 0;
     const left = this._getLeftOffset();
     const top = this._getTopOffset();
+
     const offsets = this._applyPatternGradientTransform(
       ctx,
+      //@ts-ignore
       method === 'fillText' ? this.fill : this.stroke
     );
 
@@ -842,7 +853,7 @@ export class CircleNotes extends Textbox {
     };
   }
 
-  drawRoundRectPath(cxt, width, height, radius) {
+  drawRoundRectPath(cxt: any, width: any, height: any, radius: any) {
     cxt.beginPath(0);
     //从右下角顺时针绘制，弧度从0到1/2PI
     cxt.arc(width - radius, height - radius, radius, 0, Math.PI / 2);

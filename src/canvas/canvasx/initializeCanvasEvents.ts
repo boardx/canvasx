@@ -10,9 +10,9 @@ let posY = 0;
 let initialX;
 let initialY;
 let modifyType: string;
-let canvas = window.canvas;
 
 export function whiteboardMouseMoveListener(event: any) {
+  const canvas = event.target.canvas;
   // Return if event exists and event type is 'touchmove'
   if (event && event.e.type === 'touchmove') return;
 
@@ -27,7 +27,8 @@ export function whiteboardMouseMoveListener(event: any) {
   }
 }
 
-function handleMoving(e, moveSpeeding) {
+function handleMoving(e: any, moveSpeeding: any) {
+  const canvas = e.target.canvas;
   /*
    * This function handles moving an object on the canvas when the object is near canvas edge.
    * 4 situations are covered:
@@ -40,7 +41,7 @@ function handleMoving(e, moveSpeeding) {
    */
 
   // Handle when object is near bottom edge
-  if (window.innerHeight - e.y < 50) {
+  if (document.documentElement.clientHeight - e.y < 50) {
     // Move the object down
     canvas
       .getActiveObject()
@@ -85,7 +86,7 @@ function handleMoving(e, moveSpeeding) {
   }
 
   // Handle when object is near right edge
-  if (window.innerWidth - e.x < 50) {
+  if (document.documentElement.clientWidth - e.x < 50) {
     // Move the object to the right
     canvas
       .getActiveObject()
@@ -106,7 +107,8 @@ function handleMoving(e, moveSpeeding) {
 /**
  * canvas mouseup event listener
  */
-export function whiteboardMouseUpListener(event) {
+export function whiteboardMouseUpListener(event: any) {
+  const canvas = event.target.canvas;
   // 使用事件服务反注册函`changeCursor`的`CANVAS_MOUSE_MOVE`事件
 
   // canvas.off('mouse:move', changeCursor);
@@ -141,15 +143,17 @@ export function whiteboardMouseUpListener(event) {
  * canvas mouseout event listener
  * @param {*} event
  */
-export function whiteboardMouseOutListener(event) {
+export function whiteboardMouseOutListener(event: any) {
+  const canvas = event.target.canvas;
   canvas.mouse.down = false;
 }
 
-export function whiteboardMouseDownListener(event) {
+export function whiteboardMouseDownListener(event: any) {
+  const canvas = event.target.canvas;
   // If there is an active object on the canvas,
   // we register an event handler for mouse-move events that changes the cursor.
   if (canvas.getActiveObject()) {
-    canvas.on('mouse:move', changeCursor);
+    // canvas.on('mouse:move', changeCursor);
     // EventService.getInstance().register(
     //   EventNames.CANVAS_MOUSE_MOVE,
     //   changeCursor,
@@ -187,7 +191,7 @@ export function whiteboardMouseDownListener(event) {
   if (event.target && event.target.isEditing) return true;
 
   // We check if the whiteboard is in pan mode.
-  const panMode = store.getState().board.isPanMode || null;
+  // const panMode = store.getState().board.isPanMode || null;
   // We flag that the mouse is down.
   canvas.mouse.down = true;
 
@@ -211,7 +215,7 @@ export function whiteboardMouseDownListener(event) {
  * switch the interaction mode, mouse or trackpad
  * @param {string} interactionMode
  */
-export function switchInteractionMode(interactionMode) {
+export function switchInteractionMode(interactionMode: any, canvas: WBCanvas) {
   // Checking if canvas is not available, or the current UI is mobile. If either is true, exit the function.
   // if (!canvas || store.getState().system.currentUIType === 'mobile') return;
 
@@ -242,20 +246,20 @@ export function switchInteractionMode(interactionMode) {
 
   // Registering a whiteboardMouseMoveListener to handle a canvas mouse move event.
   canvas.on('mouse:move', whiteboardMouseMoveListener);
-  // EventService.getInstance().register(
-  //   EventNames.CANVAS_MOUSE_MOVE,
-  //   whiteboardMouseMoveListener,
-  // );
-  //todo: need to check
-  // Registering a windowGestureStarthandler to handle a window gesture start event.
-  canvas.on('gesture:start', windowGestureStarthandler);
-  // EventService.getInstance().register(
-  //   EventNames.WINDOW_GESTURE_START,
-  //   windowGestureStarthandler,
-  // );
+  // // EventService.getInstance().register(
+  // //   EventNames.CANVAS_MOUSE_MOVE,
+  // //   whiteboardMouseMoveListener,
+  // // );
+  // //todo: need to check
+  // // Registering a windowGestureStarthandler to handle a window gesture start event.
+  // canvas.on('gesture:start', windowGestureStarthandler);
+  // // EventService.getInstance().register(
+  // //   EventNames.WINDOW_GESTURE_START,
+  // //   windowGestureStarthandler,
+  // // );
 
-  // Registering a windowGestureChangeHandler to handle a window gesture change event.
-  canvas.on('gesture:change', windowGestureChangeHandler);
+  // // Registering a windowGestureChangeHandler to handle a window gesture change event.
+  // canvas.on('gesture:change', windowGestureChangeHandler);
   // EventService.getInstance().register(
   //   EventNames.WINDOW_GESTURE_CHANGE,
   //   windowGestureChangeHandler,
@@ -275,6 +279,7 @@ const windowGestureStarthandler = (e: any) => {
 };
 
 const windowGestureChangeHandler = (e: any) => {
+  const canvas = e.target.canvas;
   // Update the rotation and scale upon gesture's change
   rotation = gestureStartRotation + e.rotation;
   scale = gestureStartScale * e.scale;
@@ -288,10 +293,10 @@ const windowGestureChangeHandler = (e: any) => {
   canvas.mouse.zoomUpdate = true;
 
   // Restrict the scale (zoom level) to a certain range
-  if (scale > 4 && !store.getState().slides.slidesMode) scale = 4;
+  // if (scale > 4 && !store.getState().slides.slidesMode) scale = 4;
   if (scale < 0.05) scale = 0.05;
   // Dispatch an action to update the zoom factor in the store
-  store.dispatch(handleSetZoomFactor(scale));
+  // store.dispatch(handleSetZoomFactor(scale));
 
   // Store the viewport transformation in local storage
   canvas.updateViewportToLocalStorage(canvas.viewportTransform);
@@ -309,7 +314,7 @@ const windowGestureChangeHandler = (e: any) => {
 //   // Exit the function if an inappropriate mode is selected or a file is being dragged or a click is being processed
 //   if (store.getState().mode.type === 'draw' || store.getState().mode.type === 'line' ||
 //     canvas.isDrawingMode ||
-//     (canvas.getActiveObject() && canvas.getActiveObject().obj_type === 'WBFile') ||
+//     (canvas.getActiveObject() && canvas.getActiveObject().objType === 'WBFile') ||
 //     canvas.mouse.moved
 //   ) {
 //     return;
@@ -320,11 +325,11 @@ const windowGestureChangeHandler = (e: any) => {
 //   // If the target is of a note type and is editable, enter edit mode
 //   if (
 //     target &&
-//     (target.obj_type === 'WBRectNotes' ||
-//       target.obj_type === 'WBCircleNotes' ||
-//       target.obj_type === 'WBTextbox' ||
-//       target.obj_type === 'WBText' ||
-//       target.obj_type === 'WBShapeNotes' ||
+//     (target.objType === 'WBRectNotes' ||
+//       target.objType === 'WBCircleNotes' ||
+//       target.objType === 'WBTextbox' ||
+//       target.objType === 'WBText' ||
+//       target.objType === 'WBShapeNotes' ||
 //       target.type === 'textbox') &&
 //     target.editable &&
 //     !target.isPanel
@@ -336,12 +341,12 @@ const windowGestureChangeHandler = (e: any) => {
 //   // If the target is of a note or image type and is editable, exit the function
 //   if (
 //     target &&
-//     (target.obj_type === 'WBRectNotes' ||
-//       target.obj_type === 'WBCircleNotes' ||
-//       target.obj_type === 'WBUrlImage' ||
-//       target.obj_type === 'WBTextbox' ||
-//       target.obj_type === 'WBText' ||
-//       target.obj_type === 'WBShapeNotes') &&
+//     (target.objType === 'WBRectNotes' ||
+//       target.objType === 'WBCircleNotes' ||
+//       target.objType === 'WBUrlImage' ||
+//       target.objType === 'WBTextbox' ||
+//       target.objType === 'WBText' ||
+//       target.objType === 'WBShapeNotes') &&
 //     target.editable
 //   ) {
 //     return;
@@ -381,7 +386,7 @@ const windowGestureChangeHandler = (e: any) => {
 //     defaultNote.textAlign = nextObject.textAlign;
 //     defaultNote.backgroundColor = nextObject.backgroundColor;
 //     defaultNote.fill = nextObject.fill;
-//     defaultNote.obj_type = nextObject.obj_type;
+//     defaultNote.objType = nextObject.objType;
 //     canvas.changeDefaulNote(defaultNote);
 //   }
 
@@ -390,7 +395,7 @@ const windowGestureChangeHandler = (e: any) => {
 //     // Initialized note properties
 //   }
 
-//   note._id = UtilityService.getInstance().generateWidgetID();
+//   note.id = UtilityService.getInstance().generateWidgetID();
 //   // Create and add widget from note properties
 //   // Rest of the function
 // }
@@ -400,7 +405,7 @@ const windowGestureChangeHandler = (e: any) => {
 //   const { target } = event;
 
 //   // Get the widget with the corresponding id from the widget list
-//   const widget = canvas.findById(target._id);
+//   const widget = canvas.findById(target.id);
 
 //   // If the event target hasn't changed, return immediately
 //   if (!event.target.changed) return;
@@ -423,20 +428,21 @@ const windowGestureChangeHandler = (e: any) => {
 //   canvas.requestRenderAll();
 // }
 
-export async function onObjectSelectionCleared() {
+export async function onObjectSelectionCleared(event: any) {
+  const canvas = event.target.canvas;
   // 获取当前在画布上活动的对象
   const target = canvas.getActiveObject();
 
   // 上传被绘制的笔记
-  uploadTheNotesDraw(target);
+  // uploadTheNotesDraw(target);
 
   // 显示菜单，该行代码已被注释，如果需要就取消注释
   // showMenu();
 
   // 如果当前处于自定义颜色模式,则关闭自定义颜色模式
-  if (store.getState().widgets.customColorMode) {
-    store.dispatch(handleSetCustomColorMode(false));
-  }
+  // if (store.getState().widgets.customColorMode) {
+  //   store.dispatch(handleSetCustomColorMode(false));
+  // }
 
   // // 如果当前处于自定义颜色边框模式,则关闭自定义颜色边框模式
   // if (Session.get('customColorBorderMode')) {
@@ -460,13 +466,13 @@ export function initializeCanvasEvents(canvas: WBCanvas) {
   // fabric.Object.prototype.transparentCorners = false;
 
   // Register event listener for 'TEXT_EDITING_EXISTED' event, to call the function 'onTextEditingExited'
-  canvas.on('text:editing:exited', onTextEditingExited);
+  // canvas.on('text:editing:exited', onTextEditingExited);
 
   // Register event listener for 'CANVAS_BEFORE_SELECTION_CLEARED' event, to call the function 'onObjectSelectionCleared'
   canvas.on('before:selection:cleared', onObjectSelectionCleared);
 
   // Register event listener for 'CANVAS_SELECTION_UPDATED' event, to call the function 'onSelectionUpdated'
-  canvas.on('selection:updated', onSelectionUpdated);
+  // canvas.on('selection:updated', onSelectionUpdated);
   // EventService.getInstance().register(
   //   EventNames.CANVAS_SELECTION_UPDATED,
   //   onSelectionUpdated,
@@ -478,7 +484,7 @@ export function initializeCanvasEvents(canvas: WBCanvas) {
   canvas.on('object:scaling', (event: any) => {
     const { target } = event;
 
-    // if (target.obj_type === 'WBTextbox' || target.obj_type === 'WBText') {
+    // if (target.objType === 'WBTextbox' || target.objType === 'WBText') {
     //   const obj = target;
 
     //   const w = obj.width * obj.scaleX;
@@ -502,8 +508,8 @@ export function initializeCanvasEvents(canvas: WBCanvas) {
     // if (target.isActiveSelection()) {
     //   target._objects.forEach((obj: any) => {
     //     obj.set({ hasBorders: false });
-    //     if (obj._id && obj.obj_type !== 'WBShapeNotes') {
-    //       const objwidget = self.findById(obj._id);
+    //     if (obj.id && obj.objType !== 'WBShapeNotes') {
+    //       const objwidget = self.findById(obj.id);
 
     //       objwidget.setCoords();
 
@@ -514,7 +520,7 @@ export function initializeCanvasEvents(canvas: WBCanvas) {
     //         top: objwidget.top,
     //       });
     //     } else {
-    //       const objwidget = self.findById(obj._id);
+    //       const objwidget = self.findById(obj.id);
 
     //       if (!objwidget) return;
 
@@ -523,15 +529,15 @@ export function initializeCanvasEvents(canvas: WBCanvas) {
     //       self.requestRenderAll();
     //     }
     //   });
-    // } else if (target.obj_type !== 'WBArrow' && target.obj_type !== 'WBGroup') {
+    // } else if (target.objType !== 'WBArrow' && target.objType !== 'WBGroup') {
     //   // get left and top before scaling
     //   const objwidget = WidgetService.getInstance().getWidgetFromWidgetList(
-    //     target._id
+    //     target.id
     //   );
 
     //   if (!objwidget) return;
 
-    //   self.syncObjectChangeToRemote(target._id, {
+    //   self.syncObjectChangeToRemote(target.id, {
     //     left: target.left,
     //     top: target.top,
     //     scaleX: target.scaleX,
@@ -542,7 +548,7 @@ export function initializeCanvasEvents(canvas: WBCanvas) {
     //     self.onObjectModifyUpdateArrows(target);
 
     //   if (
-    //     target.obj_type === 'WBRectPanel' &&
+    //     target.objType === 'WBRectPanel' &&
     //     target.subIdList() &&
     //     target.subIdList().length > 0
     //   ) {

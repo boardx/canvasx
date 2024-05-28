@@ -76,17 +76,17 @@ export async function run({ github, context, a, b }) {
 
   await (commentId
     ? github.rest.issues.updateComment({
-        repo,
-        owner,
-        comment_id: commentId,
-        body,
-      })
+      repo,
+      owner,
+      commentid: commentId,
+      body,
+    })
     : github.rest.issues.createComment({
-        repo,
-        owner,
-        issue_number: context.payload.pull_request.number,
-        body,
-      }));
+      repo,
+      owner,
+      issue_number: context.payload.pull_request.number,
+      body,
+    }));
 }
 
 export async function run_simple({ github, context, a, b }) {
@@ -125,15 +125,15 @@ export async function run_simple({ github, context, a, b }) {
 
   await (commentId
     ? github.rest.issues.updateComment({
-        repo,
-        owner,
-        comment_id: commentId,
-        body,
-      })
+      repo,
+      owner,
+      commentid: commentId,
+      body,
+    })
     : github.rest.issues.createComment({
-        repo,
-        owner,
-        issue_number: context.payload.pull_request.number,
-        body,
-      }));
+      repo,
+      owner,
+      issue_number: context.payload.pull_request.number,
+      body,
+    }));
 }

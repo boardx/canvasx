@@ -14,8 +14,10 @@ const IndexPage: NextPage = () => {
     const onLoad = useCallback(
         (canvas: fabric.Canvas) => {
             canvas.setDimensions({
-                width: window.innerWidth,
-                height: window.innerHeight - 60,
+                width: document.documentElement.clientWidth
+                ,
+                height: document.documentElement.clientHeight
+                    - 60,
             });
 
             // create a polygon object

@@ -6,6 +6,7 @@ import { TMat2D } from '../../typedefs';
 import { InteractiveFabricObject } from '../Object/InteractiveObject';
 import { createObjectDefaultControls } from '../../controls/commonControls';
 import { FabricObject } from '../Object/Object';
+import { Transform } from '../../EventTypeDefs';
 
 const getPath = (
   fromPoint: XY,
@@ -43,14 +44,13 @@ class X_Connector extends Path {
   preTransform: TMat2D | null;
   fromObjectId: string;
   toObjectId: string;
-  id: string;
 
   constructor(
     fromPoint: XY,
     toPoint: XY,
     control1: XY,
     control2: XY,
-    style: any,
+    style: any = {},
     options = {}
   ) {
     const path = getPath(
@@ -349,24 +349,11 @@ class X_Connector extends Path {
       x: currentControl.offsetX,
       y: currentControl.offsetY,
     };
+    //@ts-ignore
     const result = fabricObject.transformPointToViewport(point);
 
     return result;
   }
-
-  onStartPointMoving(
-    eventData: any,
-    transform: Transform,
-    x: number,
-    y: number
-  ) {}
-
-  onEndPointMoving(
-    eventData: any,
-    transform: Transform,
-    x: number,
-    y: number
-  ) {}
 
   //responding to control movement
   //control is the control being moved
@@ -380,7 +367,7 @@ class X_Connector extends Path {
   ) {
     const target = transform.target;
     // const relevantPoint = getLocalPoint(transform, 'center', 'top', x, y);
-
+    //@ts-ignore
     const relevantPoint = target.transformPointFromCanvas(new Point(x, y));
     console.log('dragActionHandler', controlType, x, y, relevantPoint);
     // relevantPoint.x = relevantPoint.x ;
@@ -558,8 +545,6 @@ export const TransformPointFromCanvasToObject = (
   const transformedPoint = point.transform(invertedMatrix);
   return transformedPoint;
 };
-window.TransformPointFromObjectToCanvas = TransformPointFromObjectToCanvas;
-window.TransformPointFromCanvasToObject = TransformPointFromCanvasToObject;
 
 export const TransformPointFromObjectToCanvas2 = (
   object: FabricObject,

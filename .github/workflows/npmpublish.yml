@@ -68,4 +68,4 @@ jobs:
           title: 'chore(): Update bug report'
           body: |
             Automated update to `.github/ISSUE_TEMPLATE/bug_report.yml`
-            Triggered by job [`${{ github.job }}`](../actions/runs/${{ github.run_id }})
+            Triggered by job [`${{ github.job }}`](../actions/runs/${{ github.runid }})

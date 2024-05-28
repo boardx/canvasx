@@ -1,42 +1,21 @@
 {
-  "name": "fabric",
-  "description": "Object model for HTML5 canvas, and SVG-to-canvas parser. Backed by jsdom and node-canvas.",
-  "homepage": "http://fabricjs.com/",
-  "version": "6.0.0-rc1",
-  "author": "Juriy Zaytsev <kangax@gmail.com>",
-  "contributors": [
-    {
-      "name": "Andrea Bogazzi",
-      "email": "andreabogazzi79@gmail.com",
-      "url": "https://github.com/asturur"
-    },
-    {
-      "name": "Shachar Nencel",
-      "email": "shacharnen@gmail.com",
-      "url": "https://github.com/ShaMan123"
-    },
-    {
-      "name": "Steve Eberhardt",
-      "email": "melchiar2@gmail.com",
-      "url": "https://github.com/melchiar"
-    }
-  ],
+  "name": "canvasx",
+  "description": "CanvasX is open source digital whiteboard.",
+  "homepage": "http://www.boardx.us/",
+  "version": "0.0.1",
+  "author": "boardx",
+  "contributors": [],
   "keywords": [
-    "canvas",
-    "graphic",
-    "graphics",
-    "SVG",
-    "node-canvas",
-    "parser",
-    "HTML5",
-    "object model"
+    "whiteboard",
+    "sticky note",
+    "AI"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/fabricjs/fabric.js"
+    "url": "https://github.com/boardx/canvasx"
   },
   "bugs": {
-    "url": "https://github.com/fabricjs/fabric.js/issues"
+    "url": "https://github.com/boardx/canvasx/issues"
   },
   "license": "MIT",
   "scripts": {

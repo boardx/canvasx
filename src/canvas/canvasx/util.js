@@ -44,23 +44,23 @@ const _URL = window.URL || window.webkitURL;
 
 /**
  *
- * @param {*} obj_type
+ * @param {*} objType
  * @returns
  */
-Util["getType"] = function (obj_type) {
+Util["getType"] = function (objType) {
   let text = "";
-  if (obj_type === "WBRectNotes") text = "便利贴";
-  else if (obj_type === "WBCircleNotes") text = "便利贴";
-  else if (obj_type === "WBText") text = "文本";
-  else if (obj_type === "WBImage") text = "图片";
-  else if (obj_type === "WBUrlImage") text = "网址";
-  else if (obj_type === "WBPath") text = "绘画";
-  else if (obj_type === "WBLine") text = "图形";
-  else if (obj_type === "WBArrow") text = "图形";
-  else if (obj_type === "WBRect") text = "图形";
-  else if (obj_type === "WBCircle") text = "图形";
-  else if (obj_type === "sticker") text = "图标";
-  else if (obj_type === "WBGroup") text = "群组";
+  if (objType === "WBRectNotes") text = "便利贴";
+  else if (objType === "WBCircleNotes") text = "便利贴";
+  else if (objType === "WBText") text = "文本";
+  else if (objType === "WBImage") text = "图片";
+  else if (objType === "WBUrlImage") text = "网址";
+  else if (objType === "WBPath") text = "绘画";
+  else if (objType === "WBLine") text = "图形";
+  else if (objType === "WBArrow") text = "图形";
+  else if (objType === "WBRect") text = "图形";
+  else if (objType === "WBCircle") text = "图形";
+  else if (objType === "sticker") text = "图标";
+  else if (objType === "WBGroup") text = "群组";
   return text;
 };
 
@@ -285,8 +285,8 @@ Util.rgbaToHex = function (orig) {
   var alpha = ((rgb && rgb[4]) || "").trim();
   const hex = rgb
     ? (rgb[1] | (1 << 8)).toString(16).slice(1) +
-      (rgb[2] | (1 << 8)).toString(16).slice(1) +
-      (rgb[3] | (1 << 8)).toString(16).slice(1)
+    (rgb[2] | (1 << 8)).toString(16).slice(1) +
+    (rgb[3] | (1 << 8)).toString(16).slice(1)
     : orig;
   if (alpha !== "") {
     a = alpha;
@@ -510,7 +510,7 @@ Util.animateMouseToPosition = async function (userNo, left, top) {
       $(`#${userNo}`).css("top", newTop);
     },
     easing: fabric.util.ease.easeInOutQuad,
-    onComplete() {},
+    onComplete() { },
   });
 };
 
@@ -607,15 +607,15 @@ Util.replaceAll = function (inStr, search, replace) {
   return inStr.split(search).join(replace);
 };
 
-Util.changeMenuBarSelected = (obj_type) => {
+Util.changeMenuBarSelected = (objType) => {
   store.dispatch(handleSetNoteSelected(false));
   store.dispatch(handleSetTextSelected(true));
   store.dispatch(handleSetShapeSelected(true));
   store.dispatch(handleSetPathSelected(true));
   store.dispatch(handleSetArrowSelected(true));
   store.dispatch(handleSetFileSelected(true));
-  if (!obj_type) return;
-  switch (obj_type) {
+  if (!objType) return;
+  switch (objType) {
     case "WBRectNotes":
       store.dispatch(handleSetNoteSelected(true));
       break;
@@ -637,8 +637,8 @@ Util.changeMenuBarSelected = (obj_type) => {
   }
 };
 
-Util.getMenuBarSelected = (obj_type) => {
-  switch (obj_type) {
+Util.getMenuBarSelected = (objType) => {
+  switch (objType) {
     case "WBRectNotes":
       return store.getState().widgets.noteSelected;
     case "WBText":

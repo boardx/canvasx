@@ -1,25 +1,24 @@
-//@ts-nocheck
-
 import { classRegistry } from '../../ClassRegistry';
-import { Textbox } from './X_Textbox';
+import { X_Textbox as Textbox } from './X_Textbox';
 import { createRectNotesDefaultControls } from '../../controls/X_commonControls';
-import type { TBBox, TClassProperties } from '../../typedefs';
+import type {
+  TBBox,
+  TClassProperties,
+  TOriginX,
+  TOriginY,
+} from '../../typedefs';
 import { Point } from '../../Point';
 import { X_Connector } from './X_Connector';
-import { invertTransform } from '../../util';
 
 // this will be a separated effort
 export const rectNotesDefaultValues: Partial<TClassProperties<RectNotes>> = {
   minWidth: 20,
   dynamicMinWidth: 2,
-  lockScalingFlip: true,
-  noScaleCache: false,
-  _wordJoiners: /[ \t\r]/,
+
   splitByGrapheme: true,
   height: 138,
   maxHeight: 138,
-  originX: 'center',
-  originY: 'center',
+
   width: 230,
   cornerStrokeColor: 'gray',
   cornerStyle: 'circle',
@@ -33,6 +32,7 @@ export const rectNotesDefaultValues: Partial<TClassProperties<RectNotes>> = {
  * user can only change width. Height is adjusted automatically based on the
  * wrapping of lines.
  */
+///@ts-ignore
 export class RectNotes extends Textbox {
   /**selectable
    * Minimum width of textbox, in pixels.
@@ -44,14 +44,21 @@ export class RectNotes extends Textbox {
   declare locked: boolean;
 
   declare verticalAlign: string;
+  declare originX: TOriginX;
+  declare originY: TOriginY;
+  declare width: number;
+  declare cornerStrokeColor: string;
 
+  declare cornerColor: string;
+  declare transparentCorners: boolean;
   declare zIndex: number;
+  declare height: number;
   declare maxHeight: number;
   declare connectors: object[];
   declare id: string;
 
   public extendPropeties = [
-    'obj_type',
+    'objType',
     'whiteboardId',
     'userId',
     'timestamp',
@@ -59,7 +66,7 @@ export class RectNotes extends Textbox {
     'locked',
     'verticalAlign',
     'lines',
-    '_id',
+    'id',
     'zIndex',
     'relationship',
     'emoj',
@@ -89,7 +96,10 @@ export class RectNotes extends Textbox {
   static getDefaults() {
     return {
       ...super.getDefaults(),
-      controls: createRectNotesDefaultControls(),
+      controls: {
+        ...createRectNotesDefaultControls(),
+        // mr: { /* add your desired value here */ },
+      },
       ...RectNotes.ownDefaults,
     };
   }
@@ -103,7 +113,9 @@ export class RectNotes extends Textbox {
 
   findById(id: string) {
     const canvas = this.canvas;
-    const obj = canvas?.getObjects().filter((widget: any) => widget.id === id);
+    const obj: any = canvas
+      ?.getObjects()
+      .filter((widget: any) => widget.id === id);
     if (obj.length === 0) return null;
     return obj[0];
   }
@@ -120,8 +132,8 @@ export class RectNotes extends Textbox {
     const connectingX = connectingPoint.x;
     const connectingY = connectingPoint.y;
 
-    let controlX: number;
-    let controlY: number;
+    let controlX: number = 0;
+    let controlY: number = 0;
 
     // Find the nearest border and calculate the control point outside the bounding box
     const distances = [
@@ -154,14 +166,13 @@ export class RectNotes extends Textbox {
         break;
     }
 
-    return { x: controlX, y: controlY };
+    return new Point(controlX, controlY);
   }
 
-  updateConnector(point, connector: X_Connector, type: string) {
+  updateConnector(point: any, connector: X_Connector, type: string) {
     const controlPoint = this.calculateControlPoint(
       this.getBoundingRect(),
-      new Point(point.x, point.y),
-      type === 'from' ? connector.control1 : connector.control2
+      new Point(point.x, point.y)
     );
 
     console.log(
@@ -177,16 +188,12 @@ export class RectNotes extends Textbox {
 
     //recalculate the startpoint or endpoint of the connector, and also the ControlPoint
     if (type === 'from') {
-      connector.startPoint = point;
-      connector.control1 = controlPoint;
       connector.update({
         fromPoint: point,
         control1: controlPoint,
       });
     }
     if (type === 'to') {
-      connector.endPoint = point;
-      connector.control2 = controlPoint;
       connector.update({
         toPoint: point,
         control2: controlPoint,
@@ -197,15 +204,16 @@ export class RectNotes extends Textbox {
   moveOrScaleHandler(e: any) {
     //if there is a connector, move the connector
     if (this.connectors?.length === 0) return;
-    this.connectors?.forEach((connector) => {
+    this.connectors?.forEach((connector: any) => {
       const pointConnector = connector.point;
 
       //get canvas point of the connector point
       const point = new Point(pointConnector.x, pointConnector.y);
-
+      //@ts-ignore
       const transformedPoint = this.transformPointToCanvas(point);
 
       //use the connectorId to find the connector and then update the connector
+      //ts-ignore
       const connectorObj = this.findById(connector.connectorId);
 
       if (!connectorObj) return;
@@ -328,89 +336,89 @@ export class RectNotes extends Textbox {
     return super.styleHas(property, lineIndex);
   }
 
-  /**
-   * Returns true if object has no styling or no styling in a line
-   * @param {Number} lineIndex , lineIndex is on wrapped lines.
-   * @return {Boolean}
-   */
-  isEmptyStyles(lineIndex: number): boolean {
-    if (!this.styles) {
-      return true;
-    }
-    let offset = 0,
-      nextLineIndex = lineIndex + 1,
-      nextOffset,
-      shouldLimit = false;
-    const map = this._styleMap[lineIndex],
-      mapNextLine = this._styleMap[lineIndex + 1];
-    if (map) {
-      lineIndex = map.line;
-      offset = map.offset;
-    }
-    if (mapNextLine) {
-      nextLineIndex = mapNextLine.line;
-      shouldLimit = nextLineIndex === lineIndex;
-      nextOffset = mapNextLine.offset;
-    }
-    const obj =
-      typeof lineIndex === 'undefined'
-        ? this.styles
-        : { line: this.styles[lineIndex] };
-    for (const p1 in obj) {
-      for (const p2 in obj[p1]) {
-        if (p2 >= offset && (!shouldLimit || p2 < nextOffset)) {
-          // eslint-disable-next-line no-unused-vars
-          for (const p3 in obj[p1][p2]) {
-            return false;
-          }
-        }
-      }
-    }
-    return true;
-  }
+  // /**
+  //  * Returns true if object has no styling or no styling in a line
+  //  * @param {Number} lineIndex , lineIndex is on wrapped lines.
+  //  * @return {Boolean}
+  //  */
+  // isEmptyStyles(lineIndex: number): boolean {
+  //   if (!this.styles) {
+  //     return true;
+  //   }
+  //   let offset = 0,
+  //     nextLineIndex = lineIndex + 1,
+  //     nextOffset,
+  //     shouldLimit = false;
+  //   const map = this._styleMap[lineIndex],
+  //     mapNextLine = this._styleMap[lineIndex + 1];
+  //   if (map) {
+  //     lineIndex = map.line;
+  //     offset = map.offset;
+  //   }
+  //   if (mapNextLine) {
+  //     nextLineIndex = mapNextLine.line;
+  //     shouldLimit = nextLineIndex === lineIndex;
+  //     nextOffset = mapNextLine.offset;
+  //   }
+  //   const obj =
+  //     typeof lineIndex === 'undefined'
+  //       ? this.styles
+  //       : { line: this.styles[lineIndex] };
+  //   for (const p1 in obj) {
+  //     for (const p2 in obj[p1]) {
+  //       if (p2 >= offset && (!shouldLimit || p2 < nextOffset)) {
+  //         // eslint-disable-next-line no-unused-vars
+  //         for (const p3 in obj[p1][p2]) {
+  //           return false;
+  //         }
+  //       }
+  //     }
+  //   }
+  //   return true;
+  // }
 
-  /**
-   * @param {Number} lineIndex
-   * @param {Number} charIndex
-   * @private
-   */
-  _getStyleDeclaration(lineIndex: number, charIndex: number) {
-    if (this._styleMap && !this.isWrapping) {
-      const map = this._styleMap[lineIndex];
-      if (!map) {
-        return null;
-      }
-      lineIndex = map.line;
-      charIndex = map.offset + charIndex;
-    }
-    return super._getStyleDeclaration(lineIndex, charIndex);
-  }
+  // /**
+  //  * @param {Number} lineIndex
+  //  * @param {Number} charIndex
+  //  * @private
+  //  */
+  // _getStyleDeclaration(lineIndex: number, charIndex: number) {
+  //   if (this._styleMap && !this.isWrapping) {
+  //     const map = this._styleMap[lineIndex];
+  //     if (!map) {
+  //       return null;
+  //     }
+  //     lineIndex = map.line;
+  //     charIndex = map.offset + charIndex;
+  //   }
+  //   return super._getStyleDeclaration(lineIndex, charIndex);
+  // }
 
-  /**
-   * @param {Number} lineIndex
-   * @param {Number} charIndex
-   * @param {Object} style
-   * @private
-   */
-  _setStyleDeclaration(lineIndex: number, charIndex: number, style: object) {
-    const map = this._styleMap[lineIndex];
-    lineIndex = map.line;
-    charIndex = map.offset + charIndex;
+  // /**
+  //  * @param {Number} lineIndex
+  //  * @param {Number} charIndex
+  //  * @param {Object} style
+  //  * @private
+  //  */
+  // _setStyleDeclaration(lineIndex: number, charIndex: number, style: object) {
+  //   const map = this._styleMap[lineIndex];
+  //   lineIndex = map.line;
+  //   charIndex = map.offset + charIndex;
 
-    this.styles[lineIndex][charIndex] = style;
-  }
+  //   this.styles[lineIndex][charIndex] = style;
+  // }
 
-  /**
-   * @param {Number} lineIndex
-   * @param {Number} charIndex
-   * @private
-   */
-  _deleteStyleDeclaration(lineIndex: number, charIndex: number) {
-    const map = this._styleMap[lineIndex];
-    lineIndex = map.line;
-    charIndex = map.offset + charIndex;
-    delete this.styles[lineIndex][charIndex];
-  }
+  // /**
+  //  * @param {Number} lineIndex
+  //  * @param {Number} charIndex
+  //  * @private
+  //  */
+  // _deleteStyleDeclaration(lineIndex: number, charIndex: number) {
+  //   const map = this._styleMap[lineIndex];
+  //   lineIndex = map.line;
+  //   charIndex = map.offset + charIndex;
+  //   delete this.styles[lineIndex][charIndex];
+  // }
 
   /**
    * probably broken need a fix
@@ -436,54 +444,54 @@ export class RectNotes extends Textbox {
     this.styles[map.line] = {};
   }
 
-  /**
-   * Wraps text using the 'width' property of Textbox. First this function
-   * splits text on newlines, so we preserve newlines entered by the user.
-   * Then it wraps each line using the width of the Textbox by calling
-   * _wrapLine().
-   * @param {Array} lines The string array of text that is split into lines
-   * @param {Number} desiredWidth width you want to wrap to
-   * @returns {Array} Array of lines
-   */
-  _wrapText(lines: Array<any>, desiredWidth: number): Array<any> {
-    const wrapped = [];
-    this.isWrapping = true;
-    for (let i = 0; i < lines.length; i++) {
-      wrapped.push(...this._wrapLine(lines[i], i, desiredWidth));
-    }
-    this.isWrapping = false;
-    return wrapped;
-  }
+  // /**
+  //  * Wraps text using the 'width' property of Textbox. First this function
+  //  * splits text on newlines, so we preserve newlines entered by the user.
+  //  * Then it wraps each line using the width of the Textbox by calling
+  //  * _wrapLine().
+  //  * @param {Array} lines The string array of text that is split into lines
+  //  * @param {Number} desiredWidth width you want to wrap to
+  //  * @returns {Array} Array of lines
+  //  */
+  // _wrapText(lines: Array<any>, desiredWidth: number): Array<any> {
+  //   const wrapped = [];
+  //   this.isWrapping = true;
+  //   for (let i = 0; i < lines.length; i++) {
+  //     wrapped.push(...this._wrapLine(lines[i], i, desiredWidth));
+  //   }
+  //   this.isWrapping = false;
+  //   return wrapped;
+  // }
 
-  /**
-   * Helper function to measure a string of text, given its lineIndex and charIndex offset
-   * It gets called when charBounds are not available yet.
-   * Override if necessary
-   * Use with {@link Textbox#wordSplit}
-   *
-   * @param {CanvasRenderingContext2D} ctx
-   * @param {String} text
-   * @param {number} lineIndex
-   * @param {number} charOffset
-   * @returns {number}
-   */
-  _measureWord(word, lineIndex: number, charOffset = 0): number {
-    let width = 0,
-      prevGrapheme;
-    const skipLeft = true;
-    for (let i = 0, len = word.length; i < len; i++) {
-      const box = this._getGraphemeBox(
-        word[i],
-        lineIndex,
-        i + charOffset,
-        prevGrapheme,
-        skipLeft
-      );
-      width += box.kernedWidth;
-      prevGrapheme = word[i];
-    }
-    return width;
-  }
+  // /**
+  //  * Helper function to measure a string of text, given its lineIndex and charIndex offset
+  //  * It gets called when charBounds are not available yet.
+  //  * Override if necessary
+  //  * Use with {@link Textbox#wordSplit}
+  //  *
+  //  * @param {CanvasRenderingContext2D} ctx
+  //  * @param {String} text
+  //  * @param {number} lineIndex
+  //  * @param {number} charOffset
+  //  * @returns {number}
+  //  */
+  // _measureWord(word, lineIndex: number, charOffset = 0): number {
+  //   let width = 0,
+  //     prevGrapheme;
+  //   const skipLeft = true;
+  //   for (let i = 0, len = word.length; i < len; i++) {
+  //     const box = this._getGraphemeBox(
+  //       word[i],
+  //       lineIndex,
+  //       i + charOffset,
+  //       prevGrapheme,
+  //       skipLeft
+  //     );
+  //     width += box.kernedWidth;
+  //     prevGrapheme = word[i];
+  //   }
+  //   return width;
+  // }
 
   /**
    * Override this method to customize word splitting
@@ -521,87 +529,87 @@ export class RectNotes extends Textbox {
     return graphemes;
   }
 
-  _wrapLine(
-    _line,
-    lineIndex: number,
-    desiredWidth: number,
-    reservedSpace = 0
-  ): Array<any> {
-    const additionalSpace = this._getWidthOfCharSpacing();
-    const splitByGrapheme = this.splitByGrapheme;
-    const graphemeLines = [];
-    const words = splitByGrapheme
-      ? this.graphemeSplitForRectNotes(_line)
-      : this.wordSplit(_line);
-    const infix = splitByGrapheme ? '' : ' ';
+  // _wrapLine(
+  //   _line: any,
+  //   lineIndex: number,
+  //   desiredWidth: number,
+  //   reservedSpace = 0
+  // ): Array<any> {
+  //   const additionalSpace = this._getWidthOfCharSpacing();
+  //   const splitByGrapheme = this.splitByGrapheme;
+  //   const graphemeLines = [];
+  //   const words = splitByGrapheme
+  //     ? this.graphemeSplitForRectNotes(_line)
+  //     : this.wordSplit(_line);
+  //   const infix = splitByGrapheme ? '' : ' ';
 
-    let lineWidth = 0,
-      line = [],
-      // spaces in different languages?
-      offset = 0,
-      infixWidth = 0,
-      largestWordWidth = 0,
-      lineJustStarted = true;
-    // fix a difference between split and graphemeSplit
-    if (words.length === 0) {
-      words.push([]);
-    }
-    desiredWidth -= reservedSpace;
-    // measure words
-    const data = words.map((word) => {
-      // if using splitByGrapheme words are already in graphemes.
-      word = splitByGrapheme ? word : this.graphemeSplitForRectNotes(word);
-      const width = this._measureWord(word, lineIndex, offset);
-      largestWordWidth = Math.max(width, largestWordWidth);
-      offset += word.length + 1;
-      return { word: word, width: width };
-    });
-    const maxWidth = Math.max(
-      desiredWidth,
-      largestWordWidth,
-      this.dynamicMinWidth
-    );
-    // layout words
-    offset = 0;
-    let i;
-    for (i = 0; i < words.length; i++) {
-      const word = data[i].word;
-      const wordWidth = data[i].width;
-      offset += word.length;
+  //   let lineWidth = 0,
+  //     line: any[] = [],
+  //     // spaces in different languages?
+  //     offset = 0,
+  //     infixWidth = 0,
+  //     largestWordWidth = 0,
+  //     lineJustStarted = true;
+  //   // fix a difference between split and graphemeSplit
+  //   if (words.length === 0) {
+  //     words.push([]);
+  //   }
+  //   desiredWidth -= reservedSpace;
+  //   // measure words
+  //   const data = words.map((word) => {
+  //     // if using splitByGrapheme words are already in graphemes.
+  //     word = splitByGrapheme ? word : this.graphemeSplitForRectNotes(word);
+  //     const width = this._measureWord(word, lineIndex, offset);
+  //     largestWordWidth = Math.max(width, largestWordWidth);
+  //     offset += word.length + 1;
+  //     return { word: word, width: width };
+  //   });
+  //   const maxWidth = Math.max(
+  //     desiredWidth,
+  //     largestWordWidth,
+  //     this.dynamicMinWidth
+  //   );
+  //   // layout words
+  //   offset = 0;
+  //   let i;
+  //   for (i = 0; i < words.length; i++) {
+  //     const word = data[i].word;
+  //     const wordWidth = data[i].width;
+  //     offset += word.length;
 
-      lineWidth += infixWidth + wordWidth - additionalSpace;
-      if (lineWidth > maxWidth && !lineJustStarted) {
-        graphemeLines.push(line);
-        line = [];
-        lineWidth = wordWidth;
-        lineJustStarted = true;
-      } else {
-        lineWidth += additionalSpace;
-      }
+  //     lineWidth += infixWidth + wordWidth - additionalSpace;
+  //     if (lineWidth > maxWidth && !lineJustStarted) {
+  //       graphemeLines.push(line);
+  //       line = [];
+  //       lineWidth = wordWidth;
+  //       lineJustStarted = true;
+  //     } else {
+  //       lineWidth += additionalSpace;
+  //     }
 
-      if (!lineJustStarted && !splitByGrapheme) {
-        line.push(infix);
-      }
-      if (word.length > 1) {
-        line = line.concat(word.split(''));
-      } else {
-        line = line.concat(word);
-      }
+  //     if (!lineJustStarted && !splitByGrapheme) {
+  //       line.push(infix);
+  //     }
+  //     if (word.length > 1) {
+  //       line = line.concat(word.split(''));
+  //     } else {
+  //       line = line.concat(word);
+  //     }
 
-      infixWidth = splitByGrapheme
-        ? 0
-        : this._measureWord([infix], lineIndex, offset);
-      offset++;
-      lineJustStarted = false;
-    }
+  //     infixWidth = splitByGrapheme
+  //       ? 0
+  //       : this._measureWord([infix], lineIndex, offset);
+  //     offset++;
+  //     lineJustStarted = false;
+  //   }
 
-    i && graphemeLines.push(line);
+  //   i && graphemeLines.push(line);
 
-    if (largestWordWidth + reservedSpace > this.dynamicMinWidth) {
-      this.dynamicMinWidth = largestWordWidth - additionalSpace + reservedSpace;
-    }
-    return graphemeLines;
-  }
+  //   if (largestWordWidth + reservedSpace > this.dynamicMinWidth) {
+  //     this.dynamicMinWidth = largestWordWidth - additionalSpace + reservedSpace;
+  //   }
+  //   return graphemeLines;
+  // }
 
   /**
    * Detect if the text line is ended with an hard break
@@ -626,7 +634,7 @@ export class RectNotes extends Textbox {
    * and counting style.
    * @return Number
    */
-  missingNewlineOffset(lineIndex) {
+  missingNewlineOffset(lineIndex: number) {
     if (this.splitByGrapheme) {
       return this.isEndOfWrapping(lineIndex) ? 1 : 0;
     }
@@ -656,33 +664,33 @@ export class RectNotes extends Textbox {
     return Math.max(this.minWidth, this.dynamicMinWidth);
   }
 
-  _removeExtraneousStyles() {
-    const linesToKeep = {};
-    for (const prop in this._styleMap) {
-      if (this._textLines[prop]) {
-        linesToKeep[this._styleMap[prop].line] = 1;
-      }
-    }
-    for (const prop in this.styles) {
-      if (!linesToKeep[prop]) {
-        delete this.styles[prop];
-      }
-    }
-  }
+  // _removeExtraneousStyles() {
+  //   const linesToKeep = {};
+  //   for (const prop in this._styleMap) {
+  //     if (this._textLines[prop]) {
+  //       linesToKeep[this._styleMap[prop].line] = 1;
+  //     }
+  //   }
+  //   for (const prop in this.styles) {
+  //     if (!linesToKeep[prop]) {
+  //       delete this.styles[prop];
+  //     }
+  //   }
+  // }
 
-  /**
-   * Returns object representation of an instance
-   * @method toObject
-   * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-   * @return {Object} object representation of an instance
-   */
-  toObject(propertiesToInclude: Array<any>): object {
-    return super.toObject(
-      [...this.extendPropeties, 'minWidth', 'splitByGrapheme'].concat(
-        propertiesToInclude
-      )
-    );
-  }
+  // /**
+  //  * Returns object representation of an instance
+  //  * @method toObject
+  //  * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+  //  * @return {Object} object representation of an instance
+  //  */
+  // toObject(propertiesToInclude: Array<any>): object {
+  //   return super.toObject(
+  //     [...this.extendPropeties, 'minWidth', 'splitByGrapheme'].concat(
+  //       propertiesToInclude
+  //     )
+  //   );
+  // }
   /**boardx custom function */
 
   /* caculate cusor positon in the middle of the textbox */
@@ -725,6 +733,13 @@ export class RectNotes extends Textbox {
   _getTopOffset() {
     return -this._getTotalLineHeights() / 2;
   }
+  _getTotalLineHeights() {
+    return this._textLines.reduce(
+      (total, line, index) => total + this.getHeightOfLine(index),
+      0
+    );
+  }
+
   _getTotalLineHeight() {
     return this._textLines.reduce(
       (total, _line, index) => total + this.getHeightOfLine(index),
@@ -780,28 +795,3 @@ export class RectNotes extends Textbox {
 
 classRegistry.setClass(RectNotes);
 classRegistry.setSVGClass(RectNotes, 'RectNotes');
-
-const TransformPointFromObjectToCanvas = (
-  object: FabricObject,
-  point: Point
-) => {
-  const mObject = object.calcOwnMatrix();
-  // const mCanvas = object.getViewportTransform();
-  // const matrix = multiplyTransformMatrices(mCanvas, mObject);
-  const transformedPoint = point.transform(mObject); // transformPoint(point, matrix);
-  return transformedPoint;
-};
-
-export const TransformPointFromCanvasToObject = (
-  object: FabricObject,
-  point: Point
-) => {
-  const mObject = object.calcOwnMatrix();
-  // const mCanvas = object.canvas!.viewportTransform;
-  // const matrix = multiplyTransformMatrices(mCanvas, mObject);
-  const invertedMatrix = invertTransform(mObject);
-  const transformedPoint = point.transform(invertedMatrix);
-  return transformedPoint;
-};
-window.TransformPointFromObjectToCanvas = TransformPointFromObjectToCanvas;
-window.TransformPointFromCanvasToObject = TransformPointFromCanvasToObject;

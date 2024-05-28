@@ -76,9 +76,27 @@ export default function MyApp({ children }: { children: React.ReactNode }) {
                             </Link>
                             <Divider orientation="vertical" />
                             <Link
-                                href=" /polygon"
+                                href=" /file"
                             >
-                                POLYGON
+                                FILE
+                            </Link>
+                            <Divider orientation="vertical" />
+                            <Link
+                                href=" /website"
+                            >
+                                WEBSITE
+                            </Link>
+                            <Divider orientation="vertical" />
+                            <Link
+                                href=" /image"
+                            >
+                                IMAGE
+                            </Link>
+                            <Divider orientation="vertical" />
+                            <Link
+                                href=" /viewport"
+                            >
+                                VIEWPORT
                             </Link>
                         </Sheet>
                     </Container>

@@ -1,6 +1,6 @@
 
 'use client';
-import * as fabric from 'fabric';
+import * as fabric from 'canvasx';
 import { NextPage } from 'next';
 import { useRef, useCallback } from 'react';
 import { Canvas } from '../../components/Canvas';
@@ -14,8 +14,10 @@ const IndexPage: NextPage = () => {
     const onLoad = useCallback(
         (canvas: fabric.Canvas) => {
             canvas.setDimensions({
-                width: window.innerWidth,
-                height: window.innerHeight - 60,
+                width: document.documentElement.clientWidth
+                ,
+                height: document.documentElement.clientHeight
+                    - 60,
             });
             const textValue = 'CanvasX Demo';
 
@@ -26,9 +28,8 @@ const IndexPage: NextPage = () => {
                     top: 220 + i * 120,
                     left: 200 + i * 120,
                     textAlign: 'center',
-                    textValue,
                     backgroundColor: 'lightblue',
-                    _id: Math.random().toString(36).substr(2, 9),
+                    id: Math.random().toString(36).substr(2, 9),
                 });
                 canvas.add(rectNote);
             }
@@ -37,12 +38,13 @@ const IndexPage: NextPage = () => {
             for (let i = 0; i < 3; i++) {
                 const circleNote = new fabric.CircleNotes(textValue, {
                     originX: 'center',
+                    originY: 'center',
                     top: 520 + i * 110,
                     left: 520 + i * 110,
                     textAlign: 'center',
-                    textValue,
+
                     backgroundColor: 'yellow',
-                    _id: Math.random().toString(36).substr(2, 9),
+                    id: Math.random().toString(36).substr(2, 9),
                 });
                 canvas.add(circleNote);
             }
@@ -56,9 +58,9 @@ const IndexPage: NextPage = () => {
                     width: 138,
                     height: 138,
                     textAlign: 'center',
-                    textValue,
+
                     backgroundColor: 'lightgreen',
-                    _id: Math.random().toString(36).substr(2, 9),
+                    id: Math.random().toString(36).substr(2, 9),
                 });
                 canvas.add(rectNote);
             }
@@ -73,9 +75,8 @@ const IndexPage: NextPage = () => {
                     width: 200,
                     height: 200,
                     icon: i + 1,
-                    textValue,
                     backgroundColor: 'lightblue',
-                    _id: Math.random().toString(36).substr(2, 9),
+                    id: Math.random().toString(36).substr(2, 9),
                 });
                 canvas.add(rectNote);
             }
