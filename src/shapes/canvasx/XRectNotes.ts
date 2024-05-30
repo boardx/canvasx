@@ -1,34 +1,30 @@
-import { TClassProperties } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
-import { Textbox, TextboxProps } from '../Textbox';
+import { XTextbox as Textbox } from './XTextbox';
 import { createRectNotesDefaultControls } from '../../controls/X_commonControls';
-// @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
-// regexes, list of properties that are not suppose to change by instances, magic consts.
-// this will be a separated effort
-export const circleNotesDefaultValues: Partial<TClassProperties<CircleNotes>> =
-  {
-    minWidth: 20,
-    dynamicMinWidth: 2,
-    verticalAlign: 'middle',
-    lockScalingFlip: true,
-    noScaleCache: false,
-    _wordJoiners: /[ \t\r]/,
-    splitByGrapheme: true,
-    objType: 'WBCircleNotes',
-    height: 138,
-    maxHeight: 138,
-    width: 138,
-    noteType: 'circle',
-    radius: 138,
-    cornerStrokeColor: 'gray',
-    cornerStyle: 'circle',
-    cornerColor: 'white',
-    transparentCorners: false,
-  };
+import type {
+  TBBox,
+  TClassProperties,
+  TOriginX,
+  TOriginY,
+} from '../../typedefs';
+import { Point } from '../../Point';
+import { XConnector } from './XConnector';
 
-export interface CircleNotesProps extends TextboxProps {
-  id: string;
-}
+// this will be a separated effort
+export const rectNotesDefaultValues: Partial<TClassProperties<XRectNotes>> = {
+  minWidth: 20,
+  dynamicMinWidth: 2,
+
+  splitByGrapheme: true,
+  height: 138,
+  maxHeight: 138,
+
+  width: 230,
+  cornerStrokeColor: 'gray',
+  cornerStyle: 'circle',
+  cornerColor: 'white',
+  transparentCorners: false,
+};
 
 /**
  * Textbox class, based on IText, allows the user to resize the text rectangle
@@ -36,41 +32,30 @@ export interface CircleNotesProps extends TextboxProps {
  * user can only change width. Height is adjusted automatically based on the
  * wrapping of lines.
  */
-export class CircleNotes extends Textbox {
+///@ts-ignore
+export class XRectNotes extends Textbox {
   /**selectable
    * Minimum width of textbox, in pixels.
    * @type Number
    * @default
    */
   declare minWidth: number;
-  declare maxHeight: number;
-  declare noteType: string;
-  declare radius: number;
-
-  /* boardx cusotm function */
-  declare id: string;
-
-  declare objType: string;
 
   declare locked: boolean;
 
-  declare whiteboardId: string;
-
-  declare userId: string;
-
-  declare timestamp: Date;
-
   declare verticalAlign: string;
+  declare originX: TOriginX;
+  declare originY: TOriginY;
+  declare width: number;
+  declare cornerStrokeColor: string;
 
+  declare cornerColor: string;
+  declare transparentCorners: boolean;
   declare zIndex: number;
-
-  declare lines: object[];
-
-  declare relationship: object[];
-
-  declare emoj: object[];
-
-  declare userEmoji: object[];
+  declare height: number;
+  declare maxHeight: number;
+  declare connectors: object[];
+  declare id: string;
 
   public extendPropeties = [
     'objType',
@@ -106,19 +91,154 @@ export class CircleNotes extends Textbox {
 
   static textLayoutProperties = [...Textbox.textLayoutProperties, 'width'];
 
-  static ownDefaults: Record<string, any> = circleNotesDefaultValues;
+  static ownDefaults: Record<string, any> = rectNotesDefaultValues;
 
   static getDefaults() {
     return {
       ...super.getDefaults(),
-      controls: createRectNotesDefaultControls(),
-      ...CircleNotes.ownDefaults,
+      controls: {
+        ...createRectNotesDefaultControls(),
+        // mr: { /* add your desired value here */ },
+      },
+      ...XRectNotes.ownDefaults,
     };
   }
-
-  constructor(text: string, options: Partial<CircleNotesProps>) {
+  constructor(
+    text: string,
+    options: Partial<TClassProperties<XRectNotes>> = {}
+  ) {
     super(text, options);
+    this.initializeEvent();
   }
+
+  findById(id: string) {
+    const canvas = this.canvas;
+    const obj: any = canvas
+      ?.getObjects()
+      .filter((widget: any) => widget.id === id);
+    if (obj.length === 0) return null;
+    return obj[0];
+  }
+
+  calculateControlPoint(boundingBox: TBBox, connectingPoint: Point): Point {
+    const left = boundingBox.left;
+    const top = boundingBox.top;
+    const width = boundingBox.width;
+    const height = boundingBox.height;
+
+    const right = left + width;
+    const bottom = top + height;
+
+    const connectingX = connectingPoint.x;
+    const connectingY = connectingPoint.y;
+
+    let controlX: number = 0;
+    let controlY: number = 0;
+
+    // Find the nearest border and calculate the control point outside the bounding box
+    const distances = [
+      { side: 'left', distance: Math.abs(connectingX - left) },
+      { side: 'right', distance: Math.abs(connectingX - right) },
+      { side: 'top', distance: Math.abs(connectingY - top) },
+      { side: 'bottom', distance: Math.abs(connectingY - bottom) },
+    ];
+
+    const nearestBorder = distances.reduce((min, current) =>
+      current.distance < min.distance ? current : min
+    );
+
+    switch (nearestBorder.side) {
+      case 'left':
+        controlX = left - 220;
+        controlY = connectingY;
+        break;
+      case 'right':
+        controlX = right + 220;
+        controlY = connectingY;
+        break;
+      case 'top':
+        controlX = connectingX;
+        controlY = top - 220;
+        break;
+      case 'bottom':
+        controlX = connectingX;
+        controlY = bottom + 220;
+        break;
+    }
+
+    return new Point(controlX, controlY);
+  }
+
+  updateConnector(point: any, connector: XConnector, type: string) {
+    const controlPoint = this.calculateControlPoint(
+      this.getBoundingRect(),
+      new Point(point.x, point.y)
+    );
+
+    console.log(
+      'updateConnector: point:',
+      point,
+      'control point:',
+      controlPoint,
+      connector,
+      type
+    );
+    //if the connector is from the object, then the startpoint should be updated
+    //if the connector is to the object, then the endpoint should be updated
+
+    //recalculate the startpoint or endpoint of the connector, and also the ControlPoint
+    if (type === 'from') {
+      connector.update({
+        fromPoint: point,
+        control1: controlPoint,
+      });
+    }
+    if (type === 'to') {
+      connector.update({
+        toPoint: point,
+        control2: controlPoint,
+      });
+    }
+  }
+
+  moveOrScaleHandler(e: any) {
+    //if there is a connector, move the connector
+    if (this.connectors?.length === 0) return;
+    this.connectors?.forEach((connector: any) => {
+      const pointConnector = connector.point;
+
+      //get canvas point of the connector point
+      const point = new Point(pointConnector.x, pointConnector.y);
+      //@ts-ignore
+      const transformedPoint = this.transformPointToCanvas(point);
+
+      //use the connectorId to find the connector and then update the connector
+      //ts-ignore
+      const connectorObj = this.findById(connector.connectorId);
+
+      if (!connectorObj) return;
+      console.log('connectorObj', connectorObj);
+
+      if (this.id === connectorObj.fromId) {
+        this.updateConnector(transformedPoint, connectorObj, 'from');
+      }
+
+      if (this.id === connectorObj.toId) {
+        this.updateConnector(transformedPoint, connectorObj, 'to');
+      }
+    });
+  }
+
+  initializeEvent() {
+    this.on('moving', (e) => {
+      this.moveOrScaleHandler(e);
+    });
+
+    this.on('scaling', (e) => {
+      this.moveOrScaleHandler(e);
+    });
+  }
+
   /**
    * Unlike superclass's version of this function, Textbox does not update
    * its width.
@@ -147,12 +267,16 @@ export class CircleNotes extends Textbox {
     }
     // clear cache and re-calculate height
     const height = this.calcTextHeight();
-    if (height > 76 && this.fontSize > 2) {
+    if (height > this.maxHeight && this.fontSize > 6) {
       this.set('fontSize', this.fontSize - 2);
       this._splitTextIntoLines(this.text);
       return;
     }
-
+    if (height > 130 && this.fontSize === 6) {
+      const prenum = 125 / height;
+      const newText = this.text.substring(0, this.text.length * prenum - 5);
+      this.set('text', newText + '...');
+    }
     this.height = this.maxHeight;
     return this.height;
   }
@@ -165,9 +289,9 @@ export class CircleNotes extends Textbox {
    * @private
    */
   _generateStyleMap(textInfo: any) {
-    let realLineCount = 0,
-      realLineCharCount = 0,
-      charCount = 0;
+    let realLineCount = 0;
+    let realLineCharCount = 0;
+    let charCount = 0;
     const map: any = {};
 
     for (let i = 0; i < textInfo.graphemeLines.length; i++) {
@@ -185,7 +309,10 @@ export class CircleNotes extends Textbox {
         charCount++;
       }
 
-      map[i] = { line: realLineCount, offset: realLineCharCount };
+      map[i] = {
+        line: realLineCount,
+        offset: realLineCharCount,
+      };
 
       charCount += textInfo.graphemeLines[i].length;
       realLineCharCount += textInfo.graphemeLines[i].length;
@@ -194,20 +321,20 @@ export class CircleNotes extends Textbox {
     return map;
   }
 
-  // /**
-  //  * Returns true if object has a style property or has it on a specified line
-  //  * @param {Number} lineIndex
-  //  * @return {Boolean}
-  //  */
-  // styleHas(property, lineIndex: number): boolean {
-  //   if (this._styleMap && !this.isWrapping) {
-  //     const map = this._styleMap[lineIndex];
-  //     if (map) {
-  //       lineIndex = map.line;
-  //     }
-  //   }
-  //   return super.styleHas(property, lineIndex);
-  // }
+  /**
+   * Returns true if object has a style property or has it on a specified line
+   * @param {Number} lineIndex
+   * @return {Boolean}
+   */
+  styleHas(property: any, lineIndex: number): boolean {
+    if (this._styleMap && !this.isWrapping) {
+      const map = this._styleMap[lineIndex];
+      if (map) {
+        lineIndex = map.line;
+      }
+    }
+    return super.styleHas(property, lineIndex);
+  }
 
   // /**
   //  * Returns true if object has no styling or no styling in a line
@@ -267,31 +394,31 @@ export class CircleNotes extends Textbox {
   //   return super._getStyleDeclaration(lineIndex, charIndex);
   // }
 
-  /**
-   * @param {Number} lineIndex
-   * @param {Number} charIndex
-   * @param {Object} style
-   * @private
-   */
-  _setStyleDeclaration(lineIndex: number, charIndex: number, style: object) {
-    const map = this._styleMap[lineIndex];
-    lineIndex = map.line;
-    charIndex = map.offset + charIndex;
+  // /**
+  //  * @param {Number} lineIndex
+  //  * @param {Number} charIndex
+  //  * @param {Object} style
+  //  * @private
+  //  */
+  // _setStyleDeclaration(lineIndex: number, charIndex: number, style: object) {
+  //   const map = this._styleMap[lineIndex];
+  //   lineIndex = map.line;
+  //   charIndex = map.offset + charIndex;
 
-    this.styles[lineIndex][charIndex] = style;
-  }
+  //   this.styles[lineIndex][charIndex] = style;
+  // }
 
-  /**
-   * @param {Number} lineIndex
-   * @param {Number} charIndex
-   * @private
-   */
-  _deleteStyleDeclaration(lineIndex: number, charIndex: number) {
-    const map = this._styleMap[lineIndex];
-    lineIndex = map.line;
-    charIndex = map.offset + charIndex;
-    delete this.styles[lineIndex][charIndex];
-  }
+  // /**
+  //  * @param {Number} lineIndex
+  //  * @param {Number} charIndex
+  //  * @private
+  //  */
+  // _deleteStyleDeclaration(lineIndex: number, charIndex: number) {
+  //   const map = this._styleMap[lineIndex];
+  //   lineIndex = map.line;
+  //   charIndex = map.offset + charIndex;
+  //   delete this.styles[lineIndex][charIndex];
+  // }
 
   /**
    * probably broken need a fix
@@ -336,35 +463,35 @@ export class CircleNotes extends Textbox {
   //   return wrapped;
   // }
 
-  /**
-   * Helper function to measure a string of text, given its lineIndex and charIndex offset
-   * It gets called when charBounds are not available yet.
-   * Override if necessary
-   * Use with {@link Textbox#wordSplit}
-   *
-   * @param {CanvasRenderingContext2D} ctx
-   * @param {String} text
-   * @param {number} lineIndex
-   * @param {number} charOffset
-   * @returns {number}
-   */
-  _measureWord(word: any, lineIndex: number, charOffset = 0): number {
-    let width = 0,
-      prevGrapheme;
-    const skipLeft = true;
-    for (let i = 0, len = word.length; i < len; i++) {
-      const box = this._getGraphemeBox(
-        word[i],
-        lineIndex,
-        i + charOffset,
-        prevGrapheme,
-        skipLeft
-      );
-      width += box.kernedWidth;
-      prevGrapheme = word[i];
-    }
-    return width;
-  }
+  // /**
+  //  * Helper function to measure a string of text, given its lineIndex and charIndex offset
+  //  * It gets called when charBounds are not available yet.
+  //  * Override if necessary
+  //  * Use with {@link Textbox#wordSplit}
+  //  *
+  //  * @param {CanvasRenderingContext2D} ctx
+  //  * @param {String} text
+  //  * @param {number} lineIndex
+  //  * @param {number} charOffset
+  //  * @returns {number}
+  //  */
+  // _measureWord(word, lineIndex: number, charOffset = 0): number {
+  //   let width = 0,
+  //     prevGrapheme;
+  //   const skipLeft = true;
+  //   for (let i = 0, len = word.length; i < len; i++) {
+  //     const box = this._getGraphemeBox(
+  //       word[i],
+  //       lineIndex,
+  //       i + charOffset,
+  //       prevGrapheme,
+  //       skipLeft
+  //     );
+  //     width += box.kernedWidth;
+  //     prevGrapheme = word[i];
+  //   }
+  //   return width;
+  // }
 
   /**
    * Override this method to customize word splitting
@@ -385,16 +512,13 @@ export class CircleNotes extends Textbox {
    * @returns {Array} Array of line(s) into which the given text is wrapped
    * to.
    */
+
   graphemeSplitForRectNotes(textstring: string): string[] {
     const graphemes = [];
     const words = textstring.split(/\b/);
     for (let i = 0; i < words.length; i++) {
-      // 检查单词是否全为拉丁字母，长度不大于13，且没有四个或更多的连续相同的字母
-      if (
-        /^[a-zA-Z]+$/.test(words[i]) &&
-        words[i].length <= 13 &&
-        !/(\w)\1{3,}/.test(words[i])
-      ) {
+      // 检查单词是否全为拉丁字母，长度不大于16
+      if (/^[a-zA-Z]{1,16}$/.test(words[i])) {
         graphemes.push(words[i]);
       } else {
         for (let j = 0; j < words[i].length; j++) {
@@ -411,16 +535,16 @@ export class CircleNotes extends Textbox {
   //   desiredWidth: number,
   //   reservedSpace = 0
   // ): Array<any> {
-  //   const additionalSpace = this._getWidthOfCharSpacing(),
-  //     splitByGrapheme = this.splitByGrapheme,
-  //     graphemeLines = [],
-  //     words = splitByGrapheme
-  //       ? this.graphemeSplitForRectNotes(_line)
-  //       : this.wordSplit(_line),
-  //     infix = splitByGrapheme ? '' : ' ';
+  //   const additionalSpace = this._getWidthOfCharSpacing();
+  //   const splitByGrapheme = this.splitByGrapheme;
+  //   const graphemeLines = [];
+  //   const words = splitByGrapheme
+  //     ? this.graphemeSplitForRectNotes(_line)
+  //     : this.wordSplit(_line);
+  //   const infix = splitByGrapheme ? '' : ' ';
 
   //   let lineWidth = 0,
-  //     line = [],
+  //     line: any[] = [],
   //     // spaces in different languages?
   //     offset = 0,
   //     infixWidth = 0,
@@ -505,17 +629,17 @@ export class CircleNotes extends Textbox {
     return false;
   }
 
-  // /**
-  //  * Detect if a line has a linebreak and so we need to account for it when moving
-  //  * and counting style.
-  //  * @return Number
-  //  */
-  // missingNewlineOffset(lineIndex) {
-  //   if (this.splitByGrapheme) {
-  //     return this.isEndOfWrapping(lineIndex) ? 1 : 0;
-  //   }
-  //   return 1;
-  // }
+  /**
+   * Detect if a line has a linebreak and so we need to account for it when moving
+   * and counting style.
+   * @return Number
+   */
+  missingNewlineOffset(lineIndex: number) {
+    if (this.splitByGrapheme) {
+      return this.isEndOfWrapping(lineIndex) ? 1 : 0;
+    }
+    return 1;
+  }
 
   /**
    * Gets lines of text to render in the Textbox. This function calculates
@@ -554,58 +678,6 @@ export class CircleNotes extends Textbox {
   //   }
   // }
 
-  getObject() {
-    const object = {};
-    const keys = [
-      'id', // string, the id of the object
-      'angle', //  integer, angle for recording rotating
-      'backgroundColor', // string,  background color, works when the image is transparent
-      'fill', // the font color
-      'width', // integer, width of the object
-      'height', // integer, height of the object
-      'left', // integer left for position
-      'lines', // array, the arrows array [{…}]
-      'locked', // boolean, lock status for the widget， this is connected to lock
-      'lockMovementX', // boolean, lock the verticle movement
-      'lockMovementY', // boolean, lock the horizontal movement
-      'lockScalingFlip', // boolean,  make it can not be inverted by pulling the width to the negative side
-      'objType', // object type
-      'originX', // string, Horizontal origin of transformation of an object (one of "left", "right", "center") See http://jsfiddle.net/1ow02gea/244/ on how originX/originY affect objects in groups
-      'originY', // string, Vertical origin of transformation of an object (one of "top", "bottom", "center") See http://jsfiddle.net/1ow02gea/244/ on how originX/originY affect objects in groups
-      'scaleX', // nunber, Object scale factor (horizontal)
-      'scaleY', // number, Object scale factor (vertical)
-      'selectable', // boolean, When set to `false`, an object can not be selected for modification (using either point-click-based or group-based selection). But events still fire on it.
-      'top', // integer, Top position of an object. Note that by default it's relative to object top. You can change this by setting originY={top/center/bottom}
-      'userNo', // string, the unique id for the user, one user id could open mutiple browser, each browser has unique user no
-      'userId', // string, user identity
-      'whiteboardId', // whiteboard id, string
-      'zIndex', // the index for the object on whiteboard, integer
-      'version', // version of the app, string
-      'isPanel', // is this a panel, boolean
-      'panelObj', // if this is a panel, the id of the panel, string
-      'relationship', // array, viewporttransform
-      'subObjList', // ["5H9qYfNGt4vizhcuS"] array list id for sub objects
-      'fontFamily', // string, font family
-      'fontSize', // integer, font size
-      'fontWeight', // integer, font weight
-      'lineHeight', // integer, font height
-      'strokeWidth', //
-      'text', // string, text
-      'textAlign', // string, alignment
-      'imageSrc', // src for the note draw
-      'isDraw', // is this a draw note
-      'emoji', // [0,0,0,0,0], record the emoji
-      'userEmoji', // [{userid,[0,0,0,0,1]},{userid,[0,0,0,0,1]}], record who vote the emoji
-      'editable', // text editable,
-      'lastEditedBy', // last edited by
-    ];
-    keys.forEach((key) => {
-      //@ts-ignore
-      object[key] = this[key];
-    });
-    return object;
-  }
-
   // /**
   //  * Returns object representation of an instance
   //  * @method toObject
@@ -621,98 +693,13 @@ export class CircleNotes extends Textbox {
   // }
   /**boardx custom function */
 
-  getWidgetMenuList() {
-    // if (this.isDraw) {
-    //   return [
-    //     'textNote',
-    //     'borderLineIcon',
-    //     'backgroundColor',
-    //     'resetDraw',
-    //     'switchNoteType',
-    //     'drawOption',
-    //     'lineWidth',
-    //     'noteDrawColor', // strokeColor
-    //     'emojiMenu',
-    //     'more',
-    //     'objectLock',
-    //     'aiassist',
-    //   ];
-    // }
-    if (this.locked) {
-      return ['objectLock'];
-    }
-    return [
-      'drawNote',
-      'more',
-      'borderLineIcon',
-      'switchNoteType',
-      'fontSize',
-      'textAlign',
-      'backgroundColor',
-      'emojiMenu',
-      'fontWeight',
-      'textBullet',
-      'objectLock',
-      'delete',
-      'aiassist',
-    ];
-  }
-  getWidgetMenuTouchList() {
-    // if (this.isDraw) {
-    //   return ['emojiMenu', 'objectLock'];
-    // }
-    if (this.locked) {
-      return ['objectLock'];
-    }
-    return [
-      'objectDelete',
-      'moreMenuStickyNote',
-      'backgroundColor',
-      'fontColor',
-      'emojiMenu',
-      'objectLock',
-      'aiassist',
-    ];
-  }
-  getWidgetMenuLength() {
-    if (this.locked) return 50;
-    // if (this.isDraw) {
-    //   return 308;
-    // }
-    return 420;
-  }
   /* caculate cusor positon in the middle of the textbox */
-  getCenteredTop(rectHeight: any) {
+  getCenteredTop(rectHeight: number) {
     const textHeight = this.height;
     return (rectHeight - textHeight) / 2;
   }
 
-  _getTopOffset() {
-    switch (this.verticalAlign) {
-      case 'middle':
-        return -this._getTotalLineHeights() / 2;
-      case 'bottom':
-        return this.height / 2 - this._getTotalLineHeights();
-      default:
-        return -this.height / 2;
-    }
-  }
-
-  _getTotalLineHeight() {
-    return this._textLines.reduce(
-      (total, _line, index) => total + this.getHeightOfLine(index),
-      0
-    );
-  }
-
-  _getTotalLineHeights() {
-    return this._textLines.reduce(
-      (total, line, index) => total + this.getHeightOfLine(index),
-      0
-    );
-  }
-
-  _render(ctx: any) {
+  _render(ctx: CanvasRenderingContext2D) {
     const path: any = this.path;
 
     path && !path.isNotVisible() && path._render(ctx);
@@ -722,89 +709,45 @@ export class CircleNotes extends Textbox {
     this._renderText(ctx);
     this._renderTextDecoration(ctx, 'overline');
     this._renderTextDecoration(ctx, 'linethrough');
-
-    // const isEmojiExist = !(
-    //   this.emoji === undefined || this.emoji.join() === '0,0,0,0,0'
-    // );
-    // if (isEmojiExist) {
-    //   this.renderEmoji(ctx);
-    // }
   }
 
-  // renderEmoji(ctx) {
-  //   if (this.emoji === undefined) {
-  //     return;
-  //   }
-
-  //   let width = 0;
-  //   const imageList = [
-  //     this.canvas.emoji_thumb,
-  //     this.canvas.emoji_love,
-  //     this.canvas.emoji_smile,
-  //     this.canvas.emoji_shock,
-  //     this.canvas.emoji_question,
-  //   ];
-  //   const imageListArray = [];
-  //   const emojiList = [];
-  //   for (let i = 0; i < 5; i++) {
-  //     if (this.emoji[i] !== 0) {
-  //       imageListArray.push(imageList[i]);
-  //       emojiList.push(this.emoji[i]);
-  //       width += 26.6;
-  //     }
-  //   }
-
-  //   if (emojiList.length === 0) return;
-
-  //   const x = this.width / 2 - width + this.padding / 2;
-  //   const y = this.height / 2 - 18 + this.padding / 2;
-  //   ctx.font = '10px Inter ';
-  //   ctx.lineJoin = 'round';
-  //   ctx.save();
-  //   ctx.translate(x - 10, y);
-  //   this.drawRoundRectPath(ctx, width, 15, 2);
-  //   ctx.fillStyle = 'rgba(255, 255, 255, 1)';
-  //   ctx.fill();
-  //   ctx.restore();
-
-  //   //ctx.strokeRect(x - 10, y, width, 16);
-  //   //ctx.fillRect(x - 10 + 10 / 2, y + 10 / 2, width - 10, 16 - 10);
-  //   ctx.fillStyle = '#000';
-  //   const isEmojiThumbExist = !(this.canvas.emoji_thumb === undefined);
-  //   if (isEmojiThumbExist) {
-  //     let modifier = 0;
-  //     for (let i = 0; i < imageListArray.length; i++) {
-  //       const imageX = this.width / 2 - 33.6 + modifier + 2 + this.padding / 2;
-  //       const imageY = this.height / 2 - 15 + this.padding / 2;
-  //       const imageW = 10;
-  //       const imageH = 10;
-  //       ctx.drawImage(imageListArray[i], imageX, imageY, imageW, imageH);
-  //       ctx.fillText(
-  //         emojiList[i].toString(),
-  //         this.width / 2 - 20.6 + modifier + 1 + this.padding / 2,
-  //         y + 12
-  //       );
-  //       modifier -= 23.6;
-  //     }
-  //   }
-  // }
-  _renderBackground(ctx: any) {
+  _renderBackground(ctx: CanvasRenderingContext2D) {
     if (!this.backgroundColor) {
       return;
     }
     const dim = this._getNonTransformedDimensions();
     ctx.fillStyle = this.backgroundColor;
-    ctx.beginPath(); // start new path
-    const radius =
-      dim.x / 2 + this.padding / this.scaleX / (this.canvas?.getZoom() ?? 1);
-    ctx.arc(0, 0, radius, 0, 2 * Math.PI); // draw circle path
-    ctx.closePath(); // close path
-    ctx.strokeStyle = this.backgroundColor;
-    ctx.fillStyle = this.backgroundColor;
-    ctx.stroke();
-    ctx.fill();
+
+    // ctx.shadowBlur = 20;
+    // ctx.shadowOffsetX = 2 * this.scaleX * canvas.getZoom();
+    // ctx.shadowOffsetY = 6 * this.scaleY * canvas.getZoom();
+    // ctx.shadowColor = 'rgba(0,0,0,0.1)';
+    // ctx.shadowColor = 'rgba(0,0,0,1)';
+
+    ctx.fillRect(-dim.x / 2, -dim.y / 2, dim.x, dim.y);
+
+    // if there is background color no other shadows
+    // should be casted
+    // this._removeShadow(ctx);
   }
-  _renderText(ctx: any) {
+  _getTopOffset() {
+    return -this._getTotalLineHeights() / 2;
+  }
+  _getTotalLineHeights() {
+    return this._textLines.reduce(
+      (total, line, index) => total + this.getHeightOfLine(index),
+      0
+    );
+  }
+
+  _getTotalLineHeight() {
+    return this._textLines.reduce(
+      (total, _line, index) => total + this.getHeightOfLine(index),
+      0
+    );
+  }
+
+  _renderText(ctx: CanvasRenderingContext2D) {
     ctx.shadowOffsetX = ctx.shadowOffsetY = ctx.shadowBlur = 0;
     ctx.shadowColor = '';
 
@@ -816,45 +759,13 @@ export class CircleNotes extends Textbox {
       this._renderTextStroke(ctx);
     }
   }
-  _renderTextCommon(ctx: any, method: any) {
-    ctx.save();
-    let lineHeights = 0;
-    const left = this._getLeftOffset();
-    const top = this._getTopOffset();
-
-    const offsets = this._applyPatternGradientTransform(
-      ctx,
-      //@ts-ignore
-      method === 'fillText' ? this.fill : this.stroke
-    );
-
-    for (let i = 0, len = this._textLines.length; i < len; i++) {
-      const heightOfLine = this.getHeightOfLine(i);
-      const maxHeight = heightOfLine / this.lineHeight;
-      const leftOffset = this._getLineLeftOffset(i);
-      this._renderTextLine(
-        method,
-        ctx,
-        this._textLines[i],
-        left + leftOffset - offsets.offsetX,
-        top + lineHeights + maxHeight - offsets.offsetY,
-        i
-      );
-      lineHeights += heightOfLine;
-    }
-    ctx.restore();
-  }
-
-  _getSVGLeftTopOffsets() {
-    return {
-      textLeft: -this.width / 2,
-      textTop: this._getTopOffset(),
-      lineTop: this.getHeightOfLine(0),
-    };
-  }
-
-  drawRoundRectPath(cxt: any, width: any, height: any, radius: any) {
-    cxt.beginPath(0);
+  drawRoundRectPath(
+    cxt: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    radius: number
+  ) {
+    cxt.beginPath();
     //从右下角顺时针绘制，弧度从0到1/2PI
     cxt.arc(width - radius, height - radius, radius, 0, Math.PI / 2);
 
@@ -882,5 +793,5 @@ export class CircleNotes extends Textbox {
   }
 }
 
-classRegistry.setClass(CircleNotes);
-classRegistry.setSVGClass(CircleNotes, 'circleNotes');
+classRegistry.setClass(XRectNotes);
+classRegistry.setSVGClass(XRectNotes, 'XRectNotes');

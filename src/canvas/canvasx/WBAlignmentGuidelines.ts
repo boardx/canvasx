@@ -217,7 +217,7 @@ export class alignmentGuideLines {
       !currentObject ||
       !currentObject.visible ||
       currentObject.objType === 'WBLine' ||
-      currentObject.objType === 'WBArrow' ||
+      currentObject.objType === 'XConnector' ||
       currentObject.objType === 'common' ||
       currentObject.group ||
       currentObject === this.activeObject ||

@@ -1,4 +1,4 @@
-import { WBCanvas } from './bx-canvas';
+import { XCanvas } from './bx-canvas';
 
 // import "../components/dropfile";
 
@@ -6,7 +6,7 @@ import './group';
 
 import './utils';
 import './zindex';
-import './WBCanvasUndoRedo';
+import './XCanvasUndoRedo';
 // import "./widgetAI";
 
-export { WBCanvas };
+export { XCanvas };

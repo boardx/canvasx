@@ -1,6 +1,7 @@
+import { classRegistry } from '../../ClassRegistry';
 import { Group } from '../Group';
 
-export class X_Group extends Group {
+export class XGroup extends Group {
   declare objType: string;
   getObject() {
     // const object = {};
@@ -81,3 +82,4 @@ export class X_Group extends Group {
     // return menuList;
   }
 }
+classRegistry.setClass(XGroup);

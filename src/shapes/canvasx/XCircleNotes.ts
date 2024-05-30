@@ -1,21 +1,34 @@
 import { TClassProperties } from '../../typedefs';
-import { IText } from '../IText/IText';
 import { classRegistry } from '../../ClassRegistry';
-import { createTextboxDefaultControls } from '../../controls/X_commonControls';
-import { EventName, TextAlign, WidgetType, Origin } from './types';
-import { Textbox } from '../Textbox';
-
-import { isTransformCentered, getLocalPoint } from '../../controls/util';
+import { Textbox, TextboxProps } from '../Textbox';
+import { createRectNotesDefaultControls } from '../../controls/X_commonControls';
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
 // regexes, list of properties that are not suppose to change by instances, magic consts.
 // this will be a separated effort
-export const textboxDefaultValues: Partial<TClassProperties<X_Textbox>> = {
-  minWidth: 20,
-  dynamicMinWidth: 2,
-  // _wordJoiners: /[ \t\r]/,
-  splitByGrapheme: true,
-  objType: 'X_Textbox',
-};
+export const circleNotesDefaultValues: Partial<TClassProperties<XCircleNotes>> =
+  {
+    minWidth: 20,
+    dynamicMinWidth: 2,
+    verticalAlign: 'middle',
+    lockScalingFlip: true,
+    noScaleCache: false,
+    _wordJoiners: /[ \t\r]/,
+    splitByGrapheme: true,
+    objType: 'XCircleNotes',
+    height: 138,
+    maxHeight: 138,
+    width: 138,
+    noteType: 'circle',
+    radius: 138,
+    cornerStrokeColor: 'gray',
+    cornerStyle: 'circle',
+    cornerColor: 'white',
+    transparentCorners: false,
+  };
+
+export interface CircleNotesProps extends TextboxProps {
+  id: string;
+}
 
 /**
  * Textbox class, based on IText, allows the user to resize the text rectangle
@@ -23,18 +36,57 @@ export const textboxDefaultValues: Partial<TClassProperties<X_Textbox>> = {
  * user can only change width. Height is adjusted automatically based on the
  * wrapping of lines.
  */
-export class X_Textbox extends Textbox {
-  /**
+export class XCircleNotes extends Textbox {
+  /**selectable
    * Minimum width of textbox, in pixels.
    * @type Number
    * @default
    */
   declare minWidth: number;
+  declare maxHeight: number;
+  declare noteType: string;
+  declare radius: number;
 
   /* boardx cusotm function */
+  declare id: string;
+
   declare objType: string;
 
-  declare hasNoText: boolean;
+  declare locked: boolean;
+
+  declare whiteboardId: string;
+
+  declare userId: string;
+
+  declare timestamp: Date;
+
+  declare verticalAlign: string;
+
+  declare zIndex: number;
+
+  declare lines: object[];
+
+  declare relationship: object[];
+
+  declare emoj: object[];
+
+  declare userEmoji: object[];
+
+  public extendPropeties = [
+    'objType',
+    'whiteboardId',
+    'userId',
+    'timestamp',
+    'zIndex',
+    'locked',
+    'verticalAlign',
+    'lines',
+    'id',
+    'zIndex',
+    'relationship',
+    'emoj',
+    'userEmoji',
+  ];
   /**
    * Minimum calculated width of a textbox, in pixels.
    * fixed to 2 so that an empty textbox cannot go to 0
@@ -44,9 +96,6 @@ export class X_Textbox extends Textbox {
    */
   declare dynamicMinWidth: number;
 
-  declare oneLine: boolean;
-
-  declare fromCopy: boolean;
   /**
    * Use this boolean property in order to split strings that have no white space concept.
    * this is a cheap way to help with chinese/japanese
@@ -55,53 +104,58 @@ export class X_Textbox extends Textbox {
    */
   declare splitByGrapheme: boolean;
 
-  static textLayoutProperties = [...IText.textLayoutProperties, 'width'];
+  static textLayoutProperties = [...Textbox.textLayoutProperties, 'width'];
 
-  static ownDefaults: Record<string, any> = textboxDefaultValues;
+  static ownDefaults: Record<string, any> = circleNotesDefaultValues;
 
   static getDefaults() {
     return {
       ...super.getDefaults(),
-      controls: createTextboxDefaultControls(),
-      ...X_Textbox.ownDefaults,
+      controls: createRectNotesDefaultControls(),
+      ...XCircleNotes.ownDefaults,
     };
   }
-  constructor(text: string, options: any) {
-    super(text, options);
-    // if (this.objType !== 'WBText' && this.objType !== 'WBTextbox') {
-    // this.addControls();
-    // }
-    this.InitializeEvent();
-    this.resetResizeControls();
-  }
 
-  // /**
-  //  * Unlike superclass's version of this function, Textbox does not update
-  //  * its width.
-  //  * @private
-  //  * @override
-  //  */
-  // initDimensions() {
-  //   if (!this.initialized) {
-  //     return;
-  //   }
-  //   this.isEditing && this.initDelayedCursor();
-  //   this._clearCache();
-  //   // clear dynamicMinWidth as it will be different after we re-wrap line
-  //   this.dynamicMinWidth = 0;
-  //   // wrap lines
-  //   this._styleMap = this._generateStyleMap(this._splitText());
-  //   // if after wrapping, the width is smaller than dynamicMinWidth, change the width and re-wrap
-  //   if (this.dynamicMinWidth > this.width) {
-  //     this._set('width', this.dynamicMinWidth);
-  //   }
-  //   if (this.textAlign.indexOf('justify') !== -1) {
-  //     // once text is measured we need to make space fatter to make justified text.
-  //     this.enlargeSpaces();
-  //   }
-  //   // clear cache and re-calculate height
-  //   this.height = this.calcTextHeight();
-  // }
+  constructor(text: string, options: Partial<CircleNotesProps>) {
+    super(text, options);
+  }
+  /**
+   * Unlike superclass's version of this function, Textbox does not update
+   * its width.
+   * @private
+   * @override
+   */
+  initDimensions() {
+    if (!this.initialized) {
+      return;
+    }
+    this.isEditing && this.initDelayedCursor();
+    this._clearCache();
+    // clear dynamicMinWidth as it will be different after we re-wrap line
+    this.dynamicMinWidth = 0;
+    // wrap lines
+    this._styleMap = this._generateStyleMap(this._splitText());
+    // if after wrapping, the width is smaller than dynamicMinWidth, change the width and re-wrap
+    if (this.dynamicMinWidth > this.width) {
+      this.set('fontSize', this.fontSize - 2);
+      this._splitTextIntoLines(this.text);
+      return;
+    }
+    if (this.textAlign.indexOf('justify') !== -1) {
+      // once text is measured we need to make space fatter to make justified text.
+      this.enlargeSpaces();
+    }
+    // clear cache and re-calculate height
+    const height = this.calcTextHeight();
+    if (height > 76 && this.fontSize > 2) {
+      this.set('fontSize', this.fontSize - 2);
+      this._splitTextIntoLines(this.text);
+      return;
+    }
+
+    this.height = this.maxHeight;
+    return this.height;
+  }
 
   /**
    * Generate an object that translates the style object so that it is
@@ -140,61 +194,61 @@ export class X_Textbox extends Textbox {
     return map;
   }
 
-  /**
-   * Returns true if object has a style property or has it on a specified line
-   * @param {Number} lineIndex
-   * @return {Boolean}
-   */
-  styleHas(property: any, lineIndex: number): boolean {
-    if (this._styleMap && !this.isWrapping) {
-      const map = this._styleMap[lineIndex];
-      if (map) {
-        lineIndex = map.line;
-      }
-    }
-    return super.styleHas(property, lineIndex);
-  }
+  // /**
+  //  * Returns true if object has a style property or has it on a specified line
+  //  * @param {Number} lineIndex
+  //  * @return {Boolean}
+  //  */
+  // styleHas(property, lineIndex: number): boolean {
+  //   if (this._styleMap && !this.isWrapping) {
+  //     const map = this._styleMap[lineIndex];
+  //     if (map) {
+  //       lineIndex = map.line;
+  //     }
+  //   }
+  //   return super.styleHas(property, lineIndex);
+  // }
 
-  /**
-   * Returns true if object has no styling or no styling in a line
-   * @param {Number} lineIndex , lineIndex is on wrapped lines.
-   * @return {Boolean}
-   */
-  isEmptyStyles(lineIndex: number): boolean {
-    if (!this.styles) {
-      return true;
-    }
-    let offset: number = 0,
-      nextLineIndex = lineIndex + 1,
-      nextOffset: any,
-      shouldLimit = false;
-    const map = this._styleMap[lineIndex],
-      mapNextLine = this._styleMap[lineIndex + 1];
-    if (map) {
-      lineIndex = map.line;
-      offset = map.offset;
-    }
-    if (mapNextLine) {
-      nextLineIndex = mapNextLine.line;
-      shouldLimit = nextLineIndex === lineIndex;
-      nextOffset = mapNextLine.offset;
-    }
-    const obj =
-      typeof lineIndex === 'undefined'
-        ? this.styles
-        : { line: this.styles[lineIndex] };
-    for (const p1 in obj as any) {
-      for (const p2 in obj[p1] as any) {
-        if (Number(p2) >= offset && (!shouldLimit || Number(p2) < nextOffset)) {
-          // eslint-disable-next-line no-unused-vars
-          for (const p3 in obj[p1][p2]) {
-            return false;
-          }
-        }
-      }
-    }
-    return true;
-  }
+  // /**
+  //  * Returns true if object has no styling or no styling in a line
+  //  * @param {Number} lineIndex , lineIndex is on wrapped lines.
+  //  * @return {Boolean}
+  //  */
+  // isEmptyStyles(lineIndex: number): boolean {
+  //   if (!this.styles) {
+  //     return true;
+  //   }
+  //   let offset = 0,
+  //     nextLineIndex = lineIndex + 1,
+  //     nextOffset,
+  //     shouldLimit = false;
+  //   const map = this._styleMap[lineIndex],
+  //     mapNextLine = this._styleMap[lineIndex + 1];
+  //   if (map) {
+  //     lineIndex = map.line;
+  //     offset = map.offset;
+  //   }
+  //   if (mapNextLine) {
+  //     nextLineIndex = mapNextLine.line;
+  //     shouldLimit = nextLineIndex === lineIndex;
+  //     nextOffset = mapNextLine.offset;
+  //   }
+  //   const obj =
+  //     typeof lineIndex === 'undefined'
+  //       ? this.styles
+  //       : { line: this.styles[lineIndex] };
+  //   for (const p1 in obj) {
+  //     for (const p2 in obj[p1]) {
+  //       if (p2 >= offset && (!shouldLimit || p2 < nextOffset)) {
+  //         // eslint-disable-next-line no-unused-vars
+  //         for (const p3 in obj[p1][p2]) {
+  //           return false;
+  //         }
+  //       }
+  //     }
+  //   }
+  //   return true;
+  // }
 
   // /**
   //  * @param {Number} lineIndex
@@ -335,8 +389,12 @@ export class X_Textbox extends Textbox {
     const graphemes = [];
     const words = textstring.split(/\b/);
     for (let i = 0; i < words.length; i++) {
-      // 检查单词是否全为拉丁字母，长度不大于16
-      if (/^[a-zA-Z]{1,16}$/.test(words[i])) {
+      // 检查单词是否全为拉丁字母，长度不大于13，且没有四个或更多的连续相同的字母
+      if (
+        /^[a-zA-Z]+$/.test(words[i]) &&
+        words[i].length <= 13 &&
+        !/(\w)\1{3,}/.test(words[i])
+      ) {
         graphemes.push(words[i]);
       } else {
         for (let j = 0; j < words[i].length; j++) {
@@ -356,13 +414,13 @@ export class X_Textbox extends Textbox {
   //   const additionalSpace = this._getWidthOfCharSpacing(),
   //     splitByGrapheme = this.splitByGrapheme,
   //     graphemeLines = [],
-  //     words: any = splitByGrapheme
+  //     words = splitByGrapheme
   //       ? this.graphemeSplitForRectNotes(_line)
   //       : this.wordSplit(_line),
   //     infix = splitByGrapheme ? '' : ' ';
 
   //   let lineWidth = 0,
-  //     line: any[] = [],
+  //     line = [],
   //     // spaces in different languages?
   //     offset = 0,
   //     infixWidth = 0,
@@ -374,7 +432,7 @@ export class X_Textbox extends Textbox {
   //   }
   //   desiredWidth -= reservedSpace;
   //   // measure words
-  //   const data = words.map((word: any) => {
+  //   const data = words.map((word) => {
   //     // if using splitByGrapheme words are already in graphemes.
   //     word = splitByGrapheme ? word : this.graphemeSplitForRectNotes(word);
   //     const width = this._measureWord(word, lineIndex, offset);
@@ -447,17 +505,17 @@ export class X_Textbox extends Textbox {
     return false;
   }
 
-  /**
-   * Detect if a line has a linebreak and so we need to account for it when moving
-   * and counting style.
-   * @return Number
-   */
-  missingNewlineOffset(lineIndex: number) {
-    if (this.splitByGrapheme) {
-      return this.isEndOfWrapping(lineIndex) ? 1 : 0;
-    }
-    return 1;
-  }
+  // /**
+  //  * Detect if a line has a linebreak and so we need to account for it when moving
+  //  * and counting style.
+  //  * @return Number
+  //  */
+  // missingNewlineOffset(lineIndex) {
+  //   if (this.splitByGrapheme) {
+  //     return this.isEndOfWrapping(lineIndex) ? 1 : 0;
+  //   }
+  //   return 1;
+  // }
 
   /**
    * Gets lines of text to render in the Textbox. This function calculates
@@ -467,37 +525,9 @@ export class X_Textbox extends Textbox {
    * @override
    */
   _splitTextIntoLines(text: string) {
-    const newText = super._splitTextIntoLines(text);
-    if (!this.fromCopy) {
-      if (
-        (this.objType === 'WBText' || this.objType === 'WBTextbox') &&
-        this.textLines &&
-        this.textLines.length > 1 &&
-        this.isEditing
-      ) {
-        this.oneLine = false;
-      } else {
-        this.oneLine = true;
-      }
-    } else {
-      this.oneLine = false;
-    }
-    if (
-      (this.objType === 'WBText' || this.objType === 'WBTextbox') &&
-      newText &&
-      newText.lines &&
-      this.oneLine &&
-      this.isEditing
-    ) {
-      if (newText.lines[0].length > 1) {
-        this.width =
-          this._measureWord(newText.lines[0], 0, 0) > this.width
-            ? this._measureWord(newText.lines[0], 0, 0) + 10
-            : this.width;
-      }
-    }
-    const graphemeLines = this._wrapText(newText.lines, this.width);
-    const lines = new Array(graphemeLines.length);
+    const newText = super._splitTextIntoLines(text),
+      graphemeLines = this._wrapText(newText.lines, this.width),
+      lines = new Array(graphemeLines.length);
     for (let i = 0; i < graphemeLines.length; i++) {
       lines[i] = graphemeLines[i].join('');
     }
@@ -523,90 +553,9 @@ export class X_Textbox extends Textbox {
   //     }
   //   }
   // }
-  // addControls() {
-  //   function renderCustomControl(ctx, left, top, fabricObject) {
-  //     const styleOverride1 = {
-  //       cornerSize: 10,
-  //       cornerStrokeColor: this.isHovering ? '#31A4F5' : '#b3cdfd',
-  //       cornerColor: this.isHovering ? '#31A4F5' : '#b3cdfd',
-  //       lineWidth: 2,
-  //     };
-  //     renderCircleControl.call(
-  //       fabricObject,
-  //       ctx,
-  //       left,
-  //       top,
-  //       styleOverride1,
-  //       fabricObject
-  //     );
-  //   }
-
-  //   this.controls.mtaStart = new Control({
-  //     x: 0,
-  //     y: -0.5,
-  //     offsetX: 0,
-  //     offsetY: -20,
-  //     render: renderCustomControl,
-  //     mouseDownHandler: (eventData, transformData) => {
-  //       this.controlMousedownProcess(transformData, 0.0, -0.5);
-  //       return true;
-  //     },
-  //     name: 'mtaStart',
-  //   });
-
-  //   this.controls.mbaStart = new Control({
-  //     x: 0,
-  //     y: 0.5,
-  //     offsetX: 0,
-  //     offsetY: 20,
-  //     render: renderCustomControl,
-  //     mouseDownHandler: (eventData, transformData) => {
-  //       this.controlMousedownProcess(transformData, 0.0, 0.5);
-  //       return true;
-  //     },
-  //     name: 'mbaStart',
-  //   });
-
-  //   this.controls.mlaStart = new Control({
-  //     x: -0.5,
-  //     y: 0,
-  //     offsetX: -20,
-  //     offsetY: 0,
-  //     render: renderCustomControl,
-  //     mouseDownHandler: (eventData, transformData) => {
-  //       this.controlMousedownProcess(transformData, -0.5, 0.0);
-  //       return true;
-  //     },
-  //     name: 'mlaStart',
-  //   });
-
-  //   this.controls.mraStart = new Control({
-  //     x: 0.5,
-  //     y: 0,
-  //     offsetX: 20,
-  //     offsetY: 0,
-  //     render: renderCustomControl,
-  //     mouseDownHandler: (eventData, transformData) => {
-  //       this.controlMousedownProcess(transformData, 0.5, 0.0);
-  //       return true;
-  //     },
-  //     name: 'mraStart',
-  //   });
-  // }
-
-  controlMousedownProcess(transformData: any, rx: any, ry: any) {
-    return;
-  }
-  /**
-   * Returns object representation of an instance
-   * @method toObject
-   * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-   * @return {Object} object representation of an instance
-   */
 
   getObject() {
     const object = {};
-
     const keys = [
       'id', // string, the id of the object
       'angle', //  integer, angle for recording rotating
@@ -627,6 +576,7 @@ export class X_Textbox extends Textbox {
       'scaleY', // number, Object scale factor (vertical)
       'selectable', // boolean, When set to `false`, an object can not be selected for modification (using either point-click-based or group-based selection). But events still fire on it.
       'top', // integer, Top position of an object. Note that by default it's relative to object top. You can change this by setting originY={top/center/bottom}
+      'userNo', // string, the unique id for the user, one user id could open mutiple browser, each browser has unique user no
       'userId', // string, user identity
       'whiteboardId', // whiteboard id, string
       'zIndex', // the index for the object on whiteboard, integer
@@ -639,15 +589,15 @@ export class X_Textbox extends Textbox {
       'fontSize', // integer, font size
       'fontWeight', // integer, font weight
       'lineHeight', // integer, font height
+      'strokeWidth', //
       'text', // string, text
       'textAlign', // string, alignment
-      'editable',
-      'shapeScaleX',
-      'shapeScaleY',
-      'maxHeight',
-      'tempTop',
-      'fixedScaleChange',
-      'preTop',
+      'imageSrc', // src for the note draw
+      'isDraw', // is this a draw note
+      'emoji', // [0,0,0,0,0], record the emoji
+      'userEmoji', // [{userid,[0,0,0,0,1]},{userid,[0,0,0,0,1]}], record who vote the emoji
+      'editable', // text editable,
+      'lastEditedBy', // last edited by
     ];
     keys.forEach((key) => {
       //@ts-ignore
@@ -656,150 +606,281 @@ export class X_Textbox extends Textbox {
     return object;
   }
 
+  // /**
+  //  * Returns object representation of an instance
+  //  * @method toObject
+  //  * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+  //  * @return {Object} object representation of an instance
+  //  */
   // toObject(propertiesToInclude: Array<any>): object {
   //   return super.toObject(
-  //     ['minWidth', 'splitByGrapheme'].concat(propertiesToInclude)
+  //     [...this.extendPropeties, 'minWidth', 'splitByGrapheme'].concat(
+  //       propertiesToInclude
+  //     )
   //   );
   // }
-  /**extend function for fronted */
-  checkTextboxChange() {}
-  InitializeEvent() {
-    const self = this;
-    const canvas = this.canvas;
+  /**boardx custom function */
 
-    self.on(EventName.EDITINGENTERED, () => {
-      // if it is in draw widget mode, then skip update
-      // if (canvas.drawTempWidget) return;
-
-      self.originX = self.textAlign;
-
-      if (self.textAlign === TextAlign.LEFT) {
-        self.left -= (self.width * self.scaleX) / 2;
-      }
-
-      if (self.textAlign === TextAlign.RIGHT) {
-        self.left += (self.width * self.scaleX) / 2;
-      }
-
-      if (self.objType === WidgetType.WBText) {
-        self.originY = 'top';
-
-        self.top -= (self.height * self.scaleY) / 2;
-
-        self.tempTop = self.top;
-
-        if (self.text === 'Type here...') {
-          self.selectAll();
-
-          self.text = '';
-
-          // self.hiddenTextarea.value = '';
-
-          self.dirty = true;
-
-          self.fill = 'rgb(0, 0, 0)';
-
-          canvas?.requestRenderAll();
-        }
-      }
-    });
-
-    self.on(EventName.EDITINGEXITED, () => {
-      // if it is in draw widget mode, then skip update
-      // if (canvas.drawTempWidget) return;
-
-      // if (self.text === '' && self.objType === WidgetType.WBText) {
-      //   canvas.removeWidget(self);
-
-      //   return;
-      // }
-
-      self.originX = Origin.Center;
-
-      self.originY = Origin.Center;
-
-      if (self.textAlign === Origin.Left) {
-        self.left += (self.width * self.scaleX) / 2;
-      }
-
-      if (self.textAlign === Origin.Right) {
-        self.left -= (self.width * self.scaleX) / 2;
-      }
-
-      if (self.objType === WidgetType.WBText) {
-        self.top = self.tempTop + (self.height * self.scaleY) / 2;
-        self.tempTop = self.top;
-      }
-    });
-
-    self.on(EventName.MODIFIED, () => {
-      self.checkTextboxChange();
-
-      // canvas.requestRenderAll();
-    });
-    self.on(EventName.CHANGED, () => {
-      if (self.styles[0]) {
-        self.styles = {};
-
-        // self.canvas.requestRenderAll();
-      }
-    });
+  getWidgetMenuList() {
+    // if (this.isDraw) {
+    //   return [
+    //     'textNote',
+    //     'borderLineIcon',
+    //     'backgroundColor',
+    //     'resetDraw',
+    //     'switchNoteType',
+    //     'drawOption',
+    //     'lineWidth',
+    //     'noteDrawColor', // strokeColor
+    //     'emojiMenu',
+    //     'more',
+    //     'objectLock',
+    //     'aiassist',
+    //   ];
+    // }
+    if (this.locked) {
+      return ['objectLock'];
+    }
+    return [
+      'drawNote',
+      'more',
+      'borderLineIcon',
+      'switchNoteType',
+      'fontSize',
+      'textAlign',
+      'backgroundColor',
+      'emojiMenu',
+      'fontWeight',
+      'textBullet',
+      'objectLock',
+      'delete',
+      'aiassist',
+    ];
+  }
+  getWidgetMenuTouchList() {
+    // if (this.isDraw) {
+    //   return ['emojiMenu', 'objectLock'];
+    // }
+    if (this.locked) {
+      return ['objectLock'];
+    }
+    return [
+      'objectDelete',
+      'moreMenuStickyNote',
+      'backgroundColor',
+      'fontColor',
+      'emojiMenu',
+      'objectLock',
+      'aiassist',
+    ];
+  }
+  getWidgetMenuLength() {
+    if (this.locked) return 50;
+    // if (this.isDraw) {
+    //   return 308;
+    // }
+    return 420;
+  }
+  /* caculate cusor positon in the middle of the textbox */
+  getCenteredTop(rectHeight: any) {
+    const textHeight = this.height;
+    return (rectHeight - textHeight) / 2;
   }
 
-  changeWidth(eventData: any, transform: any, x: any, y: any) {
-    var target = transform.target,
-      localPoint = getLocalPoint(
-        transform,
-        transform.originX,
-        transform.originY,
-        x,
-        y
-      ),
-      strokePadding =
-        target.strokeWidth / (target.strokeUniform ? target.scaleX : 1),
-      multiplier = isTransformCentered(transform) ? 2 : 1,
-      oldWidth = target.width,
-      newWidth =
-        Math.abs((localPoint.x * multiplier) / target.scaleX) - strokePadding,
-      shapeScaleX =
-        Math.abs(target.aCoords['tl'].x - target.aCoords['tr'].x) / 138;
-    target.set('shapeScaleX', shapeScaleX);
-    target.set('width', Math.max(newWidth, 0));
-
-    target.initDimensions();
-
-    target.set('dirty', true);
-
-    if (target.objType === 'WBTextbox' || target.objType === 'WBText') {
-      target.set('fixedScaleChange', false);
+  _getTopOffset() {
+    switch (this.verticalAlign) {
+      case 'middle':
+        return -this._getTotalLineHeights() / 2;
+      case 'bottom':
+        return this.height / 2 - this._getTotalLineHeights();
+      default:
+        return -this.height / 2;
     }
-
-    if (target.objType !== 'WBText') {
-      target.saveData('MODIFIED', ['width']);
-    }
-
-    return oldWidth !== newWidth;
   }
 
-  resetResizeControls() {
-    const self = this;
-    const textAlign = self.textAlign;
+  _getTotalLineHeight() {
+    return this._textLines.reduce(
+      (total, _line, index) => total + this.getHeightOfLine(index),
+      0
+    );
+  }
 
-    if (
-      self.objType === 'WBText' &&
-      (textAlign === 'left' || textAlign === 'center')
-    ) {
-      self.setControlVisible('ml', false);
-      self.setControlVisible('mr', true);
-    }
+  _getTotalLineHeights() {
+    return this._textLines.reduce(
+      (total, line, index) => total + this.getHeightOfLine(index),
+      0
+    );
+  }
 
-    if (self.objType === 'WBText' && textAlign === 'right') {
-      self.setControlVisible('ml', true);
-      self.setControlVisible('mr', false);
+  _render(ctx: any) {
+    const path: any = this.path;
+
+    path && !path.isNotVisible() && path._render(ctx);
+    this._setTextStyles(ctx);
+    this._renderTextLinesBackground(ctx);
+    this._renderTextDecoration(ctx, 'underline');
+    this._renderText(ctx);
+    this._renderTextDecoration(ctx, 'overline');
+    this._renderTextDecoration(ctx, 'linethrough');
+
+    // const isEmojiExist = !(
+    //   this.emoji === undefined || this.emoji.join() === '0,0,0,0,0'
+    // );
+    // if (isEmojiExist) {
+    //   this.renderEmoji(ctx);
+    // }
+  }
+
+  // renderEmoji(ctx) {
+  //   if (this.emoji === undefined) {
+  //     return;
+  //   }
+
+  //   let width = 0;
+  //   const imageList = [
+  //     this.canvas.emoji_thumb,
+  //     this.canvas.emoji_love,
+  //     this.canvas.emoji_smile,
+  //     this.canvas.emoji_shock,
+  //     this.canvas.emoji_question,
+  //   ];
+  //   const imageListArray = [];
+  //   const emojiList = [];
+  //   for (let i = 0; i < 5; i++) {
+  //     if (this.emoji[i] !== 0) {
+  //       imageListArray.push(imageList[i]);
+  //       emojiList.push(this.emoji[i]);
+  //       width += 26.6;
+  //     }
+  //   }
+
+  //   if (emojiList.length === 0) return;
+
+  //   const x = this.width / 2 - width + this.padding / 2;
+  //   const y = this.height / 2 - 18 + this.padding / 2;
+  //   ctx.font = '10px Inter ';
+  //   ctx.lineJoin = 'round';
+  //   ctx.save();
+  //   ctx.translate(x - 10, y);
+  //   this.drawRoundRectPath(ctx, width, 15, 2);
+  //   ctx.fillStyle = 'rgba(255, 255, 255, 1)';
+  //   ctx.fill();
+  //   ctx.restore();
+
+  //   //ctx.strokeRect(x - 10, y, width, 16);
+  //   //ctx.fillRect(x - 10 + 10 / 2, y + 10 / 2, width - 10, 16 - 10);
+  //   ctx.fillStyle = '#000';
+  //   const isEmojiThumbExist = !(this.canvas.emoji_thumb === undefined);
+  //   if (isEmojiThumbExist) {
+  //     let modifier = 0;
+  //     for (let i = 0; i < imageListArray.length; i++) {
+  //       const imageX = this.width / 2 - 33.6 + modifier + 2 + this.padding / 2;
+  //       const imageY = this.height / 2 - 15 + this.padding / 2;
+  //       const imageW = 10;
+  //       const imageH = 10;
+  //       ctx.drawImage(imageListArray[i], imageX, imageY, imageW, imageH);
+  //       ctx.fillText(
+  //         emojiList[i].toString(),
+  //         this.width / 2 - 20.6 + modifier + 1 + this.padding / 2,
+  //         y + 12
+  //       );
+  //       modifier -= 23.6;
+  //     }
+  //   }
+  // }
+  _renderBackground(ctx: any) {
+    if (!this.backgroundColor) {
+      return;
     }
-    if (self.canvas) self.canvas.requestRenderAll();
+    const dim = this._getNonTransformedDimensions();
+    ctx.fillStyle = this.backgroundColor;
+    ctx.beginPath(); // start new path
+    const radius =
+      dim.x / 2 + this.padding / this.scaleX / (this.canvas?.getZoom() ?? 1);
+    ctx.arc(0, 0, radius, 0, 2 * Math.PI); // draw circle path
+    ctx.closePath(); // close path
+    ctx.strokeStyle = this.backgroundColor;
+    ctx.fillStyle = this.backgroundColor;
+    ctx.stroke();
+    ctx.fill();
+  }
+  _renderText(ctx: any) {
+    ctx.shadowOffsetX = ctx.shadowOffsetY = ctx.shadowBlur = 0;
+    ctx.shadowColor = '';
+
+    if (this.paintFirst === 'stroke') {
+      this._renderTextStroke(ctx);
+      this._renderTextFill(ctx);
+    } else {
+      this._renderTextFill(ctx);
+      this._renderTextStroke(ctx);
+    }
+  }
+  _renderTextCommon(ctx: any, method: any) {
+    ctx.save();
+    let lineHeights = 0;
+    const left = this._getLeftOffset();
+    const top = this._getTopOffset();
+
+    const offsets = this._applyPatternGradientTransform(
+      ctx,
+      //@ts-ignore
+      method === 'fillText' ? this.fill : this.stroke
+    );
+
+    for (let i = 0, len = this._textLines.length; i < len; i++) {
+      const heightOfLine = this.getHeightOfLine(i);
+      const maxHeight = heightOfLine / this.lineHeight;
+      const leftOffset = this._getLineLeftOffset(i);
+      this._renderTextLine(
+        method,
+        ctx,
+        this._textLines[i],
+        left + leftOffset - offsets.offsetX,
+        top + lineHeights + maxHeight - offsets.offsetY,
+        i
+      );
+      lineHeights += heightOfLine;
+    }
+    ctx.restore();
+  }
+
+  _getSVGLeftTopOffsets() {
+    return {
+      textLeft: -this.width / 2,
+      textTop: this._getTopOffset(),
+      lineTop: this.getHeightOfLine(0),
+    };
+  }
+
+  drawRoundRectPath(cxt: any, width: any, height: any, radius: any) {
+    cxt.beginPath(0);
+    //从右下角顺时针绘制，弧度从0到1/2PI
+    cxt.arc(width - radius, height - radius, radius, 0, Math.PI / 2);
+
+    //矩形下边线
+    cxt.lineTo(radius, height);
+
+    //左下角圆弧，弧度从1/2PI到PI
+    cxt.arc(radius, height - radius, radius, Math.PI / 2, Math.PI);
+
+    //矩形左边线
+    cxt.lineTo(0, radius);
+
+    //左上角圆弧，弧度从PI到3/2PI
+    cxt.arc(radius, radius, radius, Math.PI, (Math.PI * 3) / 2);
+
+    //上边线
+    cxt.lineTo(width - radius, 0);
+
+    //右上角圆弧
+    cxt.arc(width - radius, radius, radius, (Math.PI * 3) / 2, Math.PI * 2);
+
+    //右边线
+    cxt.lineTo(width, height - radius);
+    cxt.closePath();
   }
 }
 
-classRegistry.setClass(Textbox);
-// classRegistry.getSVGClass(Textbox);
+classRegistry.setClass(XCircleNotes);
+classRegistry.setSVGClass(XCircleNotes, 'XCircleNotes');

@@ -337,6 +337,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * @return {Number} width value
    */
   getScaledWidth(): number {
+    console.log('getScaledWidth');
     return this._getTransformedDimensions().x;
   }
 
@@ -346,6 +347,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * @return {Number} height value
    */
   getScaledHeight(): number {
+    console.log('getScaledHeight');
     return this._getTransformedDimensions().y;
   }
 
@@ -412,6 +414,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * @return {TCornerPoint}
    */
   calcACoords(): TCornerPoint {
+    console.log('calcACoords');
     const rotateMatrix = createRotateMatrix({ angle: this.angle }),
       { x, y } = this.getRelativeCenterPoint(),
       tMatrix = createTranslateMatrix(x, y),
@@ -551,6 +554,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * @returns {Point} dimensions
    */
   _calculateCurrentDimensions(options?: any): Point {
+    console.log('_calculateCurrentDimensions');
     return this._getTransformedDimensions(options)
       .transform(this.getViewportTransform(), true)
       .scalarAdd(2 * this.padding);

@@ -1,7 +1,7 @@
 //**Fabric */
 //@ts-nocheck
 // import { FabricObject } from '../Object/FabricObject';
-import { WBCanvas } from '../../../fabric';
+import { XCanvas } from '../../../fabric';
 import { XY, Point } from '../../Point';
 import {
   invertTransform,
@@ -10,27 +10,27 @@ import {
 
 //**Utils */
 export class FabricObject2 {
-  statefullCache = false;
-  noScaleCache = true;
-  borderScaleFactor = 2;
-  padding = 0;
-  prototypeselectable = true;
-  isRemoteEditing = false;
-  RemoteUserWhoEditing = '';
-  NUM_FRACTION_DIGITS = 2;
-  activeOn = 'down';
-  borderColor = 'red';
-  cornerSize = 12;
-  hasRotatingPoint = false;
-  minScaleLimit = 0.01;
-  cornerColor = 'black';
-  cornerStrokeColor = 'black';
-  cornerStyle = 'circle';
-  id = '';
-  idsInGroup: string[] = [];
-  selectable = true;
-  activeSelectWithoutArrow: any[] = [];
-  activeSelectionWithArrow: any[] = [];
+  // statefullCache = false;
+  // noScaleCache = true;
+  // borderScaleFactor = 2;
+  // padding = 0;
+  // prototypeselectable = true;
+  // isRemoteEditing = false;
+  // RemoteUserWhoEditing = '';
+  // NUM_FRACTION_DIGITS = 2;
+
+  // borderColor = 'red';
+  // cornerSize = 12;
+  // hasRotatingPoint = false;
+  // minScaleLimit = 0.01;
+  // cornerColor = 'black';
+  // cornerStrokeColor = 'black';
+  // cornerStyle = 'circle';
+  // id = '';
+  // idsInGroup: string[] = [];
+  // selectable = true;
+  // activeSelectWithoutArrow: any[] = [];
+  // activeSelectionWithArrow: any[] = [];
 
   transformPointToCanvas(point: XY) {
     const self = this;
@@ -294,7 +294,7 @@ export class FabricObject2 {
 
   convertACoordToRCoord(ax: any, ay: any) {
     const target = this;
-    const canvas = this.canvas as WBCanvas;
+    const canvas = this.canvas as XCanvas;
 
     const obj = canvas?.findById(target.id);
 
@@ -325,7 +325,7 @@ export class FabricObject2 {
 
   convertRCoordToACoord1(rx: number, ry: number) {
     const target = this;
-    const canvas = this.canvas as WBCanvas;
+    const canvas = this.canvas as XCanvas;
     const obj = canvas.findById(target.id);
 
     if (!obj) return null;
@@ -404,7 +404,7 @@ export class FabricObject2 {
 
   convertRCoordToACoord(rx: number, ry: number) {
     const target = this;
-    const canvas = this.canvas as WBCanvas;
+    const canvas = this.canvas as XCanvas;
     const obj = canvas.findById(target.id);
     if (!obj) return null;
 
@@ -427,7 +427,7 @@ export class FabricObject2 {
 
   convertRCoordToACoordPartialAS(rx: number, ry: number) {
     const target = this;
-    const canvas = this.canvas as WBCanvas;
+    const canvas = this.canvas as XCanvas;
     const obj = canvas.findById(target.id);
 
     if (obj && obj.group) {
@@ -482,7 +482,7 @@ export class FabricObject2 {
 
   //   if (
   //     target.objType === 'WBRectNotes' ||
-  //     target.objType === 'WBCircleNotes'
+  //     target.objType === 'XCircleNotes'
   //   ) {
   //     target.lastEditedBy = store.getState().user.userInfo.userId;
   //   }
@@ -497,17 +497,17 @@ export class FabricObject2 {
   //       if (obj.id) {
   //         this.idsInGroup.push(obj.id);
 
-  //         if (obj.objType === 'WBArrow') {
+  //         if (obj.objType === 'XConnector') {
   //           this.activeSelectionWithArrow.push(obj.id);
   //         }
 
-  //         if (obj.objType !== 'WBArrow') {
+  //         if (obj.objType !== 'XConnector') {
   //           this.activeSelectWithoutArrow.push(obj.id);
   //         }
 
   //         if (
   //           obj.objType === 'WBRectNotes' ||
-  //           obj.objType === 'WBCircleNotes'
+  //           obj.objType === 'XCircleNotes'
   //         ) {
   //           obj.lastEditedBy = store.getState().user.userInfo.userId;
   //         }
@@ -623,7 +623,7 @@ export class FabricObject2 {
 
   //     if (
   //       target.objType === 'WBRectNotes' ||
-  //       target.objType === 'WBCircleNotes'
+  //       target.objType === 'XCircleNotes'
   //     ) {
   //       canvas.changeDefaulNote(target);
   //       target.styles = {};
@@ -831,7 +831,7 @@ export class FabricObject2 {
 
   // reSetControl() {
   //   const obj = this;
-  //   if (obj && obj.controls && obj.objType !== 'WBArrow') {
+  //   if (obj && obj.controls && obj.objType !== 'XConnector') {
   //     if (obj.controls.mlaStart) {
   //       obj.controls.mlaStart.offsetX = -20 * canvas.getZoom() * obj.scaleX;
   //       obj.controls.mraStart.offsetX = 20 * canvas.getZoom() * obj.scaleX;

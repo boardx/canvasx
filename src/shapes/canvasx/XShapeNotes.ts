@@ -9,7 +9,7 @@ export type { ITextProps, SerializedITextProps } from '../IText/IText';
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
 // regexes, list of properties that are not suppose to change by instances, magic consts.
 // this will be a separated effort
-export const shapeNotesDefaultValues: Partial<TClassProperties<ShapeNotes>> = {
+export const shapeNotesDefaultValues: Partial<TClassProperties<XShapeNotes>> = {
   minWidth: 20,
   dynamicMinWidth: 2,
   lockScalingFlip: true,
@@ -38,7 +38,7 @@ export interface ShapeNotesProps extends TextboxProps {
  * user can only change width. Height is adjusted automatically based on the
  * wrapping of lines.
  */
-export class ShapeNotes extends Textbox {
+export class XShapeNotes extends Textbox {
   /**selectable
    * Minimum width of textbox, in pixels.
    * @type Number
@@ -109,7 +109,7 @@ export class ShapeNotes extends Textbox {
     return {
       ...super.getDefaults(),
       controls: createRectNotesDefaultControls(),
-      ...ShapeNotes.ownDefaults,
+      ...XShapeNotes.ownDefaults,
     };
   }
 
@@ -687,7 +687,7 @@ export class ShapeNotes extends Textbox {
     //@ts-ignore
     const objects = this.canvas._getIntersectedObjects(this);
     objects.filter((obj: any) => {
-      return obj.id !== this.id && obj.objType !== 'WBArrow';
+      return obj.id !== this.id && obj.objType !== 'XConnector';
     });
     return objects;
   }
@@ -1067,4 +1067,4 @@ export class ShapeNotes extends Textbox {
   }
 }
 
-classRegistry.setClass(ShapeNotes);
+classRegistry.setClass(XShapeNotes);

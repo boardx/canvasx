@@ -420,6 +420,7 @@ export class FabricObject<
    * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
    */
   _getCacheCanvasDimensions(): TCacheCanvasDimensions {
+    console.log('_getCacheCanvasdimensions');
     const objectScale = this.getTotalObjectScaling(),
       // calculate dimensions without skewing
       dim = this._getTransformedDimensions({ skewX: 0, skewY: 0 }),
@@ -1638,9 +1639,6 @@ export class FabricObject<
 //   console.log('Hello World');
 // };
 
-import { FabricObject2 } from '../canvasx/X_Object';
-import { applyMixins } from '../../util/applyMixins';
-applyMixins(FabricObject, [FabricObject2]);
 // Object.assign(FabricObject.prototype, FabricObject2.prototype);
 
 classRegistry.setClass(FabricObject);

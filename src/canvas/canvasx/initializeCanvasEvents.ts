@@ -1,4 +1,4 @@
-import { WBCanvas } from './bx-canvas';
+import { XCanvas } from './bx-canvas';
 
 var scale = 1;
 let rotation = 0;
@@ -215,7 +215,7 @@ export function whiteboardMouseDownListener(event: any) {
  * switch the interaction mode, mouse or trackpad
  * @param {string} interactionMode
  */
-export function switchInteractionMode(interactionMode: any, canvas: WBCanvas) {
+export function switchInteractionMode(interactionMode: any, canvas: XCanvas) {
   // Checking if canvas is not available, or the current UI is mobile. If either is true, exit the function.
   // if (!canvas || store.getState().system.currentUIType === 'mobile') return;
 
@@ -326,7 +326,7 @@ const windowGestureChangeHandler = (e: any) => {
 //   if (
 //     target &&
 //     (target.objType === 'WBRectNotes' ||
-//       target.objType === 'WBCircleNotes' ||
+//       target.objType === 'XCircleNotes' ||
 //       target.objType === 'WBTextbox' ||
 //       target.objType === 'WBText' ||
 //       target.objType === 'WBShapeNotes' ||
@@ -342,7 +342,7 @@ const windowGestureChangeHandler = (e: any) => {
 //   if (
 //     target &&
 //     (target.objType === 'WBRectNotes' ||
-//       target.objType === 'WBCircleNotes' ||
+//       target.objType === 'XCircleNotes' ||
 //       target.objType === 'WBUrlImage' ||
 //       target.objType === 'WBTextbox' ||
 //       target.objType === 'WBText' ||
@@ -461,7 +461,7 @@ export async function onObjectSelectionCleared(event: any) {
 //   // showMenu(e);
 // }
 
-export function initializeCanvasEvents(canvas: WBCanvas) {
+export function initializeCanvasEvents(canvas: XCanvas) {
   // For all future instances of fabric.Object, transparent corners are disabled
   // fabric.Object.prototype.transparentCorners = false;
 
@@ -529,7 +529,7 @@ export function initializeCanvasEvents(canvas: WBCanvas) {
     //       self.requestRenderAll();
     //     }
     //   });
-    // } else if (target.objType !== 'WBArrow' && target.objType !== 'WBGroup') {
+    // } else if (target.objType !== 'XConnector' && target.objType !== 'WBGroup') {
     //   // get left and top before scaling
     //   const objwidget = WidgetService.getInstance().getWidgetFromWidgetList(
     //     target.id

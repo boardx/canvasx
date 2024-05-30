@@ -1,5 +1,5 @@
-import { X_Connector } from "../../../../fabric";
-import * as fabric from '../../../../fabric';
+import { XConnector } from "canvasx";
+import * as fabric from 'canvasx';
 
 
 
@@ -368,7 +368,7 @@ export function recoverEventsByInteractionMode() {
 //   if (
 //     target &&
 //     (target.objType === 'WBRectNotes' ||
-//       target.objType === 'WBCircleNotes' ||
+//       target.objType === 'XCircleNotes' ||
 //       target.objType === 'WBTextbox' ||
 //       target.objType === 'WBText' ||
 //       target.objType === 'WBShapeNotes' ||
@@ -384,7 +384,7 @@ export function recoverEventsByInteractionMode() {
 //   if (
 //     target &&
 //     (target.objType === 'WBRectNotes' ||
-//       target.objType === 'WBCircleNotes' ||
+//       target.objType === 'XCircleNotes' ||
 //       target.objType === 'WBUrlImage' ||
 //       target.objType === 'WBTextbox' ||
 //       target.objType === 'WBText' ||
@@ -578,7 +578,7 @@ export function initializeCanvasEvents(canvas) {
 
       // Filter out the connectors
       var filteredObjects = objects.filter(function (obj) {
-        return !(obj instanceof X_Connector);
+        return !(obj instanceof XConnector);
       });
 
       if (filteredObjects.length > 0) {

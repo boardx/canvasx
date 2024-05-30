@@ -5,13 +5,13 @@ import { NextPage } from 'next';
 import { useRef, useCallback } from 'react';
 import { Canvas } from '../../components/Canvas';
 
-import { X_Image } from '../../../../../src/shapes/canvasx/X_Image';
+// import { XImage } from '../../../../../src/shapes/canvasx/XImage';
 
 const IndexPage: NextPage = () => {
-    const ref = useRef<fabric.WBCanvas>(null);
+    const ref = useRef<fabric.XCanvas>(null);
 
     const onLoad = useCallback(
-        async (canvas: fabric.WBCanvas) => {
+        async (canvas: fabric.XCanvas) => {
             canvas.setDimensions({
                 width: document.documentElement.clientWidth
                 ,
@@ -20,7 +20,7 @@ const IndexPage: NextPage = () => {
             });
             const textValue = 'CanvasX Demo';
 
-            const image = new X_Image('elementId', {
+            const image = new fabric.XImage('elementId', {
                 top: 220,
                 left: 200,
                 width: 150,
@@ -35,7 +35,7 @@ const IndexPage: NextPage = () => {
 
             canvas.add(image);
 
-            const image2 = new X_Image('elementId', {
+            const image2 = new fabric.XImage('elementId', {
                 top: 220,
                 left: 600,
                 width: 150,

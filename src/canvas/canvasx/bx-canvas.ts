@@ -24,31 +24,30 @@ import { XY } from '../../Point';
 import { StaticCanvas } from '../StaticCanvas';
 import { Pattern } from '../../Pattern';
 import { Path } from '../../shapes/Path';
-import { RectNotes } from '../../shapes/canvasx/X_RectNotes';
-import { CircleNotes } from '../../shapes/canvasx/X_CircleNotes';
-import { ShapeNotes } from '../../shapes/canvasx/X_ShapeNotes';
+import { XRectNotes } from '../../shapes/canvasx/XRectNotes';
 import { Line } from '../../shapes/Line';
 
 import { ActiveSelection } from '../../shapes/ActiveSelection';
 import { Canvas } from '../Canvas';
 import { AlignmentType, BXCanvasInterface } from './bx-canvas-interface';
-import { X_Group } from '../../shapes/canvasx/X_Group';
+import { XGroup } from '../../shapes/canvasx/XGroup';
 import { Point } from '../../Point';
 import * as util from '../../util';
 import { Circle } from '../../shapes/Circle';
 import { invertTransform, transformPoint } from '../../util';
 import * as WebFont from 'webfontloader';
-import { X_URL } from '../../shapes/canvasx/X_URL';
+import { XURL } from '../../shapes/canvasx/XURL';
 import { WidgetType } from '../../shapes/canvasx/types';
 import { Textbox } from '../../shapes/Textbox';
-import { X_File } from '../../shapes/canvasx/X_File';
+import { XFile } from '../../shapes/canvasx/XFile';
+import { XCircleNotes, XShapeNotes } from '../../shapes/canvasx';
 
-export class WBCanvas extends Canvas implements BXCanvasInterface {
+export class XCanvas extends Canvas implements BXCanvasInterface {
   // Indicate that object scaling must be uniform (equal in all dimensions)
   uniformScaling = true;
 
   // Store the previous transform state of the canvas
-  // WBCanvas.prototype.previousViewportTransform ;
+  // XCanvas.prototype.previousViewportTransform ;
 
   // Indicate if a current selection is fully contained within the canvas
   selectionFullyContained = false;
@@ -198,7 +197,7 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
       backgroundColor: '#FCEC8A',
       scaleX: 1,
       scaleY: 1,
-      objType: 'WBRectNotes',
+      objType: 'XRectNotes',
     });
 
     // Load the 'Inter' webfont
@@ -220,7 +219,7 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
     heightOffset: number
   ): Promise<void> {
     const self = this;
-    const canvas: WBCanvas = self;
+    const canvas: XCanvas = self;
     // Calculate canvas width and height by subtracting the respective computed margins
     const canvasWidth = canvas.width - width;
     const canvasHeight = canvas.height - heightOffset;
@@ -330,7 +329,7 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
     });
   }
   selectAllWidgets(): void {
-    const canvas: WBCanvas = this;
+    const canvas: XCanvas = this;
     const objects = canvas.getObjects(); // Get all objects on the canvas
 
     const selectedObjects = objects.filter(
@@ -377,7 +376,7 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
     return size;
   }
   getContentArea() {
-    const self: WBCanvas = this;
+    const self: XCanvas = this;
 
     // Discard the currently active object on the canvas
     self.discardActiveObject();
@@ -399,7 +398,7 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
     return sel.aCoords;
   }
   toDataURLContent(multiplier: number): string {
-    const self: WBCanvas = this;
+    const self: XCanvas = this;
 
     const originalTransform = self.viewportTransform;
 
@@ -702,7 +701,7 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
     height: number,
     vpt: any,
     vpCenter: any,
-    canvas: WBCanvas
+    canvas: XCanvas
   ): void {
     throw new Error('Method not implemented.');
   }
@@ -904,27 +903,21 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
   updateViewport(): void {
     throw new Error('Method not implemented.');
   }
-  onObjectModifiedUpdateArrowsSave(
-    object: FabricObject,
-    canvas: WBCanvas
-  ): void;
-  onObjectModifiedUpdateArrowsSave(
-    object: FabricObject,
-    canvas: WBCanvas
-  ): void;
+  onObjectModifiedUpdateArrowsSave(object: FabricObject, canvas: XCanvas): void;
+  onObjectModifiedUpdateArrowsSave(object: FabricObject, canvas: XCanvas): void;
   onObjectModifiedUpdateArrowsSave(object: unknown, canvas: unknown): void {
     throw new Error('Method not implemented.');
   }
   onRefreshArrowAfterScale(arrowId: string): FabricObject;
-  onRefreshArrowAfterScale(arrowId: string, canvas: WBCanvas): void;
-  onRefreshArrowAfterScale(arrowId: string, canvas: WBCanvas): void;
+  onRefreshArrowAfterScale(arrowId: string, canvas: XCanvas): void;
+  onRefreshArrowAfterScale(arrowId: string, canvas: XCanvas): void;
   onRefreshArrowAfterScale(
     arrowId: unknown,
     canvas?: unknown
   ): void | FabricObject {
     throw new Error('Method not implemented.');
   }
-  resetConnector(object: FabricObject, canvas: WBCanvas): void {
+  resetConnector(object: FabricObject, canvas: XCanvas): void {
     throw new Error('Method not implemented.');
   }
 
@@ -970,7 +963,7 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
   ): void {
     throw new Error('Method not implemented.');
   }
-  async ungroup(object: X_Group): Promise<void> {
+  async ungroup(object: XGroup): Promise<void> {
     const self = this;
 
     // // check if the object to ungroup is a 'WBGroup' and it has an ID
@@ -1013,8 +1006,8 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
     //       if (obj.src.indexOf('?') > -1) [obj.src] = obj.src.split('?');
     //     }
 
-    //     // handle special cases for 'WBArrow' type
-    //     if (obj.objType === 'WBArrow') {
+    //     // handle special cases for 'XConnector' type
+    //     if (obj.objType === 'XConnector') {
     //       objIdArr.push(obj.id);
     //     }
 
@@ -1207,11 +1200,11 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
     //     const arrowIds = []; // array to hold arrow IDs
     //     const noneArrowIds = []; // array to hold non-arrow IDs
     //     for (const obj of objectArr) {
-    //       if (obj.objType === 'WBArrow') {
+    //       if (obj.objType === 'XConnector') {
     //         // if the object is an arrow, push it to the arrow IDs array
     //         arrowIds.push(obj.id);
     //       }
-    //       if (obj.objType !== 'WBArrow' && obj.objType !== 'common') {
+    //       if (obj.objType !== 'XConnector' && obj.objType !== 'common') {
     //         // if the object is not an arrow, push it to the non-arrow IDs array
     //         noneArrowIds.push(obj.id);
     //       }
@@ -1242,14 +1235,14 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
   ): void {
     const self = this;
 
-    const canvas: WBCanvas = self;
+    const canvas: XCanvas = self;
 
     const tempobjects = canvas.getObjects();
 
     const objects: any[] = [];
 
     tempobjects.forEach((obj: any) => {
-      if (obj.objType !== 'WBArrow') {
+      if (obj.objType !== 'XConnector') {
         objects.push(obj);
       }
     });
@@ -1609,7 +1602,7 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
     }
 
     // Create a new fabric.Group with the array of objects. Assign properties
-    const group = new X_Group(objects, {
+    const group = new XGroup(objects, {
       lockRotation: true,
       originX: 'center',
       originY: 'center',
@@ -1719,7 +1712,7 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
     }
   }
   getNextObjectByPoint(point: XY, width: number, height: number) {
-    const self: WBCanvas = this;
+    const self: XCanvas = this;
     // Convert the passed point from the board coordinate system to the canvas one
     const pointOnCanvas = self.getPositionOnCanvas(point.x, point.y);
 
@@ -1732,8 +1725,8 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
     // Filtering out unwanted object types
     objects = objects.filter(
       (o: any) =>
-        o.objType === 'WBRectNotes' ||
-        o.objType === 'WBCircleNotes' ||
+        o.objType === 'XRectNotes' ||
+        o.objType === 'XCircleNotes' ||
         o.objType === 'WBTextbox' ||
         o.objType === 'WBText'
     );
@@ -1860,7 +1853,7 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
         !currentObject ||
         !currentObject.visible ||
         currentObject.objType === 'WBLine' ||
-        currentObject.objType === 'WBArrow' ||
+        currentObject.objType === 'XConnector' ||
         currentObject.objType === 'common' ||
         currentObject.group;
 
@@ -1933,7 +1926,7 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
         !currentObject ||
         !currentObject.visible ||
         currentObject.objType === 'WBLine' ||
-        currentObject.objType === 'WBArrow' ||
+        currentObject.objType === 'XConnector' ||
         currentObject.objType === 'common' ||
         currentObject.group ||
         currentObject.id === id;
@@ -2043,7 +2036,7 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
     data.top = obj.pathOffset.y;
 
     // Set the object type
-    data.objType = 'WBPath';
+    data.objType = 'XPath';
 
     // // Get the user's id
     // data.userId = store.getState().user.userInfo.userId;
@@ -2137,7 +2130,7 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
 
         const pugImg = new Image();
 
-        let instance = new X_URL(pugImg, options);
+        let instance = new XURL(pugImg, options);
 
         return new Promise((resolve, reject) => {
           instance.fromURL(url, options).then((urlImage: any) => {
@@ -2169,7 +2162,7 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
           });
         });
 
-      case WidgetType.WBPath:
+      case WidgetType.XPath:
         // Render the drawing path
         options.lockUniScaling = true;
 
@@ -2179,12 +2172,12 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
         // Return the widget for further usage
         return widget;
 
-      case WidgetType.WBRectNotes:
+      case WidgetType.XRectNotes:
         // Lock all scaling to the same proportion for rectangle notes
         options.lockUniScaling = true;
         options._forceClearCache = true;
         // Create a new rectangle notes using fabric.js library
-        widget = new RectNotes(options.text, options);
+        widget = new XRectNotes(options.text, options);
 
         // // Check if the last edit was made by Artificial Intelligence (AI)
         // if (widget.lastEditedBy === 'AI') {
@@ -2195,7 +2188,7 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
         // Return the configured widget
         return widget;
 
-      case WidgetType.WBCircleNotes:
+      case WidgetType.XCircleNotes:
         // Lock all scaling to the same proportion for circle notes
         options.lockUniScaling = true;
 
@@ -2203,12 +2196,12 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
         options.splitByGrapheme = true;
 
         // Create a new circle notes using fabric.js library
-        widget = new CircleNotes(options.text, options);
+        widget = new XCircleNotes(options.text, options);
 
         // Return the newly created widget
         return widget;
 
-      case WidgetType.WBShapeNotes:
+      case WidgetType.XShapeNotes:
         // Lock all scaling to the same proportion for shape notes
         options.lockUniScaling = true;
 
@@ -2219,12 +2212,12 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
         options.splitByGrapheme = true;
 
         // Create a new Shape Notes widget using fabric.js library
-        widget = new ShapeNotes(options.text, options);
+        widget = new XShapeNotes(options.text, options);
 
         // Return the newly created widget
         return widget;
 
-      case WidgetType.WBImage:
+      case WidgetType.XImage:
       // // If source for image is empty, exit function
       // if (options.src === '' || !options.src) return;
 
@@ -2258,7 +2251,7 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
       //   // );
       // });
 
-      case WidgetType.WBGroup:
+      case WidgetType.XGroup:
       // // Lock the uniform scaling option to maintain proportional resizing
       // options.lockUniScaling = true;
 
@@ -2308,13 +2301,13 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
         // Return the newly created line widget
         return widget;
 
-      // Case when the widget type is WBArrow
-      case WidgetType.WBArrow:
+      // Case when the widget type is XConnector
+      case WidgetType.XConnector:
       // // Lock the uniform scaling option to maintain proportional resizing
       // options.lockUniScaling = true;
 
       // // Create a new arrow widget with the specified coordinates and options
-      // widget = new X_Connector(
+      // widget = new XConnector(
       //   [options.x1, options.y1, options.x2, options.y2],
       //   options
       // );
@@ -2387,7 +2380,7 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
         return widget;
 
       // Case when the widget type is WBFile
-      case WidgetType.WBFile:
+      case WidgetType.XFile:
         // Lock the uniform scaling option to maintain proportional resizing
         options.lockUniScaling = true;
 
@@ -2398,7 +2391,7 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
 
         // Return a new promise that creates a WBFile
         return new Promise((resolve, reject) => {
-          let instance = new X_File(preImg, options);
+          let instance = new XFile(preImg, options);
 
           // Create a new file widget from the URL specified in options
           instance.fromURL(options).then((file) => {
@@ -2486,8 +2479,8 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
     // const data = WidgetService.getInstance().getWidgetFromWidgetList(id);
     // // If the widget data exists
     // if (data) {
-    //   // If the data type is a 'WBLine' or a 'WBArrow', set initial coordinates
-    //   if (data.objType === 'WBLine' || data.objType === 'WBArrow') {
+    //   // If the data type is a 'WBLine' or a 'XConnector', set initial coordinates
+    //   if (data.objType === 'WBLine' || data.objType === 'XConnector') {
     //     data.initX1 = data.x1;
     //     data.initX2 = data.x2;
     //     data.initY1 = data.y1;
@@ -2554,8 +2547,11 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
     // Add properties from the provided data into widgetData
     Object.assign(widgetData, data);
 
-    // If the object type is not 'WBLine' and not 'WBArrow', set its position and scale
-    if (widgetData.objType !== 'WBLine' && widgetData.objType !== 'WBArrow') {
+    // If the object type is not 'WBLine' and not 'XConnector', set its position and scale
+    if (
+      widgetData.objType !== 'WBLine' &&
+      widgetData.objType !== 'XConnector'
+    ) {
       if (widgetData.scaleX) {
         widgetData.left = data.left;
         widgetData.scaleX = data.scaleX;
@@ -2565,8 +2561,8 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
         widgetData.top = data.top;
         widgetData.scaleY = data.scaleY;
       }
-    } else if (widgetData.objType === 'WBArrow') {
-      // If it's a 'WBArrow', set its stroke width and color
+    } else if (widgetData.objType === 'XConnector') {
+      // If it's a 'XConnector', set its stroke width and color
       widgetData.strokeWidth = widgetData.strokeWidth
         ? widgetData.strokeWidth
         : data.strokeWidth;
@@ -2621,7 +2617,7 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
     type: string,
     skipSaving: boolean
   ): Promise<void> {
-    // const self: WBCanvas = this;
+    // const self: XCanvas = this;
     // const canvas = self;
     // const selectedObj = [];
     // // if (self.getActiveObject() && self?.getActiveObject()?.isEditing) {
@@ -2633,7 +2629,7 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
     //     const widget = WidgetService.getInstance().getWidgetFromWidgetList(
     //       object.id
     //     );
-    //     widget.objType = 'WBRectNotes';
+    //     widget.objType = 'XRectNotes';
     //     widget.noteType = 'square';
     //     widget.text = object.text;
     //     widget.fontSize = object.fontSize;
@@ -2659,7 +2655,7 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
     //     const widget = WidgetService.getInstance().getWidgetFromWidgetList(
     //       object.id
     //     );
-    //     widget.objType = 'WBRectNotes';
+    //     widget.objType = 'XRectNotes';
     //     widget.noteType = 'rect';
     //     widget.text = object.text;
     //     widget.fontSize = object.fontSize;
@@ -2686,7 +2682,7 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
     //     const widget = WidgetService.getInstance().getWidgetFromWidgetList(
     //       object.id
     //     );
-    //     widget.objType = 'WBCircleNotes';
+    //     widget.objType = 'XCircleNotes';
     //     widget.noteType = 'circle';
     //     widget.text = object.text;
     //     widget.fontSize = object.fontSize;
@@ -2871,7 +2867,7 @@ export class WBCanvas extends Canvas implements BXCanvasInterface {
     //     text: textOfNote,
     //     textAlign: 'center',
     //     fill: '#000',
-    //     objType: 'WBRectNotes',
+    //     objType: 'XRectNotes',
     //     userid: store.getState().user.userInfo.userId,
     //     whiteboardId: store.getState().board.board.id,
     //     timestamp: Date.now(),

@@ -172,12 +172,16 @@ export * as controlsUtils from './src/controls';
 export * from './src/filters';
 
 export {
-  RectNotes,
-  CircleNotes,
-  X_Textbox,
-  ShapeNotes,
+  XRectNotes,
+  XCircleNotes,
+  XTextbox,
+  XShapeNotes,
   alignmentGuideLines,
+  XImage,
+  XConnector,
+  XFile,
+  XGroup,
+  XURL,
 } from './src/shapes/canvasx';
 
-export { WBCanvas } from './src/canvas/canvasx/bx-canvas';
-export { X_Connector } from './src/shapes/canvasx/X_Connector';
+export { XCanvas } from './src/canvas/canvasx/bx-canvas';

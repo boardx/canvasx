@@ -1,9 +1,9 @@
-import { WBCanvas } from '../../canvas/canvasx/bx-canvas';
+import { XCanvas } from '../../canvas/canvasx/bx-canvas';
 import { XY, Point } from '../../Point';
 
 import * as util from '../../util';
 
-export const getPositionOnCanvas = function (xy: XY, canvas: WBCanvas) {
+export const getPositionOnCanvas = function (xy: XY, canvas: XCanvas) {
   // If the horizontal or vertical coordinates are not defined, default them to 0
   const point = new Point(xy.x, xy.y);
 

@@ -31,7 +31,7 @@ const getPath = (
   return path;
 };
 
-class X_Connector extends Path {
+class XConnector extends Path {
   fromPoint: XY;
   toPoint: XY;
   control1: XY;
@@ -63,7 +63,7 @@ class X_Connector extends Path {
     );
     super(path, options);
     this.initialize();
-    this.type = 'X_Connector';
+    this.type = 'XConnector';
     this.objectCaching = false;
 
     const localFromPoint = TransformPointFromCanvasToObject(
@@ -520,7 +520,7 @@ class X_Connector extends Path {
   }
 }
 
-export { X_Connector };
+export { XConnector };
 
 // todo: why TransformPointFromObjectToCanvas and TransformPointFromObjectToCanvas2 is different? why it works for one doesn't work for another?
 export const TransformPointFromObjectToCanvas = (

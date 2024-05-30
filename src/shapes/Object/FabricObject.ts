@@ -5,7 +5,7 @@ import { applyMixins } from '../../util/applyMixins';
 import type { FabricObjectProps } from './types/FabricObjectProps';
 import type { TFabricObjectProps, SerializedObjectProps } from './types';
 import { classRegistry } from '../../ClassRegistry';
-import { FabricObject2 } from '../canvasx/X_Object';
+import { FabricObject2 } from '../canvasx/XObject';
 
 // TODO somehow we have to make a tree-shakeable import
 
@@ -14,7 +14,8 @@ export interface FabricObject<
   Props extends TFabricObjectProps = Partial<FabricObjectProps>,
   SProps extends SerializedObjectProps = SerializedObjectProps,
   EventSpec extends ObjectEvents = ObjectEvents
-> extends FabricObjectSVGExportMixin {}
+> extends FabricObjectSVGExportMixin,
+    FabricObject2 {}
 
 export class FabricObject<
   Props extends TFabricObjectProps = Partial<FabricObjectProps>,

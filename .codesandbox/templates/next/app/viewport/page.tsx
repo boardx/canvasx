@@ -5,9 +5,7 @@ import { NextPage } from 'next';
 import { useRef, useCallback } from 'react';
 import { Canvas } from '../../components/Canvas';
 import { useState } from 'react';
-import '../../../../../src/shapes/canvasx/X_Object';
 
-// import { RectNotes } from '../../../../src/shapes/RectNotes';
 
 import { Box, Typography } from '@mui/joy';
 
@@ -34,7 +32,7 @@ const IndexPage: NextPage = () => {
 
 
             // // Create 10 RectNotes
-            const rectNote1 = new fabric.RectNotes(textValue, {
+            const rectNote1 = new fabric.XRectNotes(textValue, {
                 originX: 'center',
                 top: 100,
                 left: 100,
@@ -47,7 +45,7 @@ const IndexPage: NextPage = () => {
             });
             canvas.add(rectNote1);
 
-            const rectNote2 = new fabric.RectNotes(textValue, {
+            const rectNote2 = new fabric.XRectNotes(textValue, {
                 originX: 'center',
                 top: 300,
                 left: 300,
@@ -70,7 +68,7 @@ const IndexPage: NextPage = () => {
 
             cp1 = rectNote1.calculateControlPoint(rectNote1.getBoundingRect(), point1);
             cp2 = rectNote2.calculateControlPoint(rectNote2.getBoundingRect(), point2);
-            const curve = new fabric.X_Connector(point1, point2, cp1, cp2, style, {
+            const curve = new fabric.XConnector(point1, point2, cp1, cp2, style, {
                 stroke: 'black',
                 strokeWidth: 2,
                 fill: '',
@@ -124,7 +122,7 @@ const IndexPage: NextPage = () => {
                 }));
             });
 
-            canvas.add(new fabric.X_Textbox(' (0,0)', {
+            canvas.add(new fabric.XTextbox(' (0,0)', {
                 left: 0,
                 top: 0,
                 fontSize: 20,
@@ -200,7 +198,7 @@ const IndexPage: NextPage = () => {
             }
             // // Create 10 CircleNotes
             // for (let i = 0; i < 10; i++) {
-            //     const circleNote = new fabric.CircleNotes(textValue, {
+            //     const circleNote = new fabric.XCircleNotes(textValue, {
             //         originX: 'center',
             //         top: 520 + i * 10,
             //         left: 520 + i * 10,
@@ -214,7 +212,7 @@ const IndexPage: NextPage = () => {
 
             // // Create 10 more RectNotes with different dimensions
             // for (let i = 0; i < 10; i++) {
-            //     const rectNote = new fabric.RectNotes(textValue, {
+            //     const rectNote = new fabric.XRectNotes(textValue, {
             //         originX: 'center',
             //         top: 200 + i * 10,
             //         left: 600 + i * 10,

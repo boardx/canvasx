@@ -4,14 +4,12 @@ import * as fabric from 'canvasx';
 import { NextPage } from 'next';
 import { useRef, useCallback } from 'react';
 import { Canvas } from '../../components/Canvas';
-import { RectNotes } from '../../../../../src/shapes/canvasx/X_RectNotes';
-import { CircleNotes } from '../../../../../src/shapes/canvasx/X_CircleNotes';
 
 const IndexPage: NextPage = () => {
-    const ref = useRef<fabric.WBCanvas>(null);
+    const ref = useRef<fabric.XCanvas>(null);
 
     const onLoad = useCallback(
-        (canvas: fabric.WBCanvas) => {
+        (canvas: fabric.XCanvas) => {
             canvas.setDimensions({
                 width: document.documentElement.clientWidth
                 ,
@@ -22,7 +20,7 @@ const IndexPage: NextPage = () => {
 
             // Create 10 RectNotes
             for (let i = 0; i < 10; i++) {
-                const rectNote = new RectNotes(textValue, {
+                const rectNote = new fabric.FabricText(textValue, {
                     originX: 'center',
                     originY: 'center',
                     top: 220 + i * 20,
@@ -36,7 +34,7 @@ const IndexPage: NextPage = () => {
 
             // Create 10 CircleNotes
             for (let i = 0; i < 10; i++) {
-                const circleNote = new CircleNotes(textValue, {
+                const circleNote = new fabric.FabricText(textValue, {
                     originX: 'center',
                     originY: 'center',
                     top: 520 + i * 10,
@@ -51,7 +49,7 @@ const IndexPage: NextPage = () => {
 
             // Create 10 more RectNotes with different dimensions
             for (let i = 0; i < 10; i++) {
-                const rectNote = new RectNotes(textValue, {
+                const rectNote = new fabric.FabricText(textValue, {
                     originX: 'center',
                     originY: 'center',
                     top: 200 + i * 10,

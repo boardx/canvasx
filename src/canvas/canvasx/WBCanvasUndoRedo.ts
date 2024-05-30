@@ -6,9 +6,9 @@
 
 // //** Redux Store */
 
-// import { WBCanvas } from './bx-canvas';
+// import { XCanvas } from './bx-canvas';
 
-// // WBCanvas.prototype.ActionList = {
+// // XCanvas.prototype.ActionList = {
 // //   SCALED: 'SCALED',
 // //   GROUP: 'GROUP',
 // //   UNGROUP: 'UNGROUP',
@@ -22,11 +22,11 @@
 // //   PASTE: 'PASTE',
 // // };
 
-// // WBCanvas.prototype.currentHistoryStateIndex = -1;
+// // XCanvas.prototype.currentHistoryStateIndex = -1;
 
-// // WBCanvas.prototype.historyState = []; // list of the state
+// // XCanvas.prototype.historyState = []; // list of the state
 
-// // WBCanvas.prototype.redoundoChange = false;
+// // XCanvas.prototype.redoundoChange = false;
 
 // /**
 //  * if the same item had more than one action clear the unneccesary item
@@ -34,7 +34,7 @@
 //  * @param {arrary} stateList
 //  * @returns
 //  */
-// WBCanvas.prototype.cleanData = function (originalStateList: any) {
+// XCanvas.prototype.cleanData = function (originalStateList: any) {
 //   // let stateList = originalStateList;
 //   // stateList
 //   //   .filter((obj) => obj.action === "REMOVED")
@@ -68,7 +68,7 @@
 // };
 
 // //sync state to remote
-// WBCanvas.prototype.syncNewState = function (stateItem) {
+// XCanvas.prototype.syncNewState = function (stateItem) {
 //   // const self = this;
 //   // const toInsertWidgetArr = [];
 //   // const toUpdateWidgetArr = [];
@@ -116,7 +116,7 @@
 //   //   const currentWidget = canvas.getActiveObject();
 //   //   if (currentWidget.isActiveSelection()) {
 //   //     currentWidget._objects.forEach((obj) => {
-//   //       if (obj.objType === "WBArrow") {
+//   //       if (obj.objType === "XConnector") {
 //   //         let startObj = obj.connectorStart;
 //   //         let endObj = obj.connectorEnd;
 //   //         if (startObj) {
@@ -153,7 +153,7 @@
 //  * newState, id, action, originalState, newState
 //  *
 //  */
-// WBCanvas.prototype.pushNewState = function (newStatet) {
+// XCanvas.prototype.pushNewState = function (newStatet) {
 //   // const self = this;
 //   // // 清理新的状态数据
 //   // const newState = self.cleanData(newStatet);
@@ -182,7 +182,7 @@
 //   // self.updateUndoRedoStatus();
 // };
 
-// WBCanvas.prototype.undo = async function () {
+// XCanvas.prototype.undo = async function () {
 //   //   const self = this;
 //   //   const asObjArr = [];
 //   //   // undo stack is empty, exit
@@ -386,7 +386,7 @@
 //   //     const currentWidget = canvas.getActiveObject();
 //   //     if (currentWidget.isActiveSelection()) {
 //   //       currentWidget._objects.forEach((obj) => {
-//   //         if (obj.objType === "WBArrow") {
+//   //         if (obj.objType === "XConnector") {
 //   //           let startObj = obj.connectorStart;
 //   //           let endObj = obj.connectorEnd;
 //   //           if (startObj) {
@@ -432,7 +432,7 @@
 //   //   this.requestRenderAll();
 // };
 
-// WBCanvas.prototype.updateUndoRedoStatus = function () {
+// XCanvas.prototype.updateUndoRedoStatus = function () {
 //   // const self = this;
 //   // const index = self.currentHistoryStateIndex;
 //   // const { length } = self.historyState;
@@ -448,12 +448,12 @@
 //   // }
 // };
 
-// WBCanvas.prototype.resetUndoRedoStatus = function () {
+// XCanvas.prototype.resetUndoRedoStatus = function () {
 //   //   // const self = this;
 //   //   // self.historyState.length = 0;
 //   //   // self.updateUndoRedoStatus();
 //   // };
-//   // WBCanvas.prototype.updateUndoRedoStackAccordingtoRemoteChange = function (
+//   // XCanvas.prototype.updateUndoRedoStackAccordingtoRemoteChange = function (
 //   //   id
 //   // ) {
 //   //   // if the id is in redo/undo stack,
@@ -482,7 +482,7 @@
 // };
 
 // // redo function
-// WBCanvas.prototype.redo = async function () {
+// XCanvas.prototype.redo = async function () {
 //   // const self = this;
 //   // const asObjArr = [];
 //   // if (self.historyState.length === 0) {
@@ -691,7 +691,7 @@
 
 // function getNoteType(type, width) {
 //   // if (type === "WBText") return "text";
-//   // if (type === "WBCircleNotes") return "circle";
+//   // if (type === "XCircleNotes") return "circle";
 //   // if (type === "WBRectNotes" && width === 230) return "53";
 //   // if (type === "WBRectNotes" && width === 138) return "33";
 // }

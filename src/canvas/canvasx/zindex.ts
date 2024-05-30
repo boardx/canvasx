@@ -1,9 +1,9 @@
 // import _ from 'underscore';
 // import * as fabric from '../../../fabric';
-// import { WBCanvas } from '@/x-canvas/canvas';
+// import { XCanvas } from '@/x-canvas/canvas';
 // import { WBObject } from '@/x-canvas/shapes/object/bx-object';
 
-// WBCanvas.prototype.getTopObjectByPointer = function (point, ismouseup, isFrom) {
+// XCanvas.prototype.getTopObjectByPointer = function (point, ismouseup, isFrom) {
 //   // Initialize all objects present on the canvas
 //   const objects = this.getObjects();
 
@@ -16,9 +16,9 @@
 //       obj &&
 //       // Checking if the point is within the object
 //       obj.containsPointNew(point, ismouseup, isFrom) &&
-//       // Checking to ensure that the object is not of type "common" or "WBArrow"
+//       // Checking to ensure that the object is not of type "common" or "XConnector"
 //       obj.objType !== 'common' &&
-//       obj.objType !== 'WBArrow'
+//       obj.objType !== 'XConnector'
 //     ) {
 //       // If all conditions met, object is pushed to the array
 //       objArray.push(obj);
@@ -37,7 +37,7 @@
 //   return null;
 // };
 
-// WBCanvas.prototype._getIntersectedObjects = function (object) {
+// XCanvas.prototype._getIntersectedObjects = function (object) {
 //   const self = this;
 
 //   // Initialize all objects present on the canvas, excluding objects of "common" type
@@ -64,7 +64,7 @@
 //   return newArray;
 // };
 
-// WBCanvas.prototype.sortByZIndex = function () {
+// XCanvas.prototype.sortByZIndex = function () {
 //   const self = this;
 
 //   // Sorting all objects on the canvas based on their z-index
@@ -74,7 +74,7 @@
 //   self.requestRenderAll();
 // };
 
-// WBCanvas.prototype.createTopZIndex = function () {
+// XCanvas.prototype.createTopZIndex = function () {
 //   const self = this;
 
 //   let topZindex = Date.now() * 100;
@@ -90,7 +90,7 @@
 // };
 
 // /* to do: maybe improve this function to better handler the zindex change */
-// WBCanvas.prototype.createUniqueZIndex = function (inputZindex, tohigher) {
+// XCanvas.prototype.createUniqueZIndex = function (inputZindex, tohigher) {
 //   // Define the scope as the canvas
 //   const self = this;
 
@@ -133,7 +133,7 @@
 //   return uniqueZIndex;
 // };
 
-// WBCanvas.prototype.zindexArrBetween = function (lowz, highz, size) {
+// XCanvas.prototype.zindexArrBetween = function (lowz, highz, size) {
 //   // Calculate the interval between two indexes based on the number of elements between them
 //   const zInterval = size > 0 ? (highz - lowz) / (size + 1) : null;
 

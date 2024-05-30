@@ -50,13 +50,13 @@ const _URL = window.URL || window.webkitURL;
 Util["getType"] = function (objType) {
   let text = "";
   if (objType === "WBRectNotes") text = "便利贴";
-  else if (objType === "WBCircleNotes") text = "便利贴";
+  else if (objType === "XCircleNotes") text = "便利贴";
   else if (objType === "WBText") text = "文本";
   else if (objType === "WBImage") text = "图片";
   else if (objType === "WBUrlImage") text = "网址";
-  else if (objType === "WBPath") text = "绘画";
+  else if (objType === "XPath") text = "绘画";
   else if (objType === "WBLine") text = "图形";
-  else if (objType === "WBArrow") text = "图形";
+  else if (objType === "XConnector") text = "图形";
   else if (objType === "WBRect") text = "图形";
   else if (objType === "WBCircle") text = "图形";
   else if (objType === "sticker") text = "图标";
@@ -622,10 +622,10 @@ Util.changeMenuBarSelected = (objType) => {
     case "WBText":
       store.dispatch(handleSetTextSelected(true));
       break;
-    case "WBPath":
+    case "XPath":
       store.dispatch(handleSetPathSelected(true));
       break;
-    case "WBArrow":
+    case "XConnector":
       store.dispatch(handleSetArrowSelected(true));
       break;
     case "WBShapeNotes":
@@ -643,9 +643,9 @@ Util.getMenuBarSelected = (objType) => {
       return store.getState().widgets.noteSelected;
     case "WBText":
       return store.getState().widgets.textSelected;
-    case "WBPath":
+    case "XPath":
       return store.getState().widgets.pathSelected;
-    case "WBArrow":
+    case "XConnector":
       return store.getState().widgets.arrowSelected;
     case "WBShapeNotes":
       return store.getState().widgets.shapeSelected;

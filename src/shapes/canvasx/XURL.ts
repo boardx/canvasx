@@ -1,55 +1,58 @@
 import { TClassProperties } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
-import { createFileDefaultControls } from '../../controls/commonControls';
 import { Shadow } from '../../Shadow';
 import { Rect } from '../../shapes/Rect';
-import { FabricImage as FbricImage } from '../Image';
-
+import { FabricImage } from '../Image';
+import { createFileDefaultControls } from '../../controls/commonControls';
 import type { FabricObjectProps, SerializedObjectProps } from '../Object/types';
+import { getFabricDocument } from '../../env';
 
-import { TOptions } from '../../typedefs';
-import { loadImage } from '../../util';
+import { LoadImageOptions, loadImage } from '../../util/misc/objectEnlive';
 
-export type WBFileSource =
+import type { TOptions } from '../../typedefs';
+
+export type ImageSource =
   | string
   | HTMLImageElement
   | HTMLVideoElement
   | HTMLCanvasElement;
 
-interface UniqueWBFileProps {
+interface UniqueImageProps {
   srcFromAttribute: boolean;
   minimumScaleTrigger: number;
   cropX: number;
   cropY: number;
   imageSmoothing: boolean;
   crossOrigin: string | null;
+  url: string;
 }
 
-export const WBFileDefaultValues: Partial<TClassProperties<X_File>> = {
+export const UrlImageDefaultValues: Partial<TClassProperties<XURL>> = {
   minWidth: 20,
   dynamicMinWidth: 2,
   lockScalingFlip: true,
   noScaleCache: false,
-
   splitByGrapheme: true,
-  objType: 'WBFile',
+  objType: 'XURL',
   height: 200,
   maxHeight: 200,
+  width: 230,
 };
 
-export interface SerializedWBFileProps extends SerializedObjectProps {
+export interface SerializedImageProps extends SerializedObjectProps {
   src: string;
   crossOrigin: string | null;
   filters: any[];
   resizeFilter?: any;
   cropX: number;
   cropY: number;
+  url: string;
 }
-export interface WBFileProps extends FabricObjectProps, UniqueWBFileProps {}
+export interface UrlImageProps extends FabricObjectProps, UniqueImageProps {}
 
-export class X_File<
-  Props extends TOptions<WBFileProps> = Partial<WBFileProps>
-> extends FbricImage {
+export class XURL<
+  Props extends TOptions<UrlImageProps> = Partial<UrlImageProps>
+> extends FabricImage<Props> {
   declare minWidth: number;
 
   /* boardx cusotm function */
@@ -70,13 +73,15 @@ export class X_File<
 
   declare zIndex: number;
 
+  declare url: string | undefined;
+
   declare lines: object[];
 
-  declare url: string;
+  declare title: string;
 
   declare relationship: object[];
-  declare name: string;
-  declare isUploading: boolean;
+
+  declare description: string;
 
   public extendPropeties = [
     'objType',
@@ -91,6 +96,7 @@ export class X_File<
     'zIndex',
     'relationship',
     'url',
+    'title',
   ];
 
   declare dynamicMinWidth: number;
@@ -103,22 +109,25 @@ export class X_File<
    */
   declare splitByGrapheme: boolean;
 
-  static ownDefaults: Record<string, any> = WBFileDefaultValues;
+  static ownDefaults: Record<string, any> = UrlImageDefaultValues;
 
   static getDefaults() {
     return {
       ...super.getDefaults(),
       controls: createFileDefaultControls(),
-      ...X_File.ownDefaults,
+      ...XURL.ownDefaults,
     };
   }
 
   //@ts-ignore
-  constructor(element: WBFileSource, options: Props) {
+  constructor(element: ImageSource, options: Props) {
     super(element.toString(), options);
     this.filters = [];
-    // this.resizeFilters = [];
-    this.name = options.name;
+
+    this.url = options.url;
+    this.title = options.title;
+    this.description = options.description;
+
     this.shadow = new Shadow({
       color: 'rgba(217, 161, 177, 0.54)',
       offsetX: 1,
@@ -126,6 +135,7 @@ export class X_File<
       blur: 4,
       id: 310,
     });
+
     (this.clipPath = new Rect({
       left: 0,
       top: 0,
@@ -135,80 +145,43 @@ export class X_File<
       height: 248,
       fill: '#000000',
     })),
-      // // double click
-      // this.on('mousedblclick', () => {
-      //   if (this.src || !this.isUploading) {
-      //     //@ts-ignore
-      //     if (Boardx.Util.isMobile()) {
-      //       getWindow().parent.location.href = this.fileSrc
-      //         ? this.fileSrc
-      //         : this.src;
-      //     } else if (this.isFileVideo(this.name)) {
-      //       store.dispatch(handleSetVideoUrl(this.src));
-      //     } else {
-      //       getWindow()
-      //         .open(this.fileSrc ? this.fileSrc : this.src, '_blank')
-      //         .focus();
-      //     }
-      //   }
-      // });
-      // this.initDoubleClickSimulation();
-      (this.width = 230);
+      // double click
+      this.InitializeEvent();
+    // this.initDoubleClickSimulation();
+    this.width = 230;
     this.height = 248;
   }
-  // setElement(element: WBFileSource, size: Partial<TSize> = {}) {
-  //   this.removeTexture(this.cacheKey);
-  //   this.removeTexture(`${this.cacheKey}_filtered`);
-  //   this._element = element;
-  //   this._originalElement = element;
-  //   this._setWidthHeight(size);
-  //   element.classList.add(WBFile.CSS_CANVAS);
-  //   if (this.filters.length !== 0) {
-  //     this.applyFilters();
+  //   setElement(element: ImageSource, size: Partial<TSize> = {}) {
+  //     this.removeTexture(this.cacheKey);
+  //     this.removeTexture(`${this.cacheKey}_filtered`);
+  //     this._element = element as ImageSource;
+  //     this._originalElement = element as ImageSource;
+  //     this._setWidthHeight(size);
+  //     // element.classList.add(XURL.CSS_CANVAS);
+  //     if (this.filters.length !== 0) {
+  //         this.applyFilters();
+  //     }
+  //     // resizeFilters work on the already filtered copy.
+  //     // we need to apply resizeFilters AFTER normal filters.
+  //     // applyResizeFilters is run more often than normal filters
+  //     // and is triggered by user interactions rather than dev code
+  //     if (this.resizeFilter) {
+  //       this.applyResizeFilters();
+  //     }
   //   }
-  //   // resizeFilters work on the already filtered copy.
-  //   // we need to apply resizeFilters AFTER normal filters.
-  //   // applyResizeFilters is run more often than normal filters
-  //   // and is triggered by user interactions rather than dev code
-  //   if (this.resizeFilter) {
-  //     this.applyResizeFilters();
-  //   }
-  // }
 
-  // toObject(propertiesToInclude: Array<any>): object {
-  //   return super.toObject(
-  //     [...this.extendPropeties, 'minWidth', 'splitByGrapheme'].concat(
-  //       propertiesToInclude
-  //     )
-  //   );
-  // }
+  //   toObject(propertiesToInclude: Array<any>): object {
+  //     return super.toObject(
+  //       [...this.extendPropeties, 'minWidth', 'splitByGrapheme'].concat(
+  //         propertiesToInclude
+  //       )
+  //     );
+  //   }
   getWidgetMenuList() {
-    const menuList = [];
     if (this.locked) {
-      menuList.push('objectLock');
-    } else {
-      menuList.push('more');
-      menuList.push('objectLock');
-      menuList.push('delete');
-      menuList.push('fileName');
-      menuList.push('borderLineIcon');
-      menuList.push('fileDownload');
-      const fileType = this.name.split('.').pop() || '';
-      if (
-        fileType.toLocaleLowerCase() == 'mp3' ||
-        fileType.toLocaleLowerCase() === 'm4a' ||
-        fileType.toLocaleLowerCase() === 'wav' ||
-        fileType.toLocaleLowerCase() === 'aac' ||
-        fileType.toLocaleLowerCase() === 'flac' ||
-        fileType.toLocaleLowerCase() === 'ogg' ||
-        fileType.toLocaleLowerCase() === 'aiff' ||
-        fileType.toLocaleLowerCase() === 'wma' ||
-        fileType.toLocaleLowerCase() === 'ape'
-      ) {
-        menuList.push('audioToText');
-      }
+      return ['objectLock'];
     }
-    return menuList;
+    return ['more', 'objectLock', 'delete'];
   }
   getWidgetMenuLength() {
     if (this.locked) return 50;
@@ -236,20 +209,22 @@ export class X_File<
         'Delete',
       ];
     }
+
     if (this.locked) {
       menuList.push('Unlock');
     } else {
       menuList.push('Lock');
     }
-
     return menuList;
   }
 
   InitializeEvent = () => {
     const zoom = this.canvas?.getZoom() || 1;
     // this.on('mousedblclick', (memo) => {
-    //   const offsetX = memo.e.offsetX - (this.left - this.width / 2);
-    //   const offsetY = memo.e.offsetY - (this.top - this.height / 2);
+    //   const offsetX =
+    //     (memo.e as MouseEvent).offsetX - (this.left - this.width / 2);
+    //   const offsetY =
+    //     (memo.e as MouseEvent).offsetY - (this.top - this.height / 2);
 
     //   if (
     //     offsetX < 20 ||
@@ -258,18 +233,20 @@ export class X_File<
     //     offsetY > 480 ||
     //     (offsetY > 64 && offsetY < 446)
     //   ) {
-    //     getWindow().open(this.url, '_blank').focus();
+    //     getWindow()?.open(this.url, '_blank').focus();
     //   } else {
     //     let text = this.title;
-    //     const textarea = $('#urlTextarea');
-    //     const cvsPosition = $('#canvasContainer').offset();
+    //     const textarea = document.getElementById('urlTextarea');
+    //     const cvsPosition = document
+    //       .getElementById('canvasContainer')
+    //       ?.getBoundingClientRect();
     //     let fontSize = 20 * this.scaleX * zoom;
     //     const left = `${
     //       cvsPosition.left +
     //       (this.left - (this.width / 2 - 22) * this.scaleX) * zoom
     //     }px`;
     //     let top = `${
-    //       cvsPosition.top +
+    //       cvsPosition?.top +
     //       (this.top - (this.height / 2 - 22) * this.scaleY) * zoom
     //     }px`;
     //     const newWidth = (this.width - 44) * this.scaleX * zoom;
@@ -307,34 +284,39 @@ export class X_File<
     // });
     // this.on('removed', this.removedListener);
   };
-  // removedListener() {
-  //   if (this.loading) {
-  //     this.loading.remove();
-  //     this.loading = null;
+  //   removedListener() {
+  //     if (this.loading) {
+  //       this.loading.remove();
+  //       this.loading = null;
+  //     }
   //   }
-  // }
-  // initDoubleClickSimulation() {
-  //   this.__lastClickTime = +new Date();
-  //   this.on('touchstart', this.onMouseDown.bind(this));
-  //   this.on('mousedown', this.onMouseDown.bind(this));
-  // }
-
-  // onMouseUp(options) {
-  //   this.__newClickTime = +new Date();
-  //   if (this.__newClickTime - this.__lastClickTime < 500) {
-  //     this.fire('dblclick', options);
-  //     this._stopEvent(options.e);
+  //   initDoubleClickSimulation() {
+  //     this.__lastClickTime = +new Date();
+  //     this.on('touchstart', this.onMouseDown.bind(this));
+  //     this.on('mousedown', this.onMouseDown.bind(this));
   //   }
-  //   this.__lastClickTime = this.__newClickTime;
-  // }
+  //   onMouseDown(options) {
+  //     this.__newClickTime = +new Date();
+  //     if (this.__newClickTime - this.__lastClickTime < 500) {
+  //       this.lockMovementX = true;
+  //       this.lockMovementY = true;
+  //       this.fire('dblclick', options);
+  //       this._stopEvent(options.e);
+  //     } else {
+  //       this.lockMovementX = false;
+  //       this.lockMovementY = false;
+  //     }
 
-  // _stopEvent(e) {
-  //   e.preventDefault();
-  //   e.stopPropagation();
-  // }
-  //@ts-ignore
+  //     this.__lastClickTime = this.__newClickTime;
+  //   }
+  _stopEvent(e: any) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
   drawObject(ctx: CanvasRenderingContext2D) {
     let elementToDraw = null;
+
     // draw border
     ctx.beginPath();
     ctx.fillStyle = 'rgba(255,255,255,0)';
@@ -346,90 +328,43 @@ export class X_File<
 
     if (
       this.isMoving === false &&
-      // this.resizeFilters.length &&
+      //   this.resizeFilters.length &&
       this._needsResize()
     ) {
       this._lastScaleX = this.scaleX;
       this._lastScaleY = this.scaleY;
-      // elementToDraw = this.applyFilters(
-      //   null,
-      //   this.resizeFilters,
-      //   this._filteredEl || this._originalElement,
-      //   true
-      // );
+      //   elementToDraw = this.applyFilters(
+      //     null,
+      //     this.resizeFilters,
+      //     this._filteredEl || this._originalElement,
+      //     true
+      //   );
     } else {
       elementToDraw = this._element;
     }
 
-    const imgWidth =
-      this.name.substring(this.name.lastIndexOf('.') + 1) === 'pdf' ? 320 : 230;
-    const imgHeight =
-      this.name.substring(this.name.lastIndexOf('.') + 1) === 'pdf' ? 453 : 160;
-
     if (elementToDraw) {
-      ctx.drawImage(
-        elementToDraw,
-        -this.width / 2,
-        -this.height / 2,
-        imgWidth,
-        imgHeight
-      );
+      ctx.drawImage(elementToDraw, -this.width / 2, -this.height / 2, 230, 160);
     }
 
-    if (this.name.substring(this.name.lastIndexOf('.') + 1) !== 'pdf') {
-      this.renderTitle(ctx, this.name);
-    }
+    this.renderTitle(ctx, this.title);
+
     this._renderStroke(ctx);
   }
+  renderDescription(ctx: any) {
+    const maxWidth = this.width;
 
-  getFileType(name = '') {
-    let fileType = '';
-    switch (name.substring(name.lastIndexOf('.') + 1)) {
-      case 'doc':
-      case 'docx':
-        fileType = 'Word Document';
-        break;
-      case 'xls':
-      case 'xlsx':
-        fileType = 'Excel Document';
-        break;
-      case 'ppt':
-      case 'pptx':
-        fileType = 'PPT Document';
-        break;
-      case 'pdf':
-        fileType = 'PDF Document';
-        break;
-      case 'zip':
-        fileType = 'ZIP File';
-        break;
-      case 'mp4':
-        fileType = 'Video Document';
-        break;
-      case 'webm':
-        fileType = 'Video Document';
-        break;
-      default:
-        fileType = 'Other Document';
-        break;
-    }
-    return fileType;
+    ctx.font = '10px Arial';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+    const x = -this.width / 2;
+    const y = this.height / 2;
+
+    ctx.font = '18px Arial';
+    ctx.fillStyle = 'rgba(0, 0, 0)';
+    this.splitByGrapheme = true;
+    this.wrapText(ctx, this.description, x, y, maxWidth, 18);
   }
-
-  isFileVideo(name: string) {
-    if (!name) return false;
-    const FileType = this.name.split('.').pop() || '';
-    switch (name.substr(name.lastIndexOf('.') + 1).toUpperCase()) {
-      case 'MP4':
-        return true;
-      case 'WEBM':
-        return true;
-      default:
-        return false;
-    }
-  }
-
-  renderTitle(ctx: any, title: string) {
+  renderTitle(ctx: any, title: any) {
     const maxWidth = this.width;
     const x = -this.width / 2;
     const y = this.height / 2 - 60;
@@ -452,38 +387,58 @@ export class X_File<
     };
     // Handle non-unicode or non-utf8 coding string
     const unicodeTitle = GB2312UnicodeConverter.ToUnicode(title);
-
+    if (!this.url && this.src) {
+      this.url = this.src;
+    }
     // handle the situation that the website's title is null
-    if (title === null || unicodeTitle.indexOf('\\ufffd') !== -1 || !title) {
+    if (
+      (title === null || unicodeTitle.indexOf('\\ufffd') !== -1 || !title) &&
+      this.url
+    ) {
       const firstChar = this.url.indexOf('.');
       const lastChar = this.url.indexOf('.', firstChar + 1);
-      this.name = this.url.substring(firstChar + 1, lastChar);
+      this.title = this.url.substring(firstChar + 1, lastChar);
     }
 
     // title setting
     this.wrapText(ctx, title, x + 15, y - 5, maxWidth - 20, 23);
 
     // url setting
-    const newurl = this.url
-      ? `${this.url.split('/')[0]}/${this.url.split('/')[1]}/${
-          this.url.split('/')[2]
-        }`
-      : '';
+    const newurl = `${this.url?.split('/')[0]}/${this.url?.split('/')[1]}/${
+      this.url?.split('/')[2]
+    }`;
     ctx.font = '12px Arial';
     ctx.fillStyle = 'rgba(35, 41, 48, 0.65)';
     // gray square in front of website
     this.wrapText(ctx, newurl, x + 15, y + 45, maxWidth - 20, 25);
   }
+  renderPublishDate(ctx: any) {
+    const maxWidth = this.width;
 
-  changeFileImgUrl(targetSrc: string) {
-    this.setSrc(targetSrc);
+    ctx.font = '10px Arial';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+    const x = -this.width / 2 + 20;
+    const y = this.height / 2 - 10;
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+
+    ctx.fillRect(-this.width / 2, y - 20, maxWidth, 30);
+
+    ctx.font = '18px Arial';
+    ctx.fillStyle = 'rgba(255, 255, 255, 1)';
+    // this.wrapText(
+    //   ctx,
+    //   `${this.publisher}:${new Date(this.publishedDate).toDateString()}`,
+    //   x,
+    //   y,
+    //   maxWidth,
+    //   18
+    // );
   }
-
   wrapText(
     context: any,
     text: any,
-    x: number,
-    y: number,
+    x: any,
+    y: any,
     maxWidth: number,
     lineHeight: number
   ) {
@@ -538,57 +493,43 @@ export class X_File<
     }
     if (lineCount < 3) context.fillText(line, x, _y);
   }
-  getFileIconURL(name: string) {
-    let fileIconURL = '';
-    switch (name.substring(name.lastIndexOf('.') + 1)) {
-      case 'doc':
-      case 'docx':
-        fileIconURL = '/fileIcons/word.png';
-        break;
-      case 'xls':
-      case 'xlsx':
-        fileIconURL = '/fileIcons/excel.png';
-        break;
-      case 'ppt':
-      case 'pptx':
-        fileIconURL = '/fileIcons/ppt.png';
-        break;
-      case 'pdf':
-        fileIconURL = '/fileIcons/pdf.svg';
-        break;
-      case 'zip':
-        fileIconURL = '/fileIcons/zip.png';
-        break;
-      case 'mp4':
-        fileIconURL = '/fileIcons/mp4.png';
-        break;
 
-      case 'webm':
-        fileIconURL = '/fileIcons/mp4.png';
-        break;
-      default:
-        fileIconURL = '/fileIcons/file.png';
-        break;
-    }
-    return fileIconURL;
-  }
-  fromURL<T extends TOptions<SerializedWBFileProps>>(
-    fileOptions: any
-  ): Promise<X_File> {
-    return new Promise(async (resolve, reject) => {
-      const url = fileOptions.previewImage
-        ? fileOptions.previewImage
-        : this.getFileIconURL(fileOptions.name);
-      try {
-        const loadedImg = await loadImage(url, {
-          ...fileOptions,
+  fromURL<T extends TOptions<SerializedImageProps>>(
+    url: string,
+    options: any
+  ): Promise<XURL> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const cvs = getFabricDocument().createElement('canvas');
+      const ctx = cvs.getContext('2d');
+      //   img.crossOrigin = '';
+      //@ts-ignore
+      img.onload = async function () {
+        // fix size version
+        cvs.width = 230;
+        cvs.height = 160; // 230 / img.width * img.height;
+        ctx?.drawImage(img, 0, 0, 230, 160);
+
+        const imgOptions: LoadImageOptions = {
           crossOrigin: 'anonymous',
-        });
-        resolve(new X_File(loadedImg, fileOptions));
-      } catch (error) {
+          ...options,
+        };
+
+        try {
+          const loadedImg = await loadImage(cvs.toDataURL(), imgOptions);
+          resolve(new XURL(loadedImg, options));
+        } catch (error) {
+          reject(error);
+        }
+      };
+
+      img.onerror = function (error: any) {
         reject(error);
-      }
+      };
+
+      img.src = url;
     });
   }
 }
-classRegistry.setClass(X_File);
+
+classRegistry.setClass(XURL);

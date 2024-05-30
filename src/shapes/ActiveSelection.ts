@@ -137,6 +137,7 @@ export class ActiveSelection extends Group {
    * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
    */
   enterGroup(object: FabricObject, removeParentTransform?: boolean) {
+    console.log('enterGroup');
     // This condition check that the object has currently a group, and the group
     // is also its parent, meaning that is not in an active selection, but is
     // in a normal group.

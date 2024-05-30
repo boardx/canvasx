@@ -1,6 +1,7 @@
+import { classRegistry } from '../../ClassRegistry';
 import { FabricImage } from '../Image';
 
-export class X_Image extends FabricImage {
+export class XImage extends FabricImage {
   declare objType: string;
   declare zIndex: number;
   declare locked: boolean;
@@ -121,3 +122,4 @@ export class X_Image extends FabricImage {
     return menuList;
   }
 }
+classRegistry.setClass(XImage);

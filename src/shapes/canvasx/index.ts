@@ -1,10 +1,17 @@
-import './X_ActiveSelection';
+import './XActiveSelection';
+import './XObject';
 
 export { alignmentGuideLines } from '../../canvas/canvasx/WBAlignmentGuidelines';
 
-export { CircleNotes } from './X_CircleNotes';
-export { RectNotes } from './X_RectNotes';
-export { ShapeNotes } from './X_ShapeNotes';
-export { X_Textbox } from './X_Textbox';
+export { XCircleNotes } from './XCircleNotes';
+export { XRectNotes } from './XRectNotes';
+export { XShapeNotes } from './XShapeNotes';
+export { XTextbox } from './XTextbox';
+// export { X_Object } from './X_Object';
+export { XImage } from './XImage';
+export { XConnector } from './XConnector';
+export { XFile } from './XFile';
+export { XGroup } from './XGroup';
+export { XURL } from './XURL';
 
 import '../../canvas/canvasx/initializeCanvasEvents';

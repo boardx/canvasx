@@ -1,7 +1,7 @@
 import { Group } from '../../shapes/Group';
 import { FabricObject } from '../../shapes/Object/Object';
 import { TMat2D } from '../../typedefs';
-import { WBCanvas } from './bx-canvas';
+import { XCanvas } from './bx-canvas';
 import { ActiveSelection } from '../../shapes/ActiveSelection';
 import type { XY } from '../../Point';
 
@@ -43,7 +43,7 @@ export interface BXCanvasInterface {
     height: number,
     vpt: any,
     vpCenter: any,
-    canvas: WBCanvas
+    canvas: XCanvas
   ): void;
 
   animateToRect(
@@ -51,29 +51,23 @@ export interface BXCanvasInterface {
     height: number,
     vpt: any,
     vpCenter: any,
-    canvas: WBCanvas
+    canvas: XCanvas
   ): void;
 
-  animateToVpt(vpt: any, vpCenter: any, canvas: WBCanvas): void;
-  zoomToObject(obj: FabricObject, canvas: WBCanvas): void;
+  animateToVpt(vpt: any, vpCenter: any, canvas: XCanvas): void;
+  zoomToObject(obj: FabricObject, canvas: XCanvas): void;
   zoomToCenterPoint(vpCenter: { x: number; y: number }, zoom: number): void;
   updateViewport(): void;
 
-  onObjectModifiedUpdateArrowsSave(
-    object: FabricObject,
-    canvas: WBCanvas
-  ): void;
+  onObjectModifiedUpdateArrowsSave(object: FabricObject, canvas: XCanvas): void;
 
   onRefreshArrowAfterScale(arrowId: string): FabricObject;
-  resetConnector(object: FabricObject, canvas: WBCanvas): void;
+  resetConnector(object: FabricObject, canvas: XCanvas): void;
 
-  onObjectModifiedUpdateArrowsSave(
-    object: FabricObject,
-    canvas: WBCanvas
-  ): void;
-  onRefreshArrowAfterScale(arrowId: string, canvas: WBCanvas): void;
+  onObjectModifiedUpdateArrowsSave(object: FabricObject, canvas: XCanvas): void;
+  onRefreshArrowAfterScale(arrowId: string, canvas: XCanvas): void;
 
-  onRefreshArrowAfterScale(arrowId: string, canvas: WBCanvas): void;
+  onRefreshArrowAfterScale(arrowId: string, canvas: XCanvas): void;
   onObjectModifyUpdateArrows(object: FabricObject): void;
   onObjectMoveUpdateArrowsSave(object: FabricObject): void;
   updateConnectorsRemovedWidget(obj: FabricObject): void;

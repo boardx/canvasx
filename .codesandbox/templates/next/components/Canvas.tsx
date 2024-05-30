@@ -1,4 +1,4 @@
-import * as fabric from '../../../../fabric';
+import * as fabric from 'canvasx';
 import React, { useEffect, useRef, useState } from 'react';
 import MiniCanvas from './preview/MiniCanvas';
 
@@ -7,22 +7,22 @@ const DEV_MODE = process.env.NODE_ENV === 'development';
 import { initializeCanvasEvents } from './initializeCanvasEvents';
 
 declare global {
-  var canvas: fabric.WBCanvas | undefined;
+  var canvas: fabric.Canvas | undefined;
 }
 
 export const Canvas = React.forwardRef<
-  fabric.WBCanvas,
-  { onLoad?(canvas: fabric.WBCanvas): void }
+  fabric.Canvas,
+  { onLoad?(canvas: fabric.Canvas): void }
 >(({ onLoad }, ref) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [canvas, setCanvas] = useState(null as fabric.WBCanvas | null);
+  const [canvas, setCanvas] = useState(null as fabric.Canvas | null);
 
   useEffect(() => {
     if (!canvasRef.current) {
       return;
     }
 
-    const canvas = new fabric.WBCanvas(canvasRef.current, {
+    const canvas = new fabric.Canvas(canvasRef.current, {
       backgroundColor: '#f0f0f0',
       height: document.documentElement.clientHeight
       ,

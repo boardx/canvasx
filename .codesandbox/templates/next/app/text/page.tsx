@@ -9,10 +9,10 @@ import { Canvas } from '../../components/Canvas';
 
 
 const IndexPage: NextPage = () => {
-    const ref = useRef<fabric.WBCanvas>(null);
+    const ref = useRef<fabric.XCanvas>(null);
 
     const onLoad = useCallback(
-        (canvas: fabric.WBCanvas) => {
+        (canvas: fabric.XCanvas) => {
             canvas.setDimensions({
                 width: document.documentElement.clientWidth,
                 height: document.documentElement.clientHeight - 60,
@@ -21,7 +21,7 @@ const IndexPage: NextPage = () => {
 
             // Create 10 RectNotes
             for (let i = 0; i < 10; i++) {
-                const rectNote = new fabric.X_Textbox(textValue, {
+                const rectNote = new fabric.XTextbox(textValue, {
                     originX: 'center',
                     originY: 'center',
                     top: 220 + i * 60,
