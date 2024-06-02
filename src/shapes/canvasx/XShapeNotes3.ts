@@ -1,33 +1,29 @@
+import { getFabricDocument } from '../../env';
 import { TClassProperties } from '../../typedefs';
 import { Textbox, TextboxProps } from '../Textbox';
 import { classRegistry } from '../../ClassRegistry';
 import { createRectNotesDefaultControls } from '../../controls/commonControls';
 import { Shadow } from '../../Shadow';
-
-export type { ITextProps, SerializedITextProps } from '../IText/IText';
-
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
 // regexes, list of properties that are not suppose to change by instances, magic consts.
 // this will be a separated effort
-export const shapeNotesDefaultValues: Partial<TClassProperties<XShapeNotes>> = {
-  minWidth: 20,
-  dynamicMinWidth: 2,
-  lockScalingFlip: true,
-  noScaleCache: false,
-  _wordJoiners: /[ \t\r]/,
-  splitByGrapheme: true,
-  objType: 'WBShapeNotes',
-  height: 138,
-  textAlign: 'center',
-  centeredScaling: false,
-  verticalAlign: 'middle',
-  cornerStrokeColor: 'gray',
-  cornerStyle: 'circle',
-  cornerColor: 'white',
-  transparentCorners: false,
-};
+export const XShapeNotesDefaultValues: Partial<TClassProperties<XShapeNotes2>> =
+  {
+    minWidth: 20,
+    dynamicMinWidth: 2,
+    lockScalingFlip: true,
+    noScaleCache: false,
+    _wordJoiners: /[ \t\r]/,
+    splitByGrapheme: true,
+    objType: 'XShapeNotes',
+    height: 138,
+    maxHeight: 138,
+    textAlign: 'center',
 
-export interface ShapeNotesProps extends TextboxProps {
+    centeredScaling: false,
+  };
+
+export interface XShapeNotesProps extends TextboxProps {
   icon: number;
   id: string;
 }
@@ -38,24 +34,21 @@ export interface ShapeNotesProps extends TextboxProps {
  * user can only change width. Height is adjusted automatically based on the
  * wrapping of lines.
  */
-export class XShapeNotes extends Textbox {
+export class XShapeNotes2 extends Textbox {
   /**selectable
    * Minimum width of textbox, in pixels.
    * @type Number
    * @default
    */
   declare minWidth: number;
-  declare lineWidth: number;
-
-  declare __skipDimension: Boolean;
+  declare maxHeight: number;
+  /* boardx cusotm function */
+  declare id: string;
+  declare icon: number;
 
   declare objType: string;
 
   declare locked: boolean;
-
-  declare whiteboardId: string;
-
-  declare userId: string;
 
   declare timestamp: Date;
 
@@ -66,9 +59,6 @@ export class XShapeNotes extends Textbox {
   declare lines: object[];
 
   declare relationship: object[];
-
-  declare icon: string;
-  declare maxHeight: number;
 
   public extendPropeties = [
     'objType',
@@ -103,20 +93,20 @@ export class XShapeNotes extends Textbox {
 
   static textLayoutProperties = [...Textbox.textLayoutProperties, 'width'];
 
-  static ownDefaults: Record<string, any> = shapeNotesDefaultValues;
+  static ownDefaults: Record<string, any> = XShapeNotesDefaultValues;
 
   static getDefaults() {
     return {
       ...super.getDefaults(),
       controls: createRectNotesDefaultControls(),
-      ...XShapeNotes.ownDefaults,
+      ...XShapeNotes2.ownDefaults,
     };
   }
 
-  constructor(text: string, options: Partial<ShapeNotesProps>) {
+  constructor(text: string, options: Partial<XShapeNotesProps>) {
     super(text, options);
+    // this.setLockedShadow(this.locked);
   }
-
   /**
    * Unlike superclass's version of this function, Textbox does not update
    * its width.
@@ -124,9 +114,10 @@ export class XShapeNotes extends Textbox {
    * @override
    */
   initDimensions() {
-    if (this.__skipDimension) {
-      return;
-    }
+    console.log('### initDimensions');
+    // if (this.__skipDimension) {
+    //   return;
+    // }
 
     this.clearContextTop();
     this._clearCache();
@@ -195,104 +186,105 @@ export class XShapeNotes extends Textbox {
 
     return this.height;
   }
-  // /**
-  //  * Generate an object that translates the style object so that it is
-  //  * broken up by visual lines (new lines and automatic wrapping).
-  //  * The original text styles object is broken up by actual lines (new lines only),
-  //  * which is only sufficient for Text / IText
-  //  * @private
-  //  */
-  // _generateStyleMap(textInfo:;any) {
-  //   let realLineCount = 0,
-  //     realLineCharCount = 0,
-  //     charCount = 0;
-  //   const map = {};
+  /**
+   * Generate an object that translates the style object so that it is
+   * broken up by visual lines (new lines and automatic wrapping).
+   * The original text styles object is broken up by actual lines (new lines only),
+   * which is only sufficient for Text / IText
+   * @private
+   */
+  _generateStyleMap(textInfo: any) {
+    let realLineCount = 0,
+      realLineCharCount = 0,
+      charCount = 0;
+    const map: any = {};
 
-  //   for (let i = 0; i < textInfo.graphemeLines.length; i++) {
-  //     if (textInfo.graphemeText[charCount] === '\n' && i > 0) {
-  //       realLineCharCount = 0;
-  //       charCount++;
-  //       realLineCount++;
-  //     } else if (
-  //       !this.splitByGrapheme &&
-  //       this._reSpaceAndTab.test(textInfo.graphemeText[charCount]) &&
-  //       i > 0
-  //     ) {
-  //       // this case deals with space's that are removed from end of lines when wrapping
-  //       realLineCharCount++;
-  //       charCount++;
-  //     }
+    for (let i = 0; i < textInfo.graphemeLines.length; i++) {
+      if (textInfo.graphemeText[charCount] === '\n' && i > 0) {
+        realLineCharCount = 0;
+        charCount++;
+        realLineCount++;
+      } else if (
+        !this.splitByGrapheme &&
+        this._reSpaceAndTab.test(textInfo.graphemeText[charCount]) &&
+        i > 0
+      ) {
+        // this case deals with space's that are removed from end of lines when wrapping
+        realLineCharCount++;
+        charCount++;
+      }
 
-  //     map[i] = { line: realLineCount, offset: realLineCharCount };
+      map[i] = { line: realLineCount, offset: realLineCharCount };
 
-  //     charCount += textInfo.graphemeLines[i].length;
-  //     realLineCharCount += textInfo.graphemeLines[i].length;
-  //   }
+      charCount += textInfo.graphemeLines[i].length;
+      realLineCharCount += textInfo.graphemeLines[i].length;
+    }
 
-  //   return map;
-  // }
+    return map;
+  }
 
-  // /**
-  //  * Returns true if object has a style property or has it on a specified line
-  //  * @param {Number} lineIndex
-  //  * @return {Boolean}
-  //  */
-  // styleHas(property, lineIndex: number): boolean {
-  //   if (this._styleMap && !this.isWrapping) {
-  //     const map = this._styleMap[lineIndex];
-  //     if (map) {
-  //       lineIndex = map.line;
-  //     }
-  //   }
-  //   return super.styleHas(property, lineIndex);
-  // }
+  /**
+   * Returns true if object has a style property or has it on a specified line
+   * @param {Number} lineIndex
+   * @return {Boolean}
+   */
+  styleHas(property: any, lineIndex: number): boolean {
+    if (this._styleMap && !this.isWrapping) {
+      const map = this._styleMap[lineIndex];
+      if (map) {
+        lineIndex = map.line;
+      }
+    }
+    return super.styleHas(property, lineIndex);
+  }
 
-  // /**
-  //  * Returns true if object has no styling or no styling in a line
-  //  * @param {Number} lineIndex , lineIndex is on wrapped lines.
-  //  * @return {Boolean}
-  //  */
-  // isEmptyStyles(lineIndex: number): boolean {
-  //   if (!this.styles) {
-  //     return true;
-  //   }
-  //   let offset = 0,
-  //     nextLineIndex = lineIndex + 1,
-  //     nextOffset,
-  //     shouldLimit = false;
-  //   const map = this._styleMap[lineIndex],
-  //     mapNextLine = this._styleMap[lineIndex + 1];
-  //   if (map) {
-  //     lineIndex = map.line;
-  //     offset = map.offset;
-  //   }
-  //   if (mapNextLine) {
-  //     nextLineIndex = mapNextLine.line;
-  //     shouldLimit = nextLineIndex === lineIndex;
-  //     nextOffset = mapNextLine.offset;
-  //   }
-  //   const obj =
-  //     typeof lineIndex === 'undefined'
-  //       ? this.styles
-  //       : { line: this.styles[lineIndex] };
-  //   for (const p1 in obj) {
-  //     for (const p2 in obj[p1]) {
-  //       if (p2 >= offset && (!shouldLimit || p2 < nextOffset)) {
-  //         // eslint-disable-next-line no-unused-vars
-  //         for (const p3 in obj[p1][p2]) {
-  //           return false;
-  //         }
-  //       }
-  //     }
-  //   }
-  //   return true;
-  // }
+  /**
+   * Returns true if object has no styling or no styling in a line
+   * @param {Number} lineIndex , lineIndex is on wrapped lines.
+   * @return {Boolean}
+   */
+  isEmptyStyles(lineIndex: number): boolean {
+    if (!this.styles) {
+      return true;
+    }
+    let offset = 0,
+      nextLineIndex = lineIndex + 1,
+      nextOffset,
+      shouldLimit = false;
+    const map = this._styleMap[lineIndex],
+      mapNextLine = this._styleMap[lineIndex + 1];
+    if (map) {
+      lineIndex = map.line;
+      offset = map.offset;
+    }
+    if (mapNextLine) {
+      nextLineIndex = mapNextLine.line;
+      shouldLimit = nextLineIndex === lineIndex;
+      nextOffset = mapNextLine.offset;
+    }
+    const obj =
+      typeof lineIndex === 'undefined'
+        ? this.styles
+        : { line: this.styles[lineIndex] };
+    for (const p1 in obj) {
+      for (const p2 in obj[p1]) {
+        //@ts-ignore
+        if (p2 >= offset && (!shouldLimit || p2 < nextOffset)) {
+          // eslint-disable-next-line no-unused-vars
+          for (const p3 in obj[p1][p2]) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
 
-  // /**
-  //  * @param {Number} lineIndex
-  //  * @param {Number} charIndex
-  //  * @private
-  //  */
+  /**
+   * @param {Number} lineIndex
+   * @param {Number} charIndex
+   * @private
+   */
   // _getStyleDeclaration(lineIndex: number, charIndex: number) {
   //   if (this._styleMap && !this.isWrapping) {
   //     const map = this._styleMap[lineIndex];
@@ -355,54 +347,54 @@ export class XShapeNotes extends Textbox {
     this.styles[map.line] = {};
   }
 
-  // /**
-  //  * Wraps text using the 'width' property of Textbox. First this function
-  //  * splits text on newlines, so we preserve newlines entered by the user.
-  //  * Then it wraps each line using the width of the Textbox by calling
-  //  * _wrapLine().
-  //  * @param {Array} lines The string array of text that is split into lines
-  //  * @param {Number} desiredWidth width you want to wrap to
-  //  * @returns {Array} Array of lines
-  //  */
-  // _wrapText(lines: Array<any>, desiredWidth: number): Array<any> {
-  //   const wrapped = [];
-  //   this.isWrapping = true;
-  //   for (let i = 0; i < lines.length; i++) {
-  //     wrapped.push(...this._wrapLine(lines[i], i, desiredWidth));
-  //   }
-  //   this.isWrapping = false;
-  //   return wrapped;
-  // }
+  /**
+   * Wraps text using the 'width' property of Textbox. First this function
+   * splits text on newlines, so we preserve newlines entered by the user.
+   * Then it wraps each line using the width of the Textbox by calling
+   * _wrapLine().
+   * @param {Array} lines The string array of text that is split into lines
+   * @param {Number} desiredWidth width you want to wrap to
+   * @returns {Array} Array of lines
+   */
+  _wrapText(lines: Array<any>, desiredWidth: number): Array<any> {
+    const wrapped = [];
+    this.isWrapping = true;
+    for (let i = 0; i < lines.length; i++) {
+      wrapped.push(...this._wrapLine(lines[i], i, desiredWidth));
+    }
+    this.isWrapping = false;
+    return wrapped;
+  }
 
-  // /**
-  //  * Helper function to measure a string of text, given its lineIndex and charIndex offset
-  //  * It gets called when charBounds are not available yet.
-  //  * Override if necessary
-  //  * Use with {@link Textbox#wordSplit}
-  //  *
-  //  * @param {CanvasRenderingContext2D} ctx
-  //  * @param {String} text
-  //  * @param {number} lineIndex
-  //  * @param {number} charOffset
-  //  * @returns {number}
-  //  */
-  // _measureWord(word, lineIndex: number, charOffset = 0): number {
-  //   let width = 0,
-  //     prevGrapheme;
-  //   const skipLeft = true;
-  //   for (let i = 0, len = word.length; i < len; i++) {
-  //     const box = this._getGraphemeBox(
-  //       word[i],
-  //       lineIndex,
-  //       i + charOffset,
-  //       prevGrapheme,
-  //       skipLeft
-  //     );
-  //     width += box.kernedWidth;
-  //     prevGrapheme = word[i];
-  //   }
-  //   return width;
-  // }
+  /**
+   * Helper function to measure a string of text, given its lineIndex and charIndex offset
+   * It gets called when charBounds are not available yet.
+   * Override if necessary
+   * Use with {@link Textbox#wordSplit}
+   *
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {String} text
+   * @param {number} lineIndex
+   * @param {number} charOffset
+   * @returns {number}
+   */
+  _measureWord(word: any, lineIndex: number, charOffset = 0): number {
+    let width = 0,
+      prevGrapheme;
+    const skipLeft = true;
+    for (let i = 0, len = word.length; i < len; i++) {
+      const box = this._getGraphemeBox(
+        word[i],
+        lineIndex,
+        i + charOffset,
+        prevGrapheme,
+        skipLeft
+      );
+      width += box.kernedWidth;
+      prevGrapheme = word[i];
+    }
+    return width;
+  }
 
   /**
    * Override this method to customize word splitting
@@ -440,87 +432,87 @@ export class XShapeNotes extends Textbox {
     return graphemes;
   }
 
-  // _wrapLine(
-  //   _line: any,
-  //   lineIndex: number,
-  //   desiredWidth: number,
-  //   reservedSpace = 0
-  // ): Array<any> {
-  //   const additionalSpace = this._getWidthOfCharSpacing(),
-  //     splitByGrapheme = this.splitByGrapheme,
-  //     graphemeLines = [],
-  //     words = splitByGrapheme
-  //       ? this.graphemeSplitForRectNotes(_line)
-  //       : this.wordSplit(_line),
-  //     infix = splitByGrapheme ? '' : ' ';
+  _wrapLine(
+    _line: any,
+    lineIndex: number,
+    desiredWidth: number,
+    reservedSpace = 0
+  ): Array<any> {
+    const additionalSpace = this._getWidthOfCharSpacing(),
+      splitByGrapheme = this.splitByGrapheme,
+      graphemeLines = [],
+      words = splitByGrapheme
+        ? this.graphemeSplitForRectNotes(_line)
+        : this.wordSplit(_line),
+      infix = splitByGrapheme ? '' : ' ';
 
-  //   let lineWidth = 0,
-  //     line: any[] = [],
-  //     // spaces in different languages?
-  //     offset = 0,
-  //     infixWidth = 0,
-  //     largestWordWidth = 0,
-  //     lineJustStarted = true;
-  //   // fix a difference between split and graphemeSplit
-  //   if (words.length === 0) {
-  //     words.push([]);
-  //   }
-  //   desiredWidth -= reservedSpace;
-  //   // measure words
-  //   const data = words.map((word) => {
-  //     // if using splitByGrapheme words are already in graphemes.
-  //     word = splitByGrapheme ? word : this.graphemeSplitForRectNotes(word);
-  //     const width = this._measureWord(word, lineIndex, offset);
-  //     largestWordWidth = Math.max(width, largestWordWidth);
-  //     offset += word.length + 1;
-  //     return { word: word, width: width };
-  //   });
-  //   const maxWidth = Math.max(
-  //     desiredWidth,
-  //     largestWordWidth,
-  //     this.dynamicMinWidth
-  //   );
-  //   // layout words
-  //   offset = 0;
-  //   let i;
-  //   for (i = 0; i < words.length; i++) {
-  //     const word = data[i].word;
-  //     const wordWidth = data[i].width;
-  //     offset += word.length;
+    let lineWidth = 0,
+      line: any = [],
+      // spaces in different languages?
+      offset = 0,
+      infixWidth = 0,
+      largestWordWidth = 0,
+      lineJustStarted = true;
+    // fix a difference between split and graphemeSplit
+    if (words.length === 0) {
+      words.push([]);
+    }
+    desiredWidth -= reservedSpace;
+    // measure words
+    const data = words.map((word) => {
+      // if using splitByGrapheme words are already in graphemes.
+      word = splitByGrapheme ? word : this.graphemeSplitForRectNotes(word);
+      const width = this._measureWord(word, lineIndex, offset);
+      largestWordWidth = Math.max(width, largestWordWidth);
+      offset += word.length + 1;
+      return { word: word, width: width };
+    });
+    const maxWidth = Math.max(
+      desiredWidth,
+      largestWordWidth,
+      this.dynamicMinWidth
+    );
+    // layout words
+    offset = 0;
+    let i;
+    for (i = 0; i < words.length; i++) {
+      const word = data[i].word;
+      const wordWidth = data[i].width;
+      offset += word.length;
 
-  //     lineWidth += infixWidth + wordWidth - additionalSpace;
-  //     if (lineWidth > maxWidth && !lineJustStarted) {
-  //       graphemeLines.push(line);
-  //       line = [];
-  //       lineWidth = wordWidth;
-  //       lineJustStarted = true;
-  //     } else {
-  //       lineWidth += additionalSpace;
-  //     }
+      lineWidth += infixWidth + wordWidth - additionalSpace;
+      if (lineWidth > maxWidth && !lineJustStarted) {
+        graphemeLines.push(line);
+        line = [];
+        lineWidth = wordWidth;
+        lineJustStarted = true;
+      } else {
+        lineWidth += additionalSpace;
+      }
 
-  //     if (!lineJustStarted && !splitByGrapheme) {
-  //       line.push(infix);
-  //     }
-  //     if (word.length > 1) {
-  //       line = line.concat(word.split(''));
-  //     } else {
-  //       line = line.concat(word);
-  //     }
+      if (!lineJustStarted && !splitByGrapheme) {
+        line.push(infix);
+      }
+      if (word.length > 1) {
+        line = line.concat(word.split(''));
+      } else {
+        line = line.concat(word);
+      }
 
-  //     infixWidth = splitByGrapheme
-  //       ? 0
-  //       : this._measureWord([infix], lineIndex, offset);
-  //     offset++;
-  //     lineJustStarted = false;
-  //   }
+      infixWidth = splitByGrapheme
+        ? 0
+        : this._measureWord([infix], lineIndex, offset);
+      offset++;
+      lineJustStarted = false;
+    }
 
-  //   i && graphemeLines.push(line);
+    i && graphemeLines.push(line);
 
-  //   if (largestWordWidth + reservedSpace > this.dynamicMinWidth) {
-  //     this.dynamicMinWidth = largestWordWidth - additionalSpace + reservedSpace;
-  //   }
-  //   return graphemeLines;
-  // }
+    if (largestWordWidth + reservedSpace > this.dynamicMinWidth) {
+      this.dynamicMinWidth = largestWordWidth - additionalSpace + reservedSpace;
+    }
+    return graphemeLines;
+  }
 
   /**
    * Detect if the text line is ended with an hard break
@@ -545,7 +537,7 @@ export class XShapeNotes extends Textbox {
    * and counting style.
    * @return Number
    */
-  missingNewlineOffset(lineIndex: number) {
+  missingNewlineOffset(lineIndex: any) {
     if (this.splitByGrapheme) {
       return this.isEndOfWrapping(lineIndex) ? 1 : 0;
     }
@@ -576,7 +568,7 @@ export class XShapeNotes extends Textbox {
       graphemeLines: newLines,
     };
   }
-  _splitTextIntoLines(text: string) {
+  _splitTextIntoLines(text: any) {
     const width = this.width - this.getLeftOffset();
 
     const newText = this.textSplitTextIntoLines(text),
@@ -611,7 +603,7 @@ export class XShapeNotes extends Textbox {
   getObject() {
     const object = {};
     const keys = [
-      'id',
+      '_id',
       'angle',
       'backgroundColor',
       'fill',
@@ -628,7 +620,7 @@ export class XShapeNotes extends Textbox {
       'lockScalingFlip', // boolean,  make it can not be inverted by pulling the width to the negative side
       'fontWeight',
       'lineHeight',
-      'objType',
+      'obj_type',
       'originX',
       'originY',
       'panelObj', // the parent panel string
@@ -669,28 +661,27 @@ export class XShapeNotes extends Textbox {
     return object;
   }
 
-  // /**
-  //  * Returns object representation of an instance
-  //  * @method toObject
-  //  * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-  //  * @return {Object} object representation of an instance
-  //  */
-  // toObject(propertiesToInclude: Array<any>): object {
-  //   return super.toObject(
-  //     [...this.extendPropeties, 'minWidth', 'splitByGrapheme'].concat(
-  //       propertiesToInclude
-  //     )
-  //   );
-  // }
-  /**boardx custom function */
-  getObjectsIntersected() {
-    //@ts-ignore
-    const objects = this.canvas._getIntersectedObjects(this);
-    objects.filter((obj: any) => {
-      return obj.id !== this.id && obj.objType !== 'XConnector';
-    });
-    return objects;
+  /**
+   * Returns object representation of an instance
+   * @method toObject
+   * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+   * @return {Object} object representation of an instance
+   */
+  toObject(propertiesToInclude: Array<any>): object {
+    return super.toObject(
+      [...this.extendPropeties, 'minWidth', 'splitByGrapheme'].concat(
+        propertiesToInclude
+      )
+    );
   }
+  // /**boardx custom function */
+  // getObjectsIntersected() {
+  //   const objects = this.canvas._getIntersectedObjects(this);
+  //   objects.filter((obj) => {
+  //     return obj._id !== this._id && obj.obj_type !== 'WBArrow';
+  //   });
+  //   return objects;
+  // }
 
   setLockedShadow(locked: boolean) {
     if (locked) {
@@ -711,7 +702,7 @@ export class XShapeNotes extends Textbox {
   }
 
   /* caculate cusor positon in the middle of the textbox */
-  getCenteredTop(rectHeight: number) {
+  getCenteredTop(rectHeight: any) {
     const textHeight = this.height;
     return (rectHeight - textHeight) / 2;
   }
@@ -751,7 +742,6 @@ export class XShapeNotes extends Textbox {
       13: Constallation Rect
       14: Constellation Round
     */
-
     const shapeArray = [
       'M-50,-50L50,-50 50,50 -50,50z', // 0: rect
       'm-50,0 l50,-50 50,50 -50,50 -50,-50z', // 1: diamond
@@ -772,47 +762,39 @@ export class XShapeNotes extends Textbox {
 
     ctx.save();
 
-    // Ensure the fill and stroke styles are set as expected
-    ctx.fillStyle = this.backgroundColor;
-    ctx.strokeStyle = this.stroke || 'black'; // Default stroke color
-    ctx.lineWidth = this.lineWidth || 1; // Default line width
-
-    // Define the transformation matrix
-    const scale = Math.min(this.width / 100, this.height / 100); // Keeping aspect ratio intact
-    const dx = (this.width - 100 * scale) / 2; // Center horizontally
-    const dy = (this.height - 100 * scale) / 2; // Center vertically
-
-    const m = new DOMMatrix();
-    m.a = scale; // Scale horizontally
-    m.d = scale; // Scale vertically
-    m.e = dx; // Translate horizontally
-    m.f = dy; // Translate vertically
-
-    // Create the path from SVG path data
+    const svgPath = new Path2D(shapeArray[this.icon]);
+    const m = getFabricDocument()
+      .createElementNS('http://www.w3.org/2000/svg', 'svg')
+      .createSVGMatrix();
+    m.a = this.width / 100;
+    m.b = 0;
+    m.c = 0;
+    m.d = this.height / 100;
+    m.e = 0;
+    m.f = 0;
     const path = new Path2D();
-    //@ts-ignore
-    const svgPath = new Path2D(shapeArray[this.icon]); // Get the SVG path from your array based on this.icon
     path.addPath(svgPath, m);
-
-    // Draw the path
+    // ctx.lineWidth = this.lineWidth / (this.width / 138 + this.height / 138) / 2;
+    ctx.lineWidth = this.lineWidth;
+    ctx.strokeStyle = this.stroke;
     ctx.stroke(path);
+    ctx.fillStyle = this.backgroundColor;
     ctx.fill(path);
-
     ctx.restore();
   }
   getTopOffset() {
     let tOffset = 0;
     switch (this.icon) {
-      case '0':
-      case '2':
+      case 0:
+      case 2:
         tOffset = 40;
         break;
-      case '1':
-      case '3':
-      case '5':
+      case 1:
+      case 3:
+      case 5:
         tOffset = this.height / 2;
         break;
-      case '4':
+      case 4:
         tOffset = this.height / 3;
         break;
       default:
@@ -822,14 +804,14 @@ export class XShapeNotes extends Textbox {
   getLeftOffset() {
     let lOffset = 0;
     switch (this.icon) {
-      case '0':
-      case '2':
-      case '4':
+      case 0:
+      case 2:
+      case 4:
         lOffset = 40;
         break;
-      case '1':
-      case '3':
-      case '5':
+      case 1:
+      case 3:
+      case 5:
         lOffset = this.width / 2;
         break;
       default:
@@ -865,7 +847,7 @@ export class XShapeNotes extends Textbox {
       this._renderTextStroke(ctx);
     }
   }
-  calcTextHeight(): number {
+  calcTextHeight() {
     let lineHeight;
     let height = 0;
     for (let i = 0, len = this._textLines.length; i < len; i++) {
@@ -895,15 +877,16 @@ export class XShapeNotes extends Textbox {
     }
 
     this.height = this.maxHeight;
-    return Math.max(height, this.height);
   }
-  _renderTextCommon(ctx: any, method: any) {
+  _renderTextCommon(ctx, method) {
     ctx.save();
     let lineHeights = 0;
     const left = this._getLeftOffset();
     const top = this._getTopOffset();
-    const filler: any = method === 'fillText' ? this.fill : this.stroke;
-    const offsets = this._applyPatternGradientTransform(ctx, filler);
+    const offsets = this._applyPatternGradientTransform(
+      ctx,
+      method === 'fillText' ? this.fill : this.stroke
+    );
 
     for (let i = 0, len = this._textLines.length; i < len; i++) {
       const heightOfLine = this.getHeightOfLine(i);
@@ -1067,4 +1050,4 @@ export class XShapeNotes extends Textbox {
   }
 }
 
-classRegistry.setClass(XShapeNotes);
+classRegistry.setClass(XShapeNotes2);

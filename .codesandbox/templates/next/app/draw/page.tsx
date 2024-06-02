@@ -1,9 +1,10 @@
 
 'use client';
-import * as fabric from 'canvasx';
+import * as fabric from '../../../../../fabric';
 import { NextPage } from 'next';
 import { useRef, useCallback } from 'react';
 import { Canvas } from '../../components/Canvas';
+
 // import { RectNotes } from '../../../../src/shapes/RectNotes';
 
 // SVG data URL
@@ -12,10 +13,10 @@ const penCursor = 'data:image/svg+xml;base64,' + btoa(`
 `);
 
 const IndexPage: NextPage = () => {
-    const ref = useRef<fabric.Canvas>(null);
+    const ref = useRef<fabric.XCanvas>(null);
 
     const onLoad = useCallback(
-        (canvas: fabric.Canvas) => {
+        (canvas: fabric.XCanvas) => {
             canvas.setDimensions({
                 width: document.documentElement.clientWidth
                 ,

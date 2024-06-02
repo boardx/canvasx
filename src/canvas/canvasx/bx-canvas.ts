@@ -35,7 +35,6 @@ import { Point } from '../../Point';
 import * as util from '../../util';
 import { Circle } from '../../shapes/Circle';
 import { invertTransform, transformPoint } from '../../util';
-import * as WebFont from 'webfontloader';
 import { XURL } from '../../shapes/canvasx/XURL';
 import { WidgetType } from '../../shapes/canvasx/types';
 import { Textbox } from '../../shapes/Textbox';
@@ -45,7 +44,8 @@ import { XCircleNotes, XShapeNotes } from '../../shapes/canvasx';
 export class XCanvas extends Canvas implements BXCanvasInterface {
   // Indicate that object scaling must be uniform (equal in all dimensions)
   uniformScaling = true;
-
+  interactionMode = 'mouse';
+  isEnablePanMoving = false;
   // Store the previous transform state of the canvas
   // XCanvas.prototype.previousViewportTransform ;
 
@@ -199,15 +199,6 @@ export class XCanvas extends Canvas implements BXCanvasInterface {
       scaleY: 1,
       objType: 'XRectNotes',
     });
-
-    // Load the 'Inter' webfont
-    await loadWebFont('Inter');
-    // Load the 'Permanent Marker' webfont
-    await loadWebFont('Permanent Marker');
-
-    await loadWebFont('Poppins');
-
-    await loadWebFont('Oswald');
   }
   previousViewportTransform: TMat2D;
   async animateToRectWithOffset(
@@ -2893,6 +2884,124 @@ export class XCanvas extends Canvas implements BXCanvasInterface {
     // self.requestRenderAll();
     // self.setActiveObject(selectedObject);
   }
+
+  lockObject(o: FabricObject) {
+    // Start locking the object by calling many set methods on it.
+    // Set isEditing property false which prevent object to be edited
+    // Set other lock properties true to lock the object movement, scaling, skewing and rotation.
+    // Set editable property false to protect the object from any edits
+    o.set('isEditing', false)
+      .set('lockMovementX', true)
+      .set('lockMovementY', true)
+      .set('locked', true)
+      .set('lockScalingX', true)
+      .set('lockScalingY', true)
+      .set('lockSkewingX', true)
+      .set('lockSkewingY', true)
+      .set('lockRotation', true)
+      .set('editable', false);
+  }
+
+  // Add a method for fabric.Canvas to unlock an object
+  unLockObject(o: FabricObject) {
+    // Start unlocking the object by calling many set methods on it.
+    // Set lock properties false to allow object movement, scaling, skewing and rotation.
+    // Set selectable property true to allow object to be selected.
+    // Set editable property true to make the object editable.
+    o.set('lockMovementX', false)
+      .set('lockMovementY', false)
+      .set('locked', false)
+      .set('lockScalingX', false)
+      .set('lockScalingY', false)
+      .set('lockSkewingX', false)
+      .set('lockSkewingY', false)
+      .set('lockRotation', false)
+      .set('selectable', true)
+      .set('editable', true);
+  }
+
+  lockObjectsInCanvas() {
+    const canvas = this;
+    // If the canvas or its objects are undefined or null, just return
+    if (!this || !this.getObjects()) return;
+
+    // Otherwise, for each object in the canvas...
+    this.getObjects().forEach((o) => {
+      // If the object is of type 'common', or a temporary widget, or an arrow connector, skip it
+      if (o.objType === 'common' || o === canvas.connectorArrow) {
+        return;
+      }
+      // Lock all other objects
+      else {
+        o.set({
+          lockMovementX: true,
+
+          lockMovementY: true,
+
+          lockRotation: true,
+
+          lockScalingX: true,
+
+          lockScalingY: true,
+
+          locked: true,
+
+          editable: false,
+
+          selectable: false,
+        });
+      }
+    });
+  }
+
+  recoverLockStatusFromCollection(o: any) {
+    // Get the instance of the widget using it's id from the widget service
+    // const widget =  //WidgetService.getInstance().getWidgetFromWidgetList(o._id);
+    // // If widget is not found return
+    // if (!widget) return;
+    // // Set the properties of the object o with the respective properties of the found widget
+    // o.lockMovementX = widget.lockMovementX;
+    // o.lockMovementY = widget.lockMovementY;
+    // o.lockRotation = widget.lockRotation;
+    // o.lockScalingX = widget.lockScalingX;
+    // o.lockScalingY = widget.lockScalingY;
+    // // Set the locked status. If not available in widget set it as false
+    // o.locked = widget.locked ? widget.locked : false;
+    // // Set the editable status. If not available in widget set it as false
+    // o.editable = widget.editable ? widget.editable : false;
+    // o.selectable = widget.selectable ? widget.selectable : false;
+    // // Set the dirty status as true to indicate that the object has been modified
+    // o.dirty = true;
+    // If object is locked, set the cursor icon as lock else set it to default
+    // if (o.locked === true) {
+    //   o.hoverCursor = `url("${cursorLock}") 0 0, auto`;
+    // } else {
+    //   o.hoverCursor = 'default';
+    // }
+  }
+
+  // Adding a function to fabric.Canvas to unlock all objects in the canvas
+  unlockObjectsInCanvas() {
+    const self = this;
+
+    // If the canvas or its objects are undefined or null, just return
+    if (!self || !self.getObjects()) return;
+
+    // Otherwise, for each object in the canvas...
+    self.getObjects().forEach((o) => {
+      // If the object is of type 'common', skip it
+      if (o.objType === 'common') return;
+
+      // Unlock the object, restoring its status from the Collection
+      self.recoverLockStatusFromCollection(o);
+
+      // Mark the object as dirty (requiring a re-render)
+      o.dirty = true;
+
+      // Change the cursor to the default style`
+      self.hoverCursor = 'default';
+    });
+  }
 }
 
 ///////////////////////********************************************* */
@@ -2959,15 +3068,3 @@ function setObjectCaching(canvas: any) {
     timeoutHandler = null;
   }, 500);
 }
-
-const loadWebFont = async function (font: string) {
-  const WebFontConfig = {
-    google: {
-      api: 'https://fonts.googleapis.com/css',
-      families: [font],
-    },
-    timeout: 3000, // Set the timeout to two seconds
-  };
-
-  await WebFont.load(WebFontConfig);
-};

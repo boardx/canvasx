@@ -1,8 +1,8 @@
 {
-  "name": "canvasx",
-  "description": "CanvasX is open source digital whiteboard.",
+  "name": "@boardxus/canvasx",
+  "description": "CanvasX is the core component for boardx - the open source digital whiteboard for the future of work.",
   "homepage": "http://www.boardx.us/",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "author": "boardx",
   "contributors": [],
   "keywords": [

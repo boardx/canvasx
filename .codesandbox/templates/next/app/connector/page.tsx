@@ -1,21 +1,19 @@
 
 'use client';
-import * as fabric from 'canvasx';
+import * as fabric from '../../../../../fabric';
 import { NextPage } from 'next';
 import { useRef, useCallback } from 'react';
 import { Canvas } from '../../components/Canvas';
-import { useState } from 'react';
 
 
 import { Box } from '@mui/joy';
 
 const IndexPage: NextPage = () => {
-    const ref = useRef<fabric.Canvas>(null);
-    const [mouseInfo, setMouseInfo] = useState<string[]>([]);
-    //@ts-ignore
-    window.fabric = fabric
+    const ref = useRef<fabric.XCanvas>(null);
+    // const [mouseInfo, setMouseInfo] = useState<string[]>([]);
+
     const onLoad = useCallback(
-        (canvas: fabric.Canvas) => {
+        (canvas: fabric.XCanvas) => {
             canvas.setDimensions({
                 width: document.documentElement.clientWidth
                 ,
@@ -268,7 +266,7 @@ const IndexPage: NextPage = () => {
                     const pointer = canvas.getPointer(event.e);
                     //@ts-ignore
                     const pointOnSelectedObject = canvas.getActiveObject()?.transformPointFromCanvas(pointer);
-                    textMessage.push(`(${pointOnSelectedObject.x.toFixed(2)}, ${pointOnSelectedObject.y.toFixed(2)})`)
+                    textMessage.push(`(${pointOnSelectedObject?.x.toFixed(2)}, ${pointOnSelectedObject?.y.toFixed(2)})`)
                 } else {
                     textMessage.push('------');
                 }
@@ -284,7 +282,7 @@ const IndexPage: NextPage = () => {
                 //     top: 10   // Offset from the top edge of the canvas
                 // });
 
-                setMouseInfo(textMessage);
+                // setMouseInfo(textMessage);
 
                 canvas.renderAll(); // Re-render the canvas
             });

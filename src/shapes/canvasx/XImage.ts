@@ -22,7 +22,7 @@ export class XImage extends FabricImage {
       'lockMovementX',
       'lockMovementY',
       'lockScalingFlip',
-      'obj_type',
+      'objType',
       'originX',
       'originY',
       'scaleX',

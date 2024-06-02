@@ -1,28 +1,30 @@
-import * as fabric from 'canvasx';
+import * as fabric from '../../../../fabric';
 import React, { useEffect, useRef, useState } from 'react';
 import MiniCanvas from './preview/MiniCanvas';
 
+
 const DEV_MODE = process.env.NODE_ENV === 'development';
 
-import { initializeCanvasEvents } from './initializeCanvasEvents';
+import { initializeCanvasEvents } from '../../../../fabric';
+
 
 declare global {
-  var canvas: fabric.Canvas | undefined;
+  var canvas: fabric.XCanvas | undefined;
 }
 
 export const Canvas = React.forwardRef<
-  fabric.Canvas,
-  { onLoad?(canvas: fabric.Canvas): void }
+  fabric.XCanvas,
+  { onLoad?(canvas: fabric.XCanvas): void }
 >(({ onLoad }, ref) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [canvas, setCanvas] = useState(null as fabric.Canvas | null);
+  const [canvas, setCanvas] = useState(null as fabric.XCanvas | null);
 
   useEffect(() => {
     if (!canvasRef.current) {
       return;
     }
 
-    const canvas = new fabric.Canvas(canvasRef.current, {
+    const canvas = new fabric.XCanvas(canvasRef.current, {
       backgroundColor: '#f0f0f0',
       height: document.documentElement.clientHeight
       ,
@@ -79,6 +81,6 @@ export const Canvas = React.forwardRef<
 
   return <>
     <canvas ref={canvasRef} />
-    <MiniCanvas canvas={canvas} />
+    <MiniCanvas canvas={canvas!} />
   </>
 });

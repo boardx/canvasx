@@ -202,69 +202,52 @@ export class XTextbox extends Textbox {
   // /**
   //  * @param {Number} lineIndex
   //  * @param {Number} charIndex
+  //  * @param {Object} style
   //  * @private
   //  */
-  // _getStyleDeclaration(lineIndex: number, charIndex: number) {
-  //   if (this._styleMap && !this.isWrapping) {
-  //     const map = this._styleMap[lineIndex];
-  //     if (!map) {
-  //       return null;
-  //     }
-  //     lineIndex = map.line;
-  //     charIndex = map.offset + charIndex;
-  //   }
-  //   return super._getStyleDeclaration(lineIndex, charIndex);
+  // _setStyleDeclaration(lineIndex: number, charIndex: number, style: object) {
+  //   const map = this._styleMap[lineIndex];
+  //   lineIndex = map.line;
+  //   charIndex = map.offset + charIndex;
+
+  //   this.styles[lineIndex][charIndex] = style;
   // }
 
-  /**
-   * @param {Number} lineIndex
-   * @param {Number} charIndex
-   * @param {Object} style
-   * @private
-   */
-  _setStyleDeclaration(lineIndex: number, charIndex: number, style: object) {
-    const map = this._styleMap[lineIndex];
-    lineIndex = map.line;
-    charIndex = map.offset + charIndex;
+  // /**
+  //  * @param {Number} lineIndex
+  //  * @param {Number} charIndex
+  //  * @private
+  //  */
+  // _deleteStyleDeclaration(lineIndex: number, charIndex: number) {
+  //   const map = this._styleMap[lineIndex];
+  //   lineIndex = map.line;
+  //   charIndex = map.offset + charIndex;
+  //   delete this.styles[lineIndex][charIndex];
+  // }
 
-    this.styles[lineIndex][charIndex] = style;
-  }
+  // /**
+  //  * probably broken need a fix
+  //  * Returns the real style line that correspond to the wrapped lineIndex line
+  //  * Used just to verify if the line does exist or not.
+  //  * @param {Number} lineIndex
+  //  * @returns {Boolean} if the line exists or not
+  //  * @private
+  //  */
+  // _getLineStyle(lineIndex: number): boolean {
+  //   const map = this._styleMap[lineIndex];
+  //   return !!this.styles[map.line];
+  // }
 
-  /**
-   * @param {Number} lineIndex
-   * @param {Number} charIndex
-   * @private
-   */
-  _deleteStyleDeclaration(lineIndex: number, charIndex: number) {
-    const map = this._styleMap[lineIndex];
-    lineIndex = map.line;
-    charIndex = map.offset + charIndex;
-    delete this.styles[lineIndex][charIndex];
-  }
-
-  /**
-   * probably broken need a fix
-   * Returns the real style line that correspond to the wrapped lineIndex line
-   * Used just to verify if the line does exist or not.
-   * @param {Number} lineIndex
-   * @returns {Boolean} if the line exists or not
-   * @private
-   */
-  _getLineStyle(lineIndex: number): boolean {
-    const map = this._styleMap[lineIndex];
-    return !!this.styles[map.line];
-  }
-
-  /**
-   * Set the line style to an empty object so that is initialized
-   * @param {Number} lineIndex
-   * @param {Object} style
-   * @private
-   */
-  _setLineStyle(lineIndex: number) {
-    const map = this._styleMap[lineIndex];
-    this.styles[map.line] = {};
-  }
+  // /**
+  //  * Set the line style to an empty object so that is initialized
+  //  * @param {Number} lineIndex
+  //  * @param {Object} style
+  //  * @private
+  //  */
+  // _setLineStyle(lineIndex: number) {
+  //   const map = this._styleMap[lineIndex];
+  //   this.styles[map.line] = {};
+  // }
 
   // /**
   //  * Wraps text using the 'width' property of Textbox. First this function
@@ -775,10 +758,6 @@ export class XTextbox extends Textbox {
 
     if (target.objType === 'WBTextbox' || target.objType === 'WBText') {
       target.set('fixedScaleChange', false);
-    }
-
-    if (target.objType !== 'WBText') {
-      target.saveData('MODIFIED', ['width']);
     }
 
     return oldWidth !== newWidth;

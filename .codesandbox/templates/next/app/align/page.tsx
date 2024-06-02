@@ -1,6 +1,6 @@
 
 'use client';
-import * as fabric from 'canvasx';
+import * as fabric from '../../../../../fabric';
 import { NextPage } from 'next';
 import { useRef, useCallback } from 'react';
 import { Canvas } from '../../components/Canvas';
@@ -9,10 +9,10 @@ import { Canvas } from '../../components/Canvas';
 
 
 const IndexPage: NextPage = () => {
-    const ref = useRef<fabric.Canvas>(null);
+    const ref = useRef<fabric.XCanvas>(null);
 
     const onLoad = useCallback(
-        (canvas: fabric.Canvas) => {
+        (canvas: fabric.XCanvas) => {
             canvas.setDimensions({
                 width: document.documentElement.clientWidth
                 ,
@@ -27,6 +27,7 @@ const IndexPage: NextPage = () => {
                     originX: 'center',
                     top: 220 + i * 120,
                     left: 200 + i * 120,
+                    originY: 'center',
                     textAlign: 'center',
                     backgroundColor: 'lightblue',
                     id: Math.random().toString(36).substr(2, 9),
@@ -42,7 +43,6 @@ const IndexPage: NextPage = () => {
                     top: 520 + i * 110,
                     left: 520 + i * 110,
                     textAlign: 'center',
-
                     backgroundColor: 'yellow',
                     id: Math.random().toString(36).substr(2, 9),
                 });
@@ -58,7 +58,7 @@ const IndexPage: NextPage = () => {
                     width: 138,
                     height: 138,
                     textAlign: 'center',
-
+                    originY: 'center',
                     backgroundColor: 'lightgreen',
                     id: Math.random().toString(36).substr(2, 9),
                 });
@@ -69,6 +69,7 @@ const IndexPage: NextPage = () => {
             for (let i = 0; i < 5; i++) {
                 const rectNote = new fabric.XShapeNotes(textValue, {
                     originX: 'center',
+                    originY: 'center',
                     top: 220,
                     left: 200 + i * 250,
                     textAlign: 'center',

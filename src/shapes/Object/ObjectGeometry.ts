@@ -415,7 +415,6 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * @return {TCornerPoint}
    */
   calcACoords(): TCornerPoint {
-    console.log('calcACoords');
     const rotateMatrix = createRotateMatrix({ angle: this.angle }),
       { x, y } = this.getRelativeCenterPoint(),
       tMatrix = createTranslateMatrix(x, y),
@@ -544,7 +543,6 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * @returns {Point} dimensions
    */
   _calculateCurrentDimensions(options?: any): Point {
-    console.log('_calculateCurrentDimensions');
     return this._getTransformedDimensions(options)
       .transform(this.getViewportTransform(), true)
       .scalarAdd(2 * this.padding);

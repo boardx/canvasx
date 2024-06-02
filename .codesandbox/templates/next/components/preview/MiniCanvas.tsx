@@ -1,5 +1,5 @@
 //** Import react
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 
 import IconButton from "@mui/joy/IconButton";
@@ -11,9 +11,11 @@ import Sheet from "@mui/joy/Sheet";
 
 import { Typography } from "@mui/joy";
 
+import * as fabric from '../../../../../fabric';
 
 
-export default function MiniCanvas({ canvas: Canvas }) {
+
+export default function MiniCanvas({ canvas }: { canvas: fabric.XCanvas }) {
 
   //@ts-ignore
   // const users = useUsers(Boardx.awareness);
@@ -21,22 +23,22 @@ export default function MiniCanvas({ canvas: Canvas }) {
 
   //dom
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [isSlidemode, setIsSlidemode] = React.useState(false);
-  const [isPresentationMode, setIsPresentationMode] = React.useState(false);
+  // const [isSlidemode, setIsSlidemode] = React.useState(false);
+  // const [isPresentationMode, setIsPresentationMode] = React.useState(false);
   const miniMapElement: any = React.useRef();
-  const [zoomFactor, setZoomFactor] = useState(0);;
+  const [zoomFactor] = useState(0);;
   const [miniMapSize, setMiniMapSize] = React.useState(zoomFactor || 1);
-  const [timers, setTimers] = React.useState([]);
-  const zoomCallBack: any = React.useRef();
+  // const [timers, setTimers] = React.useState([]);
+  // const zoomCallBack: any = React.useRef();
 
-  useEffect(() => {
-    let valueSlider = 0;
-    valueSlider = parseInt(
-      ((zoomFactor == undefined ? 1 : zoomFactor) * 100).toString() || "10",
-      10
-    );
-    setMiniMapSize(valueSlider);
-  }, [zoomFactor]);
+  // useEffect(() => {
+  //   let valueSlider = 0;
+  //   valueSlider = parseInt(
+  //     ((zoomFactor == undefined ? 1 : zoomFactor) * 100).toString() || "10",
+  //     10
+  //   );
+  //   setMiniMapSize(valueSlider);
+  // }, [zoomFactor]);
 
   // useEffect(() => {
   //   EventService.getInstance().register(
@@ -57,11 +59,11 @@ export default function MiniCanvas({ canvas: Canvas }) {
     }
     handleChange(zoom);
     setMiniMapSize(zoom);
-    if (zoom === 100) {
-      timers.forEach((timer) => {
-        clearInterval(timer);
-      });
-    }
+    // if (zoom === 100) {
+    //   timers.forEach((timer) => {
+    //     clearInterval(timer);
+    //   });
+    // }
   };
   const random = (max: number, min: number) => {
     return Math.floor(Math.random() * (max - min)) + min;
@@ -73,7 +75,7 @@ export default function MiniCanvas({ canvas: Canvas }) {
   const handleFitToScreen = async () => {
     const zoom = await canvas?.zoomToViewAllObjects();
     handleChange(zoom);
-    setMiniMapSize(zoom);
+    // setMiniMapSize(zoom);
   };
 
   const returnDefaultZoom = () => {

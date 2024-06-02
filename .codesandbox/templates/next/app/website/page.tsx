@@ -1,9 +1,10 @@
 
 'use client';
-import * as fabric from 'fabric';
+import * as fabric from '../../../../../fabric';
 import { NextPage } from 'next';
 import { useRef, useCallback } from 'react';
 import { Canvas } from '../../components/Canvas';
+
 // import { RectNotes } from '../../../../src/shapes/RectNotes';
 
 import { XURL } from '../../../../../src/shapes/canvasx/XURL';
@@ -19,7 +20,7 @@ const IndexPage: NextPage = () => {
                 height: document.documentElement.clientHeight
                     - 60,
             });
-            const textValue = 'CanvasX Demo';
+            // const textValue = 'CanvasX Demo';
 
 
             const website = new XURL('elementId', {
@@ -28,10 +29,12 @@ const IndexPage: NextPage = () => {
                 cornerColor: 'red',
                 cornerSize: 10,
                 title: 'this is a title',
+                src: '',
+
             });
 
             await website.setSrc('https://knowledge.wharton.upenn.edu/wp-content/uploads/2023/03/3.15.23-scott-snyder-esg-corporate-innovation-GettyImages-1410816388-900x605.png');
-
+            //@ts-ignore todo: fix this
             canvas.add(website);
             canvas.renderAll();
             // // Create 10 RectNotes

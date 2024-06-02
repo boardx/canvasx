@@ -1,9 +1,10 @@
 
 'use client';
-import * as fabric from 'canvasx';
+import * as fabric from '../../../../../fabric';
 import { NextPage } from 'next';
 import { useRef, useCallback } from 'react';
 import { Canvas } from '../../components/Canvas';
+
 
 // import { XImage } from '../../../../../src/shapes/canvasx/XImage';
 
@@ -18,7 +19,7 @@ const IndexPage: NextPage = () => {
                 height: document.documentElement.clientHeight
                     - 60,
             });
-            const textValue = 'CanvasX Demo';
+            // const textValue = 'CanvasX Demo';
 
             const image = new fabric.XImage('elementId', {
                 top: 220,

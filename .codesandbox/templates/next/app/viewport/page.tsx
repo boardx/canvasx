@@ -1,20 +1,21 @@
 
 'use client';
-import * as fabric from 'canvasx';
+import * as fabric from '../../../../../fabric';
 import { NextPage } from 'next';
 import { useRef, useCallback } from 'react';
 import { Canvas } from '../../components/Canvas';
 import { useState } from 'react';
 
 
+
 import { Box, Typography } from '@mui/joy';
 
 const IndexPage: NextPage = () => {
-    const ref = useRef<fabric.Canvas>(null);
+    const ref = useRef<fabric.XCanvas>(null);
     const [mouseInfo, setMouseInfo] = useState<string[]>([]);
 
     const onLoad = useCallback(
-        (canvas: fabric.Canvas) => {
+        (canvas: fabric.XCanvas) => {
             canvas.setDimensions({
                 width: document.documentElement.clientWidth
                 ,
@@ -22,14 +23,47 @@ const IndexPage: NextPage = () => {
                     - 60,
             });
             const textValue = 'CanvasX Demo';
-            const connectDock1 = ['right', 'left', 'center'];
-            const connectDock2 = ['top', 'bottom', 'center'];
-            const connectBorder = ['left', 'right', 'top', 'bottom'];
+            // const connectDock1 = ['right', 'left', 'center'];
+            // const connectDock2 = ['top', 'bottom', 'center'];
+            // const connectBorder = ['left', 'right', 'top', 'bottom'];
 
             const style = 'curved';
 
 
 
+            var rect1 = new fabric.Rect({
+                left: 50,
+                top: 50,
+                fill: 'red',
+                width: 100,
+                height: 100
+            });
+
+            var rect2 = new fabric.Rect({
+                left: 200,
+                top: 50,
+                fill: 'green',
+                width: 100,
+                height: 100
+            });
+
+            var rect3 = new fabric.Rect({
+                left: 350,
+                top: 50,
+                fill: 'blue',
+                width: 100,
+                height: 100
+            });
+
+            var rect4 = new fabric.Rect({
+                left: 500,
+                top: 50,
+                fill: 'yellow',
+                width: 100,
+                height: 100
+            });
+
+            canvas.add(rect1, rect2, rect3, rect4);
 
             // // Create 10 RectNotes
             const rectNote1 = new fabric.XRectNotes(textValue, {
@@ -170,7 +204,7 @@ const IndexPage: NextPage = () => {
                     const pointer = canvas.getPointer(event.e);
                     //@ts-ignore
                     const pointOnSelectedObject = canvas.getActiveObject()?.transformPointFromCanvas(pointer);
-                    textMessage.push(`(${pointOnSelectedObject.x.toFixed(2)}, ${pointOnSelectedObject.y.toFixed(2)})`)
+                    textMessage.push(`(${pointOnSelectedObject?.x.toFixed(2)}, ${pointOnSelectedObject?.y.toFixed(2)})`)
                 } else {
                     textMessage.push('------');
                 }
