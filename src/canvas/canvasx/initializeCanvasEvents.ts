@@ -261,7 +261,7 @@ export function initializeCanvasEvents(canvas: XCanvas) {
       canvas.defaultCursor = 'default';
       canvas.hoverCursor = 'move';
       canvas.requestRenderAll();
-      // showMenu();
+      // showMenu(canvas);
     }
 
     // We flag that the mouse has not moved yet
@@ -544,7 +544,7 @@ export function initializeCanvasEvents(canvas: XCanvas) {
     // uploadTheNotesDraw(target);
 
     // 显示菜单，该行代码已被注释，如果需要就取消注释
-    // showMenu();
+    // showMenu(canvas);
 
     // 如果当前处于自定义颜色模式,则关闭自定义颜色模式
     // if (store.getState().widgets.customColorMode) {
@@ -636,7 +636,7 @@ export function initializeCanvasEvents(canvas: XCanvas) {
 
     // timer = setTimeout(() => {
 
-    //   showMenu()
+    //   showMenu(canvas)
 
     // }, 200);
 
@@ -923,7 +923,7 @@ export function initializeCanvasEvents(canvas: XCanvas) {
 
 //   // Sets a delay to show the menu after 200ms.
 //   timer = setTimeout(() => {
-//     showMenu();
+//     showMenu(canvas);
 //   }, 200)
 
 //   // Checks if the system is MacOS.

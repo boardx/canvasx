@@ -73,6 +73,7 @@ export class XFile<
   declare lines: object[];
 
   declare url: string;
+  declare fileSrc: string;
 
   declare relationship: object[];
   declare name: string;

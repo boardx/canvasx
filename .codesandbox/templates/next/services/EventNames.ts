@@ -1,4 +1,4 @@
-export class EventNames {
+export default class EventNames {
   // canvas events
   static CANVAS_MOUSE_DOWN = 'canvas:mousedown';
 
@@ -11,6 +11,7 @@ export class EventNames {
   static CANVAS_MOUSE_OUT = 'canvas:mouseout';
 
   static CANVAS_SCROLL = 'canvas:scroll';
+
 
   static CANVAS_BEFORE_SELECTION_CLEARED = 'before:selection:cleared';
 
@@ -35,6 +36,7 @@ export class EventNames {
   static TEXT_EDITING_EXISTED = 'text:editing:exited';
 
   static MOUSE_DBCLICK = 'mouse:dblclick';
+
 
   //document events
   static DOCUMENT_KEY_UP = 'document:keyup';
@@ -69,7 +71,7 @@ export class EventNames {
 
   static WINDOW_RESIZE = 'resize';
 
-  //keyboard events
+//keyboard events
   static A_CTRL_KEY_DOWN = 'a_ctrl:keydown';
 
   static B_CTRL_KEY_DOWN = 'b_ctrl:keydown';
@@ -136,6 +138,7 @@ export class EventNames {
 
   static UP_DOWN_LEFT_RIGHT_KEY_DOWN = 'up_down_left_right:keydown';
 
+  
   static HAMMER_TAP1 = 'tap1';
 
   static HAMMER_DOUBLE_TAP = 'doubletap';

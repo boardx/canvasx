@@ -71,6 +71,8 @@ export class FabricObject2 {
     else return '';
   }
 
+  saveData(action: string, fields: string[]) {}
+
   // containsPointNew(point, ismouseup, isFrom) {
   //   const self = this;
 

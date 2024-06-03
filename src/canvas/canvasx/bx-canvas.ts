@@ -49,6 +49,8 @@ export class XCanvas extends Canvas implements BXCanvasInterface {
   // Store the previous transform state of the canvas
   // XCanvas.prototype.previousViewportTransform ;
 
+  mouse: any;
+
   // Indicate if a current selection is fully contained within the canvas
   selectionFullyContained = false;
 
@@ -111,8 +113,57 @@ export class XCanvas extends Canvas implements BXCanvasInterface {
 
   defaultNote = {}; // default sticky note
 
-  zoomToViewAllObjects(): void {
-    throw new Error('Method not implemented.');
+  zoomToViewAllObjects(): number {
+    let topLeftX = 0;
+    let topLeftY = 0;
+    let bottomRightX = 0;
+    let bottomRightY = 0;
+
+    //calculate the top left and bottom right points for all the objects on canvas
+    this.getObjects().forEach((obj) => {
+      if (topLeftX == null) {
+        topLeftX = obj.left;
+        topLeftY = obj.top;
+      }
+
+      if (obj.left < topLeftX) topLeftX = obj.left;
+
+      if (obj.top < topLeftY) topLeftY = obj.top;
+
+      if (bottomRightX == null) {
+        bottomRightX = obj.left + obj.width;
+
+        bottomRightY = obj.top + obj.height;
+      }
+
+      if (obj.left + obj.width > bottomRightX)
+        bottomRightX = obj.left + obj.width;
+
+      if (obj.top + obj.height > bottomRightY)
+        bottomRightY = obj.top + obj.height;
+    });
+
+    //calculate the center of the canvas
+    const centerX = (topLeftX + bottomRightX) / 2;
+
+    const centerY = (topLeftY + bottomRightY) / 2;
+
+    //calculate the scale factor
+
+    const scaleX = this.width / (bottomRightX - topLeftX);
+
+    const scaleY = this.height / (bottomRightY - topLeftY);
+
+    let scale = Math.round(Math.min(scaleX, scaleY) * 0.8 * 100);
+
+    if (scale > 100) scale = 100;
+    if (scale < 3) scale = 3;
+
+    //zoom to cover all the objects on canvas
+
+    this.zoomToCenterPoint({ x: centerX, y: centerY }, scale / 100);
+
+    return scale;
   }
 
   //rewrite the function to make caching for pan process
@@ -150,19 +201,11 @@ export class XCanvas extends Canvas implements BXCanvasInterface {
     setObjectCaching(this);
   }
 
-  zoomToViewObjects(objs: any[]): void {
-    throw new Error('Method not implemented.');
-  }
-  recoverViewportTransformation(baordId: string): void {
-    throw new Error('Method not implemented.');
-  }
-  gobackToPreviousViewport(): void {
-    throw new Error('Method not implemented.');
-  }
-  updateViewportToLocalStorage(vpt: TMat2D): void {
-    throw new Error('Method not implemented.');
-  }
-  mouse: any;
+  zoomToViewObjects(objs: any[]): void {}
+  recoverViewportTransformation(baordId: string): void {}
+  gobackToPreviousViewport(): void {}
+  updateViewportToLocalStorage(vpt: TMat2D): void {}
+
   async InitializeCanvas(): Promise<void> {
     const self = this;
     self.set('isEnablePanMoving', false);
@@ -871,7 +914,7 @@ export class XCanvas extends Canvas implements BXCanvasInterface {
 
       async onComplete() {
         // Show the menu once the animation is complete
-        // showMenu();
+        // showMenu(canvas);
 
         // Dispatch the action to set the zoom factor to target zoom value
         // store.dispatch(handleSetZoomFactor(targetZoom));
@@ -891,9 +934,7 @@ export class XCanvas extends Canvas implements BXCanvasInterface {
     ];
     canvas.setViewportTransform(vpt);
   }
-  updateViewport(): void {
-    throw new Error('Method not implemented.');
-  }
+  updateViewport(): void {}
   onObjectModifiedUpdateArrowsSave(object: FabricObject, canvas: XCanvas): void;
   onObjectModifiedUpdateArrowsSave(object: FabricObject, canvas: XCanvas): void;
   onObjectModifiedUpdateArrowsSave(object: unknown, canvas: unknown): void {
@@ -2955,29 +2996,29 @@ export class XCanvas extends Canvas implements BXCanvasInterface {
   }
 
   recoverLockStatusFromCollection(o: any) {
-    // Get the instance of the widget using it's id from the widget service
-    // const widget =  //WidgetService.getInstance().getWidgetFromWidgetList(o._id);
-    // // If widget is not found return
-    // if (!widget) return;
-    // // Set the properties of the object o with the respective properties of the found widget
-    // o.lockMovementX = widget.lockMovementX;
-    // o.lockMovementY = widget.lockMovementY;
-    // o.lockRotation = widget.lockRotation;
-    // o.lockScalingX = widget.lockScalingX;
-    // o.lockScalingY = widget.lockScalingY;
-    // // Set the locked status. If not available in widget set it as false
-    // o.locked = widget.locked ? widget.locked : false;
-    // // Set the editable status. If not available in widget set it as false
-    // o.editable = widget.editable ? widget.editable : false;
-    // o.selectable = widget.selectable ? widget.selectable : false;
-    // // Set the dirty status as true to indicate that the object has been modified
-    // o.dirty = true;
-    // If object is locked, set the cursor icon as lock else set it to default
-    // if (o.locked === true) {
-    //   o.hoverCursor = `url("${cursorLock}") 0 0, auto`;
-    // } else {
-    //   o.hoverCursor = 'default';
-    // }
+    //   // Get the instance of the widget using it's id from the widget service
+    //   // const widget =  //WidgetService.getInstance().getWidgetFromWidgetList(o.id);
+    //   // // If widget is not found return
+    //   // if (!widget) return;
+    //   // // Set the properties of the object o with the respective properties of the found widget
+    //   // o.lockMovementX = widget.lockMovementX;
+    //   // o.lockMovementY = widget.lockMovementY;
+    //   // o.lockRotation = widget.lockRotation;
+    //   // o.lockScalingX = widget.lockScalingX;
+    //   // o.lockScalingY = widget.lockScalingY;
+    //   // // Set the locked status. If not available in widget set it as false
+    //   // o.locked = widget.locked ? widget.locked : false;
+    //   // // Set the editable status. If not available in widget set it as false
+    //   // o.editable = widget.editable ? widget.editable : false;
+    //   // o.selectable = widget.selectable ? widget.selectable : false;
+    //   // // Set the dirty status as true to indicate that the object has been modified
+    //   // o.dirty = true;
+    //   // If object is locked, set the cursor icon as lock else set it to default
+    //   // if (o.locked === true) {
+    //   //   o.hoverCursor = `url("${cursorLock}") 0 0, auto`;
+    //   // } else {
+    //   //   o.hoverCursor = 'default';
+    //   // }
   }
 
   // Adding a function to fabric.Canvas to unlock all objects in the canvas
@@ -2993,8 +3034,16 @@ export class XCanvas extends Canvas implements BXCanvasInterface {
       if (o.objType === 'common') return;
 
       // Unlock the object, restoring its status from the Collection
-      self.recoverLockStatusFromCollection(o);
+      // self.recoverLockStatusFromCollection(o);
 
+      o.lockMovementX = false;
+      o.lockMovementY = false;
+      o.lockRotation = false;
+      o.lockScalingX = false;
+      o.lockScalingY = false;
+      o.locked = false;
+      o.editable = true;
+      o.selectable = true;
       // Mark the object as dirty (requiring a re-render)
       o.dirty = true;
 

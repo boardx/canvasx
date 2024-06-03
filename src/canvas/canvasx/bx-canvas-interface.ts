@@ -17,7 +17,7 @@ export interface BXCanvasInterface {
   toUpdateRemovedObjectRemote: any[];
   showBackgroundDots: boolean;
   previousViewportTransform: TMat2D;
-  zoomToViewAllObjects(): void;
+  zoomToViewAllObjects(): number;
   zoomToViewObjects(objs: any[]): void;
   zoomToCenterPoint(vpCenter: { x: number; y: number }, zoom: number): void;
   recoverViewportTransformation(baordId: string): void;

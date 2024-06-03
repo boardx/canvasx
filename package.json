@@ -147,9 +147,6 @@
   "dependencies": {
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
-    "@mui/icons-material": "^5.15.17",
-    "@mui/joy": "^5.0.0-beta.36",
-    "@tabler/icons-react": "^3.4.0",
     "webfontloader": "^1.6.28"
   }
 }

@@ -1,0 +1,32 @@
+import SvgIcon from '@mui/joy/SvgIcon';
+import React from 'react';
+
+export default function AIAdvancedSettingDownloadIcon(props) {
+  return (
+    <SvgIcon
+      {...props}
+      style={{ width: 20, height: 20, marginLeft: '4px' }}
+      viewBox="0 0 20 20"
+    >
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <g clipPath="url(#clip0_1352_5166)">
+          <path
+            d="M15.8333 10V15.8333H4.16667V10H2.5V15.8333C2.5 16.75 3.25 17.5 4.16667 17.5H15.8333C16.75 17.5 17.5 16.75 17.5 15.8333V10H15.8333ZM10.8333 10.5583L12.9917 8.40833L14.1667 9.58333L10 13.75L5.83333 9.58333L7.00833 8.40833L9.16667 10.5583V2.5H10.8333V10.5583Z"
+            fill="#F21D6B"
+          />
+        </g>
+        <defs>
+          <clipPath id="clip0_1352_5166">
+            <rect width="20" height="20" fill="white" />
+          </clipPath>
+        </defs>
+      </svg>
+    </SvgIcon>
+  );
+}

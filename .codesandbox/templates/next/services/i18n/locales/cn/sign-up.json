@@ -1,0 +1,42 @@
+{
+  "title": "注册",
+  "actions": {
+    "submit": "注册",
+    "accountAlreadyExists": "已有账户？"
+  },
+  "inputs": {
+    "firstName": {
+      "label": "名",
+      "validation": {
+        "required": "名是必需的"
+      }
+    },
+    "lastName": {
+      "label": "姓",
+      "validation": {
+        "required": "姓是必需的"
+      }
+    },
+    "email": {
+      "label": "电子邮件",
+      "validation": {
+        "required": "电子邮件是必需的",
+        "invalid": "电子邮件无效",
+        "server": {
+          "emailAlreadyExists": "电子邮件已存在"
+        }
+      }
+    },
+    "password": {
+      "label": "密码",
+      "validation": {
+        "required": "密码是必需的",
+        "min": "密码必须至少 6 个字符长",
+        "server": {
+          "incorrectPassword": "密码无效"
+        }
+      }
+    }
+  },
+  "or": "或"
+}

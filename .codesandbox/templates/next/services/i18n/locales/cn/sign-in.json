@@ -1,0 +1,31 @@
+{
+  "title": "登陆",
+  "actions": {
+    "submit": "登陆",
+    "createAccount": "创建账号",
+    "forgotPassword": "忘记密码?"
+  },
+  "inputs": {
+    "email": {
+      "label": "邮件",
+      "validation": {
+        "required": "邮件是必须的",
+        "invalid": "邮件不正确",
+        "server": {
+          "emailNotExists": "邮件不存在"
+        }
+      }
+    },
+    "password": {
+      "label": "密码",
+      "validation": {
+        "required": "密码是必须的",
+        "min": "密码必须六位字符",
+        "server": {
+          "incorrectPassword": "密码不正确"
+        }
+      }
+    }
+  },
+  "or": "或者"
+}

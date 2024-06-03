@@ -1,0 +1,22 @@
+{
+    "title": "Refer Your Friends",
+    "content": "Refer your friend to BoardX. If they sign up, you and your friend will get 10K BoardX Credits for AI features",
+    "steptitle1": "Send Invitation",
+    "stepcontent1": "Send your referral link to your friends",
+    "steptitle2": "Registration",
+    "stepcontent2": "Let them register and create their own team",
+    "steptitle3": "Free credits",
+    "stepcontent3": "You both will get 10K credits for AI features",
+    "note1": "Note: If your want to invite your teammates to ",
+    "note2": " please click the ",
+    "note3": "Invite Member",
+    "note4": " button on the dashboard",
+    "shareLink": "Share the Referral Link",
+    "shareLinkNote": "Copy and send it or share it on your social media",
+    "copy": "Copy Link",
+    "copyInvite": "Copy Invitation",
+    "maxUsers": "Max number of users",
+    "copyLinkSuccess": "Link copied successfully",
+    "copyInvitationSuccess": "Invitation copied successfully",
+    "ReferAFriend": "Refer Friends"
+}

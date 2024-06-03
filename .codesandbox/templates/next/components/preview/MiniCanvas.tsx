@@ -1,5 +1,5 @@
 //** Import react
-import React, { useState } from "react";
+import React from "react";
 
 
 import IconButton from "@mui/joy/IconButton";
@@ -12,6 +12,9 @@ import Sheet from "@mui/joy/Sheet";
 import { Typography } from "@mui/joy";
 
 import * as fabric from '../../../../../fabric';
+import { useSelector } from "react-redux";
+import store, { RootState } from "../../redux/store";
+import { handleSetZoomFactor, handleWidgetMenuDisplay } from "../../redux/features/board.slice";
 
 
 
@@ -26,7 +29,9 @@ export default function MiniCanvas({ canvas }: { canvas: fabric.XCanvas }) {
   // const [isSlidemode, setIsSlidemode] = React.useState(false);
   // const [isPresentationMode, setIsPresentationMode] = React.useState(false);
   const miniMapElement: any = React.useRef();
-  const [zoomFactor] = useState(0);;
+  const zoomFactor = useSelector((state: RootState) => state.board.zoomFactor) || 1;
+
+
   const [miniMapSize, setMiniMapSize] = React.useState(zoomFactor || 1);
   // const [timers, setTimers] = React.useState([]);
   // const zoomCallBack: any = React.useRef();
@@ -90,12 +95,12 @@ export default function MiniCanvas({ canvas }: { canvas: fabric.XCanvas }) {
     handleZoom();
   };
 
-  const handleChange = (newValue: any) => {
-
-
-    if (typeof newValue === "number") {
+  const handleChange = (newValue: number) => {
+    let canvas = (window as any).canvas;
+    store.dispatch(handleWidgetMenuDisplay(false))
+    if (typeof newValue === 'number') {
       canvas.setZoom(newValue / 100);
-
+      store.dispatch(handleSetZoomFactor(newValue / 100));
       canvas.zoomToCenterPoint(canvas.getVpCenter(), newValue / 100);
       canvas.updateViewport();
       canvas.requestRenderAll();

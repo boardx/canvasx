@@ -4,6 +4,7 @@ import * as fabric from '../../../../../fabric';
 import { NextPage } from 'next';
 import { useRef, useCallback } from 'react';
 import { Canvas } from '../../components/Canvas';
+import showMenu from '../../components/widgetMenu/ShowMenu';
 
 // import { RectNotes } from '../../../../src/shapes/RectNotes';
 export const shapeList = [
@@ -129,8 +130,28 @@ const IndexPage: NextPage = () => {
                     backgroundColor: 'lightblue',
                     id: Math.random().toString(36).substr(2, 9),
                 });
+
+
                 canvas.add(shapeNote);
             }
+
+            canvas.on('selection:created', (e) => {
+                console.log('selection:updated', e);
+                showMenu(canvas);
+            });
+            canvas.on('selection:updated', (e) => {
+                console.log('selection:updated', e);
+                showMenu(canvas);
+            });
+            canvas.on('selection:cleared', (e) => {
+                console.log('selection:updated', e);
+                showMenu(canvas);
+            });
+            canvas.on('object:moving', (e) => {
+                console.log('object:moving', e);
+                showMenu(canvas);
+            }
+            );
 
 
 

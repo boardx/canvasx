@@ -15,6 +15,11 @@ export const textboxDefaultValues: Partial<TClassProperties<XTextbox>> = {
   // _wordJoiners: /[ \t\r]/,
   splitByGrapheme: true,
   objType: 'XTextbox',
+  cornerColor: 'white',
+  cornerSize: 10,
+  cornerStyle: 'circle',
+  transparentCorners: false,
+  cornerStrokeColor: 'gray',
 };
 
 /**
@@ -780,6 +785,35 @@ export class XTextbox extends Textbox {
       self.setControlVisible('mr', false);
     }
     if (self.canvas) self.canvas.requestRenderAll();
+  }
+
+  /* boardx extend function */
+  getWidgetMenuList() {
+    if (this.locked) {
+      return ['objectLock'];
+    }
+    return [
+      'drawNote',
+      'more',
+      'textToMultipleStickyNotes',
+      'switchNoteType',
+      'fontSize',
+      'changeFont',
+      'fontWeight',
+      'textBullet',
+      'borderLineIcon',
+      'textAlign',
+      'backgroundColor',
+      'fontColor',
+      'applyFormat',
+      'objectLock',
+      'delete',
+      'aiassist',
+    ];
+  }
+  getWidgetMenuLength() {
+    if (this.locked) return 50;
+    return 520;
   }
 }
 

@@ -6,7 +6,9 @@ import MiniCanvas from './preview/MiniCanvas';
 const DEV_MODE = process.env.NODE_ENV === 'development';
 
 import { initializeCanvasEvents } from '../../../../fabric';
-
+import WidgetMenu from './widgetMenu/WidgetMenu';
+import MenuBar from './boardMenu/MenuBar';
+import { BoardService } from '../services';
 
 declare global {
   var canvas: fabric.XCanvas | undefined;
@@ -32,6 +34,7 @@ export const Canvas = React.forwardRef<
         - 60,
     });
     canvas.setTargetFindTolerance(5)
+    BoardService.getInstance().setBoard(canvas);
 
     setCanvas(canvas); // Update the type of the setCanvas argument
 
@@ -82,5 +85,7 @@ export const Canvas = React.forwardRef<
   return <>
     <canvas ref={canvasRef} />
     <MiniCanvas canvas={canvas!} />
+    <WidgetMenu canvas={canvas!} />
+    <MenuBar />
   </>
 });

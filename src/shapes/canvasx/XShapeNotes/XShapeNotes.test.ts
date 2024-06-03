@@ -63,16 +63,16 @@ describe('XShapeNotes', () => {
 
   it('should handle modified event correctly', () => {
     xShapeNotes.handleModified();
-    expect(xShapeNotes.canvas.uniformScaling).toBe(false);
+    expect(xShapeNotes.canvas?.uniformScaling).toBe(false);
     expect(mockCanvas.renderAll).toHaveBeenCalled();
   });
 
-  //   it('should return default values correctly', () => {
-  //     const defaults = XShapeNotes.getDefaults();
-  //     expect(defaults.controls).toBeDefined();
-  //     expect(defaults.cornerColor).toBe('white');
-  //     expect(defaults.cornerStrokeColor).toBe('gray');
-  //   });
+  it('should return default values correctly', () => {
+    const defaults = XShapeNotes.getDefaults();
+    expect(defaults.controls).toBeDefined();
+    // expect(defaults.cornerColor).toBe('white');
+    // expect(defaults.cornerStrokeColor).toBe('gray');
+  });
 
   //   it('should render background correctly', () => {
   //     const ctx = {

@@ -603,7 +603,7 @@ export class XShapeNotes2 extends Textbox {
   getObject() {
     const object = {};
     const keys = [
-      '_id',
+      'id',
       'angle',
       'backgroundColor',
       'fill',
@@ -678,7 +678,7 @@ export class XShapeNotes2 extends Textbox {
   // getObjectsIntersected() {
   //   const objects = this.canvas._getIntersectedObjects(this);
   //   objects.filter((obj) => {
-  //     return obj._id !== this._id && obj.obj_type !== 'WBArrow';
+  //     return obj.id !== this.id && obj.obj_type !== 'WBArrow';
   //   });
   //   return objects;
   // }
