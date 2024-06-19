@@ -3,6 +3,7 @@ import { Group } from '../Group';
 
 export class XGroup extends Group {
   declare objType: string;
+  static type = 'XGroup';
   getObject() {
     // const object = {};
     // const keys = [

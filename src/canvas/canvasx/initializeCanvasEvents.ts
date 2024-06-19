@@ -415,7 +415,7 @@ export function initializeCanvasEvents(canvas: XCanvas) {
   //   // Exit the function if an inappropriate mode is selected or a file is being dragged or a click is being processed
   //   if (store.getState().mode.type === 'draw' || store.getState().mode.type === 'line' ||
   //     canvas.isDrawingMode ||
-  //     (canvas.getActiveObject() && canvas.getActiveObject().objType === 'WBFile') ||
+  //     (canvas.getActiveObject() && canvas.getActiveObject().objType === 'XFile') ||
   //     canvas.mouse.moved
   //   ) {
   //     return;

@@ -7,7 +7,7 @@ import { Canvas } from '../../components/Canvas';
 
 // import { RectNotes } from '../../../../src/shapes/RectNotes';
 
-import { XURL } from '../../../../../src/shapes/canvasx/XURL';
+import { XURL } from '../../../../../fabric';
 
 const IndexPage: NextPage = () => {
     const ref = useRef<fabric.XCanvas>(null);
@@ -23,19 +23,44 @@ const IndexPage: NextPage = () => {
             // const textValue = 'CanvasX Demo';
 
 
-            const website = new XURL('elementId', {
+            const website = new XURL({
                 top: 220,
                 left: 200,
-                cornerColor: 'red',
-                cornerSize: 10,
-                title: 'this is a title',
-                src: '',
+                fileName: 'EOS Worldwide',
+                fileSrc: 'https://www.eosworldwide.com/',
+                previewImage: 'https://files.boardx.us/beBT5B83vbXnsw7R5/ibQuarEwbKjEXL2pL/yBRJGAJKNN3TbKiW2/images/bigPic/5VSSmja6yynbsc3c.png',
+                id: Math.random().toString(36).substr(2, 9),
+            });
+
+
+            canvas.add(website);
+
+
+            const website3 = new XURL({
+                top: 220,
+                left: 800,
+                fileName: 'design thinking',
+                fileSrc: 'https://www.boardx.us/dtdt-workshop-process/',
+                previewImage: 'https://www.boardx.us/content/images/size/w1000/2024/06/image-1.png',
+                id: Math.random().toString(36).substr(2, 9),
+            });
+
+
+            canvas.add(website3);
+
+            const website2 = new XURL({
+                top: 220,
+                left: 500,
+                fileName: 'no preview image',
+                fileSrc: 'https://www.boardx.us',
+                id: Math.random().toString(36).substr(2, 9),
 
             });
 
-            await website.setSrc('https://knowledge.wharton.upenn.edu/wp-content/uploads/2023/03/3.15.23-scott-snyder-esg-corporate-innovation-GettyImages-1410816388-900x605.png');
-            //@ts-ignore todo: fix this
-            canvas.add(website);
+
+            canvas.add(website2);
+
+
             canvas.renderAll();
             // // Create 10 RectNotes
             // for (let i = 0; i < 5; i++) {

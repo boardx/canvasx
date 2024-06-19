@@ -86,6 +86,10 @@ const useMouseActions = () => {
     beforePan.current = mouseDownBefore.current
       .pipe(
         tap((e: any) => {
+          console.log(
+            '!@beforePan.current = mouseDownBefore.current -- tap',
+            modeType
+          );
           mouseCurrentCursor = canvas.hoverCursor;
 
           const mouseEvent = e.e as MouseEvent;
@@ -125,7 +129,10 @@ const useMouseActions = () => {
       )
       .subscribe((e: any) => {
         const mouseEvent = e.e as MouseEvent;
-
+        console.log(
+          '!@beforePan.current = mouseDownBefore.current --subscribe',
+          modeType
+        );
         if (
           mouseEvent.buttons === 2 ||
           mouseEvent.buttons === 3 ||
@@ -278,7 +285,7 @@ const useMouseActions = () => {
 
       if (modeType === 'eraser') {
         const target: any = e.target;
-        if (target && target.objType !== 'WBPath') {
+        if (target && target.objType !== 'XPath') {
           setTimeout(() => {
             canvas.discardActiveObject();
             canvas.requestRenderAll();

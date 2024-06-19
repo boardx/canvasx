@@ -1,8 +1,8 @@
 import { classRegistry } from '../../../ClassRegistry';
-import { createRectNotesDefaultControls } from '../../../controls';
+import { createRectNotesDefaultControls } from '../../../controls/X_commonControls';
 import { getFabricDocument } from '../../../env';
 import { TClassProperties, TFiller } from '../../../typedefs';
-import { Textbox, TextboxProps } from '../../Textbox';
+import { XTextbox, XTextboxProps } from '../XTextbox';
 
 import { shapeList } from './types';
 import { shapeType } from './types';
@@ -47,16 +47,18 @@ export const XShapeNotesDefaultValues: Partial<TClassProperties<XShapeNotes>> =
     transparentCorners: false,
   };
 
-interface XShapeNotesProps extends TextboxProps {
+interface XShapeNotesProps extends XTextboxProps {
   shapeName: string;
   id: string;
 }
 
-export class XShapeNotes extends Textbox {
+export class XShapeNotes extends XTextbox {
   bgShape: shapeInfo | null;
   verticalAlign = 'middle';
   maxHeight: number = 138;
   minHeight: number = 20;
+
+  static type = 'XShapeNotes';
 
   constructor(text: string, options: Partial<XShapeNotesProps>) {
     super(text, options);
@@ -70,6 +72,9 @@ export class XShapeNotes extends Textbox {
     this.verticalAlign = this.bgShape?.verticalAlign || 'middle';
     this.textAlign = this.bgShape?.textAlign || 'center';
     this.resetSplitByGrapheme();
+    Object.assign(this, {
+      controls: { ...createRectNotesDefaultControls(this) },
+    });
 
     this.on('scaling', this.handleScaling);
     this.on('modified', this.handleModified);
@@ -93,7 +98,7 @@ export class XShapeNotes extends Textbox {
   static getDefaults() {
     return {
       ...super.getDefaults(),
-      controls: createRectNotesDefaultControls(),
+
       ...XShapeNotes.ownDefaults,
     };
   }
@@ -273,6 +278,53 @@ export class XShapeNotes extends Textbox {
       return 50;
     }
     return 420;
+  }
+  getContextMenuList() {
+    let menuList;
+    if (this.locked) {
+      menuList = [
+        'Export board',
+        'Exporting selected area',
+        'Create Share Back',
+        'Bring forward',
+        'Bring to front',
+        'Send backward',
+        'Send to back',
+        'Copy as image',
+        'Copy As Text',
+      ];
+    } else {
+      menuList = [
+        'Export board',
+        'Exporting selected area',
+        'Create Share Back',
+        'Bring forward',
+        'Bring to front',
+        'Send backward',
+        'Send to back',
+        'Duplicate',
+        'Copy',
+        'Copy as image',
+        'Copy As Text',
+        'Paste',
+        'Cut',
+        'Edit',
+        'Delete',
+      ];
+    }
+    menuList.push('Select All');
+    if (this.locked) {
+      menuList.push('Unlock');
+    } else {
+      menuList.push('Lock');
+    }
+    // const notLockedPanel = this.isPanel && !this.locked;
+    // if (notLockedPanel) {
+    //   menuList.push('Switch to non-panel');
+    // } else {
+    //   menuList.push('Switch to panel');
+    // }
+    return menuList;
   }
 }
 

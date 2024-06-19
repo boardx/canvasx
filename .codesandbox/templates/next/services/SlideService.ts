@@ -1,9 +1,9 @@
-import FileService from "./FileService";
-import UtilityService from "./UtilityService";
-import store from "../redux/store";
-import { handleSetSlideCapture } from "../redux/features/board.slice";
-import * as fabric from "@boardxus/canvasx";
-import BoardService from "./board/BoardService";
+import FileService from './FileService';
+import UtilityService from './UtilityService';
+import store from '../redux/store';
+import { handleSetSlideCapture } from '../redux/features/board.slice';
+import * as fabric from '../../../../fabric';
+import BoardService from './board/BoardService';
 // import $ from 'jquery';
 
 export default class SlideService {
@@ -115,15 +115,15 @@ export default class SlideService {
       angle: 0,
       height: newHeight,
       left: newLeft,
-      objType: "common",
+      objType: 'common',
       scaleX: 1,
       scaleY: 1,
-      originX: "left",
-      originY: "top",
-      stroke: "#1a95e9",
+      originX: 'left',
+      originY: 'top',
+      stroke: '#1a95e9',
       lockUniScaling: true,
       strokeWidth: 0,
-      fill: "rgba(0,0,255,0.3)",
+      fill: 'rgba(0,0,255,0.3)',
       top: newTop,
       whiteboardId: store.getState().board.boardId,
       width: newWidth,
@@ -148,7 +148,7 @@ export default class SlideService {
     });
 
     // Define event listeners for 'moving' and 'scaling' the rectangle.
-    rect.on("moving", (e: any) => {
+    rect.on('moving', (e: any) => {
       const point = canvas.getPositionOnScreenFromCanvas(
         canvas.getActiveObject().aCoords.br.x,
         canvas.getActiveObject().aCoords.br.y
@@ -161,7 +161,7 @@ export default class SlideService {
       //   });
     });
 
-    rect.on("scaling", (e: any) => {
+    rect.on('scaling', (e: any) => {
       const point = canvas.getPositionOnScreenFromCanvas(
         canvas.getActiveObject().aCoords.br.x,
         canvas.getActiveObject().aCoords.br.y

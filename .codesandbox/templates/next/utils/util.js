@@ -3,7 +3,7 @@ import imageCompression from "browser-image-compression";
 // import "../lib/toastr.min.css";
 // import toastr from "../lib/toastr.min";
 // import stc from "string-to-color";
-import * as fabric from "@boardxus/canvasx";
+import * as fabric from "../../../../../fabric";
 //todo
 import store from "../redux/store";
 //**Import i18n */
@@ -285,8 +285,8 @@ Util.rgbaToHex = function (orig) {
   var alpha = ((rgb && rgb[4]) || "").trim();
   const hex = rgb
     ? (rgb[1] | (1 << 8)).toString(16).slice(1) +
-      (rgb[2] | (1 << 8)).toString(16).slice(1) +
-      (rgb[3] | (1 << 8)).toString(16).slice(1)
+    (rgb[2] | (1 << 8)).toString(16).slice(1) +
+    (rgb[3] | (1 << 8)).toString(16).slice(1)
     : orig;
   if (alpha !== "") {
     a = alpha;
@@ -510,7 +510,7 @@ Util.animateMouseToPosition = async function (userNo, left, top) {
       $(`#${userNo}`).css("top", newTop);
     },
     easing: fabric.util.ease.easeInOutQuad,
-    onComplete() {},
+    onComplete() { },
   });
 };
 

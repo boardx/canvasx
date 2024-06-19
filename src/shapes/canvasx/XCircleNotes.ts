@@ -1,6 +1,6 @@
 import { TClassProperties } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
-import { Textbox, TextboxProps } from '../Textbox';
+import { XTextbox, XTextboxProps } from './XTextbox';
 import { createRectNotesDefaultControls } from '../../controls/X_commonControls';
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
 // regexes, list of properties that are not suppose to change by instances, magic consts.
@@ -26,7 +26,7 @@ export const circleNotesDefaultValues: Partial<TClassProperties<XCircleNotes>> =
     transparentCorners: false,
   };
 
-export interface CircleNotesProps extends TextboxProps {
+export interface CircleNotesProps extends XTextboxProps {
   id: string;
 }
 
@@ -36,7 +36,7 @@ export interface CircleNotesProps extends TextboxProps {
  * user can only change width. Height is adjusted automatically based on the
  * wrapping of lines.
  */
-export class XCircleNotes extends Textbox {
+export class XCircleNotes extends XTextbox {
   /**selectable
    * Minimum width of textbox, in pixels.
    * @type Number
@@ -46,6 +46,8 @@ export class XCircleNotes extends Textbox {
   declare maxHeight: number;
   declare noteType: string;
   declare radius: number;
+
+  static type = 'XCircleNotes';
 
   /* boardx cusotm function */
   declare id: string;
@@ -104,20 +106,24 @@ export class XCircleNotes extends Textbox {
    */
   declare splitByGrapheme: boolean;
 
-  static textLayoutProperties = [...Textbox.textLayoutProperties, 'width'];
+  static textLayoutProperties = [...XTextbox.textLayoutProperties, 'width'];
 
   static ownDefaults: Record<string, any> = circleNotesDefaultValues;
 
   static getDefaults() {
     return {
       ...super.getDefaults(),
-      controls: createRectNotesDefaultControls(),
+
       ...XCircleNotes.ownDefaults,
     };
   }
 
   constructor(text: string, options: Partial<CircleNotesProps>) {
     super(text, options);
+
+    Object.assign(this, {
+      controls: { ...createRectNotesDefaultControls(this) },
+    });
   }
   /**
    * Unlike superclass's version of this function, Textbox does not update

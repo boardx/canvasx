@@ -1,4 +1,4 @@
-import { TClassProperties, TOriginX, TOriginY } from '../../typedefs';
+import { TBBox, TClassProperties, TOriginX, TOriginY } from '../../typedefs';
 import { IText } from '../IText/IText';
 import { classRegistry } from '../../ClassRegistry';
 import { createTextboxDefaultControls } from '../../controls/X_commonControls';
@@ -6,6 +6,9 @@ import { EventName, TextAlign, WidgetType, Origin } from './types';
 import { Textbox } from '../Textbox';
 
 import { isTransformCentered, getLocalPoint } from '../../controls/util';
+import { Point } from '../../Point';
+import { XConnector } from './XConnector';
+import { FabricObject } from '../Object/Object';
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
 // regexes, list of properties that are not suppose to change by instances, magic consts.
 // this will be a separated effort
@@ -22,6 +25,8 @@ export const textboxDefaultValues: Partial<TClassProperties<XTextbox>> = {
   cornerStrokeColor: 'gray',
 };
 
+export const XTextboxProps: Partial<TClassProperties<XTextbox>> = {};
+
 /**
  * Textbox class, based on IText, allows the user to resize the text rectangle
  * and wraps lines automatically. Textboxes have their Y scaling locked, the
@@ -29,6 +34,7 @@ export const textboxDefaultValues: Partial<TClassProperties<XTextbox>> = {
  * wrapping of lines.
  */
 export class XTextbox extends Textbox {
+  static type = 'XTextbox';
   /**
    * Minimum width of textbox, in pixels.
    * @type Number
@@ -41,6 +47,7 @@ export class XTextbox extends Textbox {
   declare tempTop: number;
 
   declare hasNoText: boolean;
+  declare hoveringControl: string;
   /**
    * Minimum calculated width of a textbox, in pixels.
    * fixed to 2 so that an empty textbox cannot go to 0
@@ -55,6 +62,7 @@ export class XTextbox extends Textbox {
   declare fromCopy: boolean;
   declare originX: TOriginX;
   declare originY: TOriginY;
+  declare connectors: any;
   /**
    * Use this boolean property in order to split strings that have no white space concept.
    * this is a cheap way to help with chinese/japanese
@@ -74,6 +82,7 @@ export class XTextbox extends Textbox {
       ...XTextbox.ownDefaults,
     };
   }
+
   constructor(text: string, options: any) {
     super(text, options);
     // if (this.objType !== 'WBText' && this.objType !== 'WBTextbox') {
@@ -81,6 +90,55 @@ export class XTextbox extends Textbox {
     // }
     this.InitializeEvent();
     this.resetResizeControls();
+  }
+
+  calculateControlPoint(boundingBox: TBBox, connectingPoint: Point): Point {
+    const left = boundingBox.left;
+    const top = boundingBox.top;
+    const width = boundingBox.width;
+    const height = boundingBox.height;
+
+    const right = left + width;
+    const bottom = top + height;
+
+    const connectingX = connectingPoint.x;
+    const connectingY = connectingPoint.y;
+
+    let controlX: number = 0;
+    let controlY: number = 0;
+
+    // Find the nearest border and calculate the control point outside the bounding box
+    const distances = [
+      { side: 'left', distance: Math.abs(connectingX - left) },
+      { side: 'right', distance: Math.abs(connectingX - right) },
+      { side: 'top', distance: Math.abs(connectingY - top) },
+      { side: 'bottom', distance: Math.abs(connectingY - bottom) },
+    ];
+
+    const nearestBorder = distances.reduce((min, current) =>
+      current.distance < min.distance ? current : min
+    );
+
+    switch (nearestBorder.side) {
+      case 'left':
+        controlX = left - 220;
+        controlY = connectingY;
+        break;
+      case 'right':
+        controlX = right + 220;
+        controlY = connectingY;
+        break;
+      case 'top':
+        controlX = connectingX;
+        controlY = top - 220;
+        break;
+      case 'bottom':
+        controlX = connectingX;
+        controlY = bottom + 220;
+        break;
+    }
+
+    return new Point(controlX, controlY);
   }
 
   // /**
@@ -647,6 +705,65 @@ export class XTextbox extends Textbox {
     return object;
   }
 
+  moveOrScaleHandler(e: any) {
+    //if there is a connector, move the connector
+    if (this.connectors?.length === 0) return;
+    this.connectors?.forEach((connector: any) => {
+      const pointConnector = connector.point;
+
+      //get canvas point of the connector point
+      const point = new Point(pointConnector.x, pointConnector.y);
+      //@ts-ignore
+      const transformedPoint = this.transformPointToCanvas(point);
+
+      //use the connectorId to find the connector and then update the connector
+      //@ts-ignore
+      const connectorObj = this.canvas?.findById(connector.connectorId);
+
+      if (!connectorObj) return;
+
+      if (this.id === connectorObj.fromId) {
+        this.updateConnector(transformedPoint, connectorObj, 'from');
+      }
+
+      if (this.id === connectorObj.toId) {
+        this.updateConnector(transformedPoint, connectorObj, 'to');
+      }
+    });
+  }
+
+  updateConnector(point: any, connector: XConnector, type: string) {
+    const controlPoint = this.calculateControlPoint(
+      this.getBoundingRect(),
+      new Point(point.x, point.y)
+    );
+
+    console.log(
+      'updateConnector: point:',
+      point,
+      'control point:',
+      controlPoint,
+      connector,
+      type
+    );
+    //if the connector is from the object, then the startpoint should be updated
+    //if the connector is to the object, then the endpoint should be updated
+
+    //recalculate the startpoint or endpoint of the connector, and also the ControlPoint
+    if (type === 'from') {
+      connector.update({
+        fromPoint: point,
+        control1: controlPoint,
+      });
+    }
+    if (type === 'to') {
+      connector.update({
+        toPoint: point,
+        control2: controlPoint,
+      });
+    }
+  }
+
   // toObject(propertiesToInclude: Array<any>): object {
   //   return super.toObject(
   //     ['minWidth', 'splitByGrapheme'].concat(propertiesToInclude)
@@ -735,6 +852,84 @@ export class XTextbox extends Textbox {
         // self.canvas.requestRenderAll();
       }
     });
+
+    this.on('moving', (e) => {
+      this.moveOrScaleHandler(e);
+    });
+
+    this.on('scaling', (e) => {
+      this.moveOrScaleHandler(e);
+    });
+  }
+
+  drawObject(ctx: CanvasRenderingContext2D) {
+    super.drawObject(ctx);
+    // console.log('!@@ drawObject', this.canvas?.dockingWidget, this);
+    //@ts-ignore
+    if (this == this.canvas?.dockingWidget) {
+      this.renderDockingControls(ctx);
+    }
+  }
+
+  renderDockingControls(ctx: CanvasRenderingContext2D) {
+    console.log('!!@renderDockingControls');
+    const self = this;
+    const canvas = self.canvas;
+    const controls = self.controls;
+    let cornerColor = 'white';
+
+    if (!canvas) return;
+
+    for (const controlKey in controls) {
+      const control = controls[controlKey];
+      if (
+        !(
+          controlKey === 'mbaStart' ||
+          controlKey === 'mlaStart' ||
+          controlKey === 'mraStart' ||
+          controlKey === 'mtaStart'
+        )
+      )
+        continue;
+
+      if (this.hoveringControl && this.hoveringControl === controlKey) {
+        cornerColor = '#F21D6B';
+      } else {
+        cornerColor = 'white';
+      }
+
+      console.log('!!@', this.hoveringControl);
+      //render 4 controls, mbaStart, mlaStart, mraStart, mtaStart
+
+      this._renderControl(
+        ctx,
+        control.x * self.width,
+        control.y * self.height,
+        { cornerStyle: 'circle', cornerColor },
+        self
+      );
+    }
+  }
+
+  _renderControl(
+    ctx: any,
+    left: number,
+    top: number,
+    styleOverride: any,
+    fabricObject: FabricObject
+  ) {
+    console.log('!!@  _renderControl', left, top);
+    let color = styleOverride.cornerColor || 'white';
+
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.strokeStyle = 'gray';
+    ctx.beginPath();
+    ctx.arc(left, top, 6, 0, Math.PI * 2, false);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
   }
 
   changeWidth(eventData: any, transform: any, x: any, y: any) {
@@ -817,5 +1012,5 @@ export class XTextbox extends Textbox {
   }
 }
 
-classRegistry.setClass(Textbox);
+classRegistry.setClass(XTextbox);
 // classRegistry.getSVGClass(Textbox);

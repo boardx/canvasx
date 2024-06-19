@@ -96,7 +96,7 @@ export const doubleClickToCreateStickyNote = debounce(async (e: any) => {
     store.getState().mode.type === "line" ||
     canvas.isDrawingMode ||
     (canvas.getActiveObject() &&
-      canvas.getActiveObject().objType === "WBFile") ||
+      canvas.getActiveObject().objType === "XFile") ||
     canvas.mouse.moved
   ) {
     return;

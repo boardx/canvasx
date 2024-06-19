@@ -40,6 +40,10 @@ import { WidgetType } from '../../shapes/canvasx/types';
 import { Textbox } from '../../shapes/Textbox';
 import { XFile } from '../../shapes/canvasx/XFile';
 import { XCircleNotes, XShapeNotes } from '../../shapes/canvasx';
+import { isActiveSelection } from '../../util/typeAssertions';
+import { Rect } from '../../shapes/Rect';
+
+let selectedObject: any;
 
 export class XCanvas extends Canvas implements BXCanvasInterface {
   // Indicate that object scaling must be uniform (equal in all dimensions)
@@ -112,6 +116,258 @@ export class XCanvas extends Canvas implements BXCanvasInterface {
   isErasingMode = false; // is the canvas in drawing mode
 
   defaultNote = {}; // default sticky note
+
+  boundHandlerMouseMove: any = null;
+  dockingWidget: any = null;
+  instanceOfConnector: any = null;
+  startPointOfConnector: any = null;
+  endPointOfConnector: any = null;
+  inConnectingMode: boolean = false;
+
+  handlerMouseMoveForConnector(canvasInstance: any, e: any) {
+    const pointer = e.scenePoint;
+    const width = 50 / canvasInstance.getZoom();
+    const height = 50 / canvasInstance.getZoom();
+    const rect = new Rect({
+      left: pointer.x - width / 2,
+      top: pointer.y - height / 2,
+      width: width,
+      height: height,
+      selectable: false,
+    });
+
+    let closestObject: any = null;
+    let minDistance = Infinity;
+
+    canvasInstance.getObjects().forEach((obj: any) => {
+      if (obj.objType === 'XConnector') {
+        return;
+      }
+      canvasInstance.dockingWidget = null;
+
+      obj.hoveringControl = null;
+      obj.dirty = true;
+
+      if (rect.intersectsWithObject(obj)) {
+        const objCenter = obj.getCenterPoint();
+        const distance = Math.sqrt(
+          Math.pow(objCenter.x - pointer.x, 2) +
+            Math.pow(objCenter.y - pointer.y, 2)
+        );
+
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestObject = obj;
+        }
+      }
+    });
+
+    if (closestObject) {
+      // if (selectedObject !== closestObject) {
+      // canvasInstance.setActiveObject(closestObject);
+      canvasInstance.dockingWidget = closestObject;
+      closestObject.dirty = true;
+      closestObject.set({
+        hasControls: true,
+        selectable: true,
+      });
+      const controlsData = ['mtaStart', 'mbaStart', 'mlaStart', 'mraStart'];
+
+      Object.keys(closestObject.controls).forEach((controlName) => {
+        console.log('controlName', controlName);
+        // const control = closestObject.controls.find((c) => c.name === controlName);
+        if (controlsData.includes(controlName)) {
+          closestObject.controls[controlName].visible = true;
+        } else {
+          closestObject.controls[controlName].visible = false;
+        }
+      });
+
+      //calculate the four points of the controls 'mtaStart', 'mbaStart', 'mlaStart', 'mraStart'
+      const mtaStartPoint = this.getControlPointOnCanvas(
+        closestObject,
+        'mtaStart'
+      );
+      const mbaStartPoint = this.getControlPointOnCanvas(
+        closestObject,
+        'mbaStart'
+      );
+      const mlaStartPoint = this.getControlPointOnCanvas(
+        closestObject,
+        'mlaStart'
+      );
+      const mraStartPoint = this.getControlPointOnCanvas(
+        closestObject,
+        'mraStart'
+      );
+
+      closestObject.hoveringControl = '';
+      //if the point is overlap with rect
+      if (mtaStartPoint && rect.containsPoint(mtaStartPoint)) {
+        console.log(
+          'mtaStartPoint',
+          mtaStartPoint,
+          rect.containsPoint(mtaStartPoint)
+        );
+        // closestObject.controls.mtaStart.visible = false;
+        closestObject.hoveringControl = 'mtaStart';
+      }
+      if (mbaStartPoint && rect.containsPoint(mbaStartPoint)) {
+        console.log(
+          'mbaStartPoint',
+          mbaStartPoint,
+          rect.containsPoint(mbaStartPoint)
+        );
+        // closestObject.controls.mbaStart.visible = false;
+        closestObject.hoveringControl = 'mbaStart';
+      }
+      if (mlaStartPoint && rect.containsPoint(mlaStartPoint)) {
+        console.log(
+          'mlaStartPoint',
+          mlaStartPoint,
+          rect.containsPoint(mlaStartPoint)
+        );
+        // closestObject.controls.mlaStart.visible = false;
+        closestObject.hoveringControl = 'mlaStart';
+      }
+      if (mraStartPoint && rect.containsPoint(mraStartPoint)) {
+        console.log(
+          'mraStartPoint',
+          mraStartPoint,
+          rect.containsPoint(mraStartPoint)
+        );
+        // closestObject.controls.mraStart.visible = false;
+        closestObject.hoveringControl = 'mraStart';
+      }
+
+      selectedObject = closestObject;
+
+      // }
+    } else if (selectedObject) {
+      selectedObject.set({
+        hasControls: false,
+        selectable: false,
+      });
+      // canvasInstance.discardActiveObject();
+      selectedObject = null;
+    }
+    canvasInstance.requestRenderAll();
+  }
+
+  getControlPointOnCanvas(obj: any, controlName: string) {
+    const controlInfo = obj.controls[controlName];
+    if (!controlInfo) {
+      return;
+    }
+    const x = controlInfo.offsetX + controlInfo.x * obj.width;
+    const y = controlInfo.offsetY + controlInfo.y * obj.height;
+    const point = new Point(x, y);
+
+    const transformedPoint = obj.transformPointToCanvas(point);
+
+    return transformedPoint;
+  }
+
+  async initializeConnectorMode() {
+    const canvasInstance = this;
+    this.inConnectingMode = true;
+    this.boundHandlerMouseMove = this.handlerMouseMoveForConnector.bind(
+      this,
+      canvasInstance
+    );
+    canvasInstance.on('mouse:move', this.boundHandlerMouseMove);
+  }
+
+  async exitConnectorMode() {
+    const canvasInstance = this;
+    this.inConnectingMode = false;
+    if (this.boundHandlerMouseMove) {
+      canvasInstance.off('mouse:move', this.boundHandlerMouseMove);
+      this.boundHandlerMouseMove = null;
+    }
+    this.makeAllControlsVisible();
+  }
+
+  async makeAllControlsVisible() {
+    this.getObjects().forEach((obj) => {
+      if (obj.controls) {
+        Object.keys(obj.controls).forEach((controlName) => {
+          obj.controls[controlName].visible = true;
+        });
+      }
+    });
+  }
+
+  /**
+   * This method of fabric.Canvas prototype is used to create multiple sticky notes by location.
+   * It takes an array of sticky notes text and a target widget as parameters.
+   * The method creates new notes with settings like zIndex, text, backgroundColor, fill, lastEditedBy, width, height, emoji, textAlign, obj_type, left, _id, originX, and originY.
+   * After creating each note, it adds this new note to the canvas and to an array newNotes.
+   * After all notes have been created, it pushes all states to canvas's newState array and inserts new notes to the database via WidgetService.
+   * If array stickyNotes is not empty, it adds all sticky notes to the active selection and sets it as the active object on the canvas.
+   *
+   * @param {Array<String>} stickyNotsArray - Array of strings, each representing the text of a sticky note.
+   * @param {Object} targetWidget - Target widget object in which new sticky notes will be added.
+   * @async
+   * @function
+   * @returns {Array} Returns an array of stickyNotes.
+   */
+  async createMutipleStickyNotesByLocation(
+    stickyNotsArray: any,
+    targetWidget: any
+  ) {
+    const self = this;
+    const canvas = self;
+    const stickyNotes = [];
+
+    if (targetWidget.isEditing) targetWidget.exitEditing();
+
+    let newState: any = [];
+    let newNotes: any = [];
+    for (let i = 0; i < stickyNotsArray.length; i++) {
+      const textOfNote = stickyNotsArray[i];
+      const newNote = targetWidget.toObject();
+
+      newNote.zIndex = Date.now() * 100;
+      newNote.text = textOfNote;
+      newNote.backgroundColor = '#d3f4f4';
+      newNote.fill = '#555555';
+      newNote.lastEditedBy = 'AI';
+      newNote.width = 230;
+      newNote.height = 138;
+      newNote.emoji = [0, 0, 0, 0, 0];
+      newNote.textAlign = 'center';
+      newNote.objType = 'XRectNotes';
+      newNote.left =
+        newNote.left +
+        (i + 1) *
+          (targetWidget.objType === 'WBTextbox'
+            ? 240
+            : targetWidget.getScaledWidth() + 30);
+      newNote.id = Math.random().toString(36).substr(2, 9);
+      newNote.originX = 'center';
+      newNote.originY = 'center';
+
+      const widget = await self.createWidgetAsync(newNote);
+
+      // newState = newState.concat(widget.getUndoRedoState('ADDED'));
+
+      self.add(widget);
+
+      stickyNotes.push(widget);
+      newNotes.push(newNote);
+    }
+    // canvas.pushNewState(newState);
+    // await WidgetService.getInstance().insertWidgetArr(newNotes);
+
+    if (stickyNotes && stickyNotes.length > 0) {
+      const selectedObject = new ActiveSelection(); //canvas.getActiveSelection();
+      selectedObject.add(...stickyNotes);
+      canvas.requestRenderAll();
+      canvas.setActiveObject(selectedObject);
+    }
+    return stickyNotes;
+  }
 
   zoomToViewAllObjects(): number {
     let topLeftX = 0;
@@ -415,10 +671,10 @@ export class XCanvas extends Canvas implements BXCanvasInterface {
     // Discard the currently active object on the canvas
     self.discardActiveObject();
 
-    // Get all the objects on the canvas that are not of type 'common' or 'WBFile'
+    // Get all the objects on the canvas that are not of type 'common' or 'XFile'
     const activeSelection = self
       .getObjects()
-      .filter((o: any) => o.type !== 'common' && o.type !== 'WBFile');
+      .filter((o: any) => o.type !== 'common' && o.type !== 'XFile');
 
     // Create a new active selection
     const sel = new ActiveSelection(activeSelection, {
@@ -1269,11 +1525,11 @@ export class XCanvas extends Canvas implements BXCanvasInterface {
 
     const canvas: XCanvas = self;
 
-    const tempobjects = canvas.getObjects();
+    const currentActiveObjects = canvas.getActiveObjects();
 
     const objects: any[] = [];
 
-    tempobjects.forEach((obj: any) => {
+    currentActiveObjects.forEach((obj: any) => {
       if (obj.objType !== 'XConnector') {
         objects.push(obj);
       }
@@ -2133,7 +2389,7 @@ export class XCanvas extends Canvas implements BXCanvasInterface {
     }
 
     if (!options.objType && options.objects && options.objects.length > 1) {
-      options.objType = 'WBGroup';
+      options.objType = 'XGroup';
 
       options.objectArr = options.objects;
     }
@@ -2143,7 +2399,7 @@ export class XCanvas extends Canvas implements BXCanvasInterface {
     options.hasControls = true;
 
     switch (options.objType) {
-      case 'WBUrlImage':
+      case 'XURL':
         var url = '/fileIcons/weblink.png';
 
         if (options.src) {
@@ -2162,37 +2418,39 @@ export class XCanvas extends Canvas implements BXCanvasInterface {
 
         const pugImg = new Image();
 
-        let instance = new XURL(pugImg, options);
+        let instance = await new XURL(options);
 
-        return new Promise((resolve, reject) => {
-          instance.fromURL(url, options).then((urlImage: any) => {
-            if (urlImage) {
-              urlImage.set({
-                rx: 40,
-                ry: 40,
-                clipTo(ctx: any) {
-                  ctx.arc(0, 0, 200, 200, Math.PI * 2, true);
-                },
-              });
+        return instance;
 
-              resolve(urlImage);
-            } else {
-              instance
-                .fromURL('/fileIcons/weblink.png', options)
-                .then((urlImage: any) => {
-                  urlImage.set({
-                    rx: 40,
-                    ry: 40,
-                    clipTo(ctx: any) {
-                      ctx.arc(0, 0, 200, 200, Math.PI * 2, true);
-                    },
-                  });
+      // return new Promise((resolve, reject) => {
+      //   instance.fromURL(url, options).then((urlImage: any) => {
+      //     if (urlImage) {
+      //       urlImage.set({
+      //         rx: 40,
+      //         ry: 40,
+      //         clipTo(ctx: any) {
+      //           ctx.arc(0, 0, 200, 200, Math.PI * 2, true);
+      //         },
+      //       });
 
-                  resolve(urlImage);
-                });
-            }
-          });
-        });
+      //       resolve(urlImage);
+      //     } else {
+      //       instance
+      //         .fromURL('/fileIcons/weblink.png', options)
+      //         .then((urlImage: any) => {
+      //           urlImage.set({
+      //             rx: 40,
+      //             ry: 40,
+      //             clipTo(ctx: any) {
+      //               ctx.arc(0, 0, 200, 200, Math.PI * 2, true);
+      //             },
+      //           });
+
+      //           resolve(urlImage);
+      //         });
+      //     }
+      //   });
+      // });
 
       case WidgetType.XPath:
         // Render the drawing path
@@ -2391,7 +2649,7 @@ export class XCanvas extends Canvas implements BXCanvasInterface {
         return widget;
 
       // Case when the widget type is WBText
-      case 'WBText':
+      case 'XText':
         // Set the origin of the Text widget to its center
         options.originX = 'center';
         options.originY = 'center';
@@ -2411,7 +2669,7 @@ export class XCanvas extends Canvas implements BXCanvasInterface {
         // Return the newly created widget
         return widget;
 
-      // Case when the widget type is WBFile
+      // Case when the widget type is XFile
       case WidgetType.XFile:
         // Lock the uniform scaling option to maintain proportional resizing
         options.lockUniScaling = true;
@@ -2421,16 +2679,14 @@ export class XCanvas extends Canvas implements BXCanvasInterface {
 
         const preImg = new Image();
 
-        // Return a new promise that creates a WBFile
-        return new Promise((resolve, reject) => {
-          let instance = new XFile(preImg, options);
+        // Return a new promise that creates a XFile
 
-          // Create a new file widget from the URL specified in options
-          instance.fromURL(options).then((file) => {
-            // Complete the promise and return the file
-            resolve(file);
-          });
-        });
+        let file = await new XFile(options);
+
+        // // Create a new file widget from the URL specified in options
+        // instance.fromURL(options).then((file) => {
+        // Complete the promise and return the file
+        return file;
 
       default:
         break;
@@ -2819,49 +3075,49 @@ export class XCanvas extends Canvas implements BXCanvasInterface {
   }
 
   removeWidget(target: any) {
-    // const self = this;
-    // const toDeleteWidgetArr = [];
-    // // If no target is provided, end the function
-    // if (!target) return;
-    // // Check if the target is an active selection of objects
-    // if (target.isActiveSelection()) {
-    //   let newState = [];
-    //   let containLockedObj = false;
-    //   // Look at each object in the selection
-    //   for (const obj of target._objects) {
-    //     // If the object is locked, record it
-    //     if (obj.locked) {
-    //       containLockedObj = true;
-    //     }
-    //   }
-    //   // For every object in the selection
-    //   for (const obj of target._objects) {
-    //     // Get their undo/redo state and add it to our array of new States.
-    //     // Assigning a state of 'REMOVED' to each of them
-    //     newState = newState.concat(obj.getUndoRedoState('REMOVED'));
-    //     // Add the id of the object to the array of widgets to be deleted
-    //     toDeleteWidgetArr.push(obj.id);
-    //   }
-    //   // Push this newState into the fabric.js states for handling undo/redo
-    //   canvas.pushNewState(newState);
-    //   // Remove each of the objects in the selection from canvas
-    //   for (const obj of target._objects) {
-    //     self.remove(obj);
-    //   }
-    //   // Deselect the group of objects, since they've just been removed
-    //   self.discardActiveObject();
-    // } else {
-    //   // If the target is just a single object, get its undo/redo state as well
-    //   const newState = target.getUndoRedoState('REMOVED');
-    //   // Push this new state to the fabric.js states
-    //   canvas.pushNewState(newState);
-    //   // Remove the single object from the canvas
-    //   self.remove(target);
-    // }
-    // // Remove the target from the canvas (again, to ensure removal in case it was missed earlier)
-    // self.remove(target);
-    // // Request the canvas to re-render itself, now that objects have been removed
-    // self.requestRenderAll();
+    const self = this;
+    const toDeleteWidgetArr = [];
+    // If no target is provided, end the function
+    if (!target) return;
+    // Check if the target is an active selection of objects
+    if (isActiveSelection(target)) {
+      let newState = [];
+      let containLockedObj = false;
+      // Look at each object in the selection
+      for (const obj of target._objects) {
+        // If the object is locked, record it
+        if (obj.locked) {
+          containLockedObj = true;
+        }
+      }
+      // // For every object in the selection
+      // for (const obj of target._objects) {
+      //   // Get their undo/redo state and add it to our array of new States.
+      //   // Assigning a state of 'REMOVED' to each of them
+      //   newState = newState.concat(obj.getUndoRedoState('REMOVED'));
+      //   // Add the id of the object to the array of widgets to be deleted
+      //   toDeleteWidgetArr.push(obj.id);
+      // }
+      // // Push this newState into the fabric.js states for handling undo/redo
+      // canvas.pushNewState(newState);
+      // Remove each of the objects in the selection from canvas
+      for (const obj of target._objects) {
+        self.remove(obj);
+      }
+      // Deselect the group of objects, since they've just been removed
+      self.discardActiveObject();
+    } else {
+      // If the target is just a single object, get its undo/redo state as well
+      // const newState = target.getUndoRedoState('REMOVED');
+      // // Push this new state to the fabric.js states
+      // canvas.pushNewState(newState);
+      // Remove the single object from the canvas
+      self.remove(target);
+    }
+    // Remove the target from the canvas (again, to ensure removal in case it was missed earlier)
+    self.remove(target);
+    // Request the canvas to re-render itself, now that objects have been removed
+    self.requestRenderAll();
   }
 
   async AddMultipleStickyNoteToBoardByText(text: any) {
@@ -3042,7 +3298,7 @@ export class XCanvas extends Canvas implements BXCanvasInterface {
       o.lockScalingX = false;
       o.lockScalingY = false;
       o.locked = false;
-      o.editable = true;
+      // o.editable = true;
       o.selectable = true;
       // Mark the object as dirty (requiring a re-render)
       o.dirty = true;

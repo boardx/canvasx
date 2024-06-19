@@ -45,7 +45,7 @@ export default function ObjectLock({
 
   const helperLock = (object: any, isLocked: any) => {
     console.log("helperLock", object, isLocked);
-    if (object.isActiveSelection()) {
+    if (object.parent) {
       lockObject(object, isLocked);
       return;
     }
@@ -90,7 +90,7 @@ export default function ObjectLock({
     if (!obj || !canvas) return;
 
     if (locked) {
-      if (obj.isActiveSelection()) {
+      if (obj.parent) {
         for (let objas of obj._objects) {
           canvas.lockObject(objas);
           if (objas.isPanel || objas.objType === "WBRectPanel") {
@@ -100,7 +100,7 @@ export default function ObjectLock({
       }
       canvas.lockObject(obj);
     } else {
-      if (obj.isActiveSelection()) {
+      if (obj.parent) {
         for (let objas of obj._objects) {
           canvas.unLockObject(objas);
           if (objas.isPanel || objas.objType === "WBRectPanel") {

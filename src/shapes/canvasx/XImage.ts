@@ -6,67 +6,31 @@ export class XImage extends FabricImage {
   declare zIndex: number;
   declare locked: boolean;
 
-  getObject() {
-    const object = {};
-    const keys = [
-      'id',
-      'angle',
-      'backgroundColor',
-      'fill',
-      'width',
-      'height',
-      'left',
-      'locked',
-      'lockScalingX',
-      'lockScalingY',
-      'lockMovementX',
-      'lockMovementY',
-      'lockScalingFlip',
-      'objType',
-      'originX',
-      'originY',
-      'scaleX',
-      'scaleY',
-      'selectable',
-      'top',
-      'userNo',
-      'userId',
-      'whiteboardId',
-      'zIndex',
-      'version',
-      'isPanel',
-      'panelObj',
-      'relationship',
-      'flipX',
-      'flipY',
-      'stroke',
-      'strokeWidth',
-      'lines',
-      'src',
-      'name',
-      'progressBar',
-      'isUploading',
-      'initedProgressBar',
-      'hoverCursor',
-      'lockUniScaling',
-      'cornerStyle',
-      'lightbox',
-      'cropSelectionRect',
-      'url',
-    ];
-    keys.forEach((key) => {
-      //@ts-ignore
-      object[key] = this[key];
-    });
-    return object;
+  static type = 'XImage';
+  constructor(elementId: string, options: Record<string, any>) {
+    super(elementId, options);
+    this.objType = 'XImage';
+    this.zIndex = 0;
+    this.locked = false;
+    this.cornerColor = 'white';
+    this.cornerSize = 15;
+    this.cornerStrokeColor = 'gray';
+    this.cornerStyle = 'circle';
+    this.transparentCorners = false;
   }
 
+  static getDefaults(): Record<string, any> {
+    return {
+      ...super.getDefaults(),
+      objType: 'XImage',
+    };
+  }
   /*boardx custom function */
   getWidgetMenuList() {
     if (this.locked) {
-      return ['objectLock'];
+      return ['objectLock', 'download'];
     }
-    return ['more', 'objectLock', 'crop', 'delete', 'aiassist'];
+    return ['more', 'objectLock', 'crop', 'delete', 'aiassist', , 'download'];
   }
   getWidgetMenuLength() {
     if (this.locked) {

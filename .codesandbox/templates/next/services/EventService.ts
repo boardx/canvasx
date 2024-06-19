@@ -14,7 +14,7 @@ import EventNames from './EventNames';
 //**rxjs */
 
 import BoardService from './board/BoardService';
-import { XCanvas } from '@boardxus/canvasx';
+import { XCanvas } from '../../../../fabric';
 
 export default class EventService {
   public _eventHandlers: any;

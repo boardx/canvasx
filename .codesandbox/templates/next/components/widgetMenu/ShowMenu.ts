@@ -1,4 +1,4 @@
-import * as fabric from '@boardxus/canvasx';
+import * as fabric from '../../../../../fabric';
 //** Import Redux kit
 import store from '../../redux/store';
 import {

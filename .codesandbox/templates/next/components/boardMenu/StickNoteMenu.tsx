@@ -22,8 +22,8 @@ import { ListItemButton, Box } from "@mui/joy";
 import Sheet from "@mui/joy/Sheet";
 import { IconX } from "@tabler/icons-react";
 import { ClickAwayListener } from "@mui/base/ClickAwayListener";
-import { XCircleNotes } from "@boardxus/canvasx";
-import { XRectNotes } from "@boardxus/canvasx";
+import { XCircleNotes } from "../../../../../fabric";
+import { XRectNotes } from "../../../../../fabric";
 
 import { BoardService } from "../../services";
 

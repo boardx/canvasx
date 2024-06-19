@@ -424,7 +424,6 @@ export class FabricObject<
    * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
    */
   _getCacheCanvasDimensions(): TCacheCanvasDimensions {
-    console.log('_getCacheCanvasdimensions');
     const objectScale = this.getTotalObjectScaling(),
       // calculate dimensions without skewing
       dim = this._getTransformedDimensions({ skewX: 0, skewY: 0 }),

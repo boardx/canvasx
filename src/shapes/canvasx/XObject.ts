@@ -38,7 +38,6 @@ export class FabricObject2 {
     const transformedPoint = toTransformPoint.transform(
       self.calcTransformMatrix()
     );
-    console.log('##transformPointToCanvas', point, transformedPoint);
     return transformedPoint;
   }
   transformPointFromCanvas(point: XY) {
@@ -492,7 +491,7 @@ export class FabricObject2 {
   //   canvas.requestRenderAll();
 
   //   // update group
-  //   if (target.isActiveSelection()) {
+  //   if (target.parent) {
   //     let newState = [];
 
   //     for (const obj of target.getObjects()) {

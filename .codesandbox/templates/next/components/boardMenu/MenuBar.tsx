@@ -23,9 +23,10 @@ import useShapeActions from "./modeHandlers/useShapeActions";
 import useStickNoteActions from "./modeHandlers/useStickNoteActions";
 import { handlePreventDefaultEvent } from "./events";
 import List from "@mui/joy/List";
-import { RootState } from "../../redux/store";
+import store, { RootState } from "../../redux/store";
 import { BoardService } from "../../services";
-
+import { changeMode } from '../../redux/features/mode.slice';
+import { XCanvas } from "../../../../../fabric";
 export function MenuBar() {
   const modeType = useSelector((state: RootState) => state.mode.type);
   const { startMouseListener, endMouseListener } = useMouseActions();
@@ -40,8 +41,32 @@ export function MenuBar() {
   const hideBoardMenu = useSelector(
     (state: RootState) => state.board.hideBoardMenu
   );
-  const canvas: any = BoardService.getInstance().getBoard();
+  const canvas: XCanvas = BoardService.getInstance().getBoard();
+
   useEffect(() => {
+
+
+
+    canvas?.getObjects().forEach((obj: any) => {
+      if (obj.controls.mbaStart) {
+        obj.controls.mbaStart.mouseDownHandler = (e: any) => {
+          store.dispatch(changeMode("line"));
+        };
+        obj.controls.mlaStart.mouseDownHandler = (e: any) => {
+          store.dispatch(changeMode("line"));
+        };
+        obj.controls.mraStart.mouseDownHandler = (e: any) => {
+          store.dispatch(changeMode("line"));
+        };
+        obj.controls.mtaStart.mouseDownHandler = (e: any) => {
+          store.dispatch(changeMode("line"));
+        };
+      }
+    });
+
+  }, [canvas, modeType]);
+  useEffect(() => {
+    console.log("!@startMouseListener", modeType);
     startMouseListener();
     startDefaultListener();
 
@@ -59,6 +84,8 @@ export function MenuBar() {
         handleEraseBefore();
         break;
       case "line":
+        console.log("!@startMouseListener---line", modeType);
+        canvas?.initializeConnectorMode();
         handleLineBefore();
         break;
       case "text":
@@ -69,6 +96,8 @@ export function MenuBar() {
         break;
       case "stickNote":
         handleStickNoteBefore();
+      case "default":
+        canvas?.exitConnectorMode();
         break;
     }
 
@@ -96,6 +125,7 @@ export function MenuBar() {
           handleStickNoteAfter();
           break;
         case "default":
+
           endDefaultListener();
           break;
       }

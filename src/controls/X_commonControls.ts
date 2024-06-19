@@ -139,13 +139,24 @@ export const createObjectArrowControls = () => ({
   }),
 });
 
-export const createObjectConnectorControls = () => {
-  function renderCustomControl(ctx, left, top, fabricObject) {
-    const styleOverride1 = {
-      cornerSize: 10,
+export const createObjectConnectorControls = (targetObject: any) => {
+  function renderCustomControl(control, ctx, left, top, fabricObject) {
+    let cornerSize, cornerColor;
 
+    // if (control.targetObject.hoveringControl === control.controlName) {
+    //   cornerSize = 15;
+    //   cornerColor = 'red';
+    // } else {
+    cornerSize = 10;
+    cornerColor = 'white';
+    // }
+
+    const styleOverride1 = {
+      cornerSize: cornerSize,
+      cornerColor,
       lineWidth: 2,
     };
+
     renderCircleControl.call(
       fabricObject,
       ctx,
@@ -161,7 +172,10 @@ export const createObjectConnectorControls = () => {
       y: -0.5,
       offsetX: 0,
       offsetY: -20,
-      render: renderCustomControl,
+      render: renderCustomControl.bind(this, {
+        controlName: 'mtaStart',
+        targetObject,
+      }),
       mouseDownHandler: (eventData, transformData) => {
         // this.controlMousedownProcess(transformData, 0.0, -0.5);
         return true;
@@ -173,7 +187,10 @@ export const createObjectConnectorControls = () => {
       y: 0.5,
       offsetX: 0,
       offsetY: 20,
-      render: renderCustomControl,
+      render: renderCustomControl.bind(this, {
+        controlName: 'mbaStart',
+        targetObject,
+      }),
       mouseDownHandler: (eventData, transformData) => {
         // this.controlMousedownProcess(transformData, 0.0, 0.5);
         return true;
@@ -185,7 +202,10 @@ export const createObjectConnectorControls = () => {
       y: 0,
       offsetX: -20,
       offsetY: 0,
-      render: renderCustomControl,
+      render: renderCustomControl.bind(this, {
+        controlName: 'mlaStart',
+        targetObject,
+      }),
       mouseDownHandler: (eventData, transformData) => {
         // this.controlMousedownProcess(transformData, -0.5, 0.0);
         return true;
@@ -197,7 +217,10 @@ export const createObjectConnectorControls = () => {
       y: 0,
       offsetX: 20,
       offsetY: 0,
-      render: renderCustomControl,
+      render: renderCustomControl.bind(this, {
+        controlName: 'mraStart',
+        targetObject,
+      }),
       mouseDownHandler: (eventData, transformData) => {
         // this.controlMousedownProcess(transformData, 0.5, 0.0);
         return true;
@@ -268,14 +291,14 @@ export const createTextboxDefaultControls = () => ({
   //...createObjectDefaultControls(),
   ...createResizeControlsForText(),
 });
-export const createRectNotesDefaultControls = () => ({
+export const createRectNotesDefaultControls = (targetObject: any) => ({
   ...createObjectDefaultNoRotateControls(),
-  ...createObjectConnectorControls(),
+  ...createObjectConnectorControls(targetObject),
 });
-export const createShapeNotesDefaultControls = () => ({
+export const createShapeNotesDefaultControls = (targetObject: any) => ({
   ...createObjectDefaultNoRotateControls(),
   ...createResizeControls(),
-  ...createObjectConnectorControls,
+  ...createObjectConnectorControls(targetObject),
 });
 export const createPathDefaultControls = () => ({
   ...createObjectDefaultNoRotateControls(),

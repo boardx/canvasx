@@ -26,9 +26,6 @@ const IndexPage: NextPage = () => {
                 left: 200,
                 width: 150,
                 height: 150,
-                cornerColor: 'red',
-                cornerSize: 10,
-
 
             });
 

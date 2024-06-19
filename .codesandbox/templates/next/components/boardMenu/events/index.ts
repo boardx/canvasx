@@ -15,7 +15,7 @@ import {
 
 //** Import component */
 import showMenu from '../../widgetMenu/ShowMenu';
-import { XShapeNotes } from '@boardxus/canvasx';
+import { XShapeNotes } from '../../../../../../fabric';
 export const calcDimension = (source: any, target: any) => {
   return {
     width: target.x < source.x ? source.x - target.x : target.x - source.x,

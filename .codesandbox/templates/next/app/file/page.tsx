@@ -20,6 +20,66 @@ const IndexPage: NextPage = () => {
                 height: document.documentElement.clientHeight
                     - 60,
             });
+            enum FileEmum {
+                DOC = 'doc',
+                DOCX = 'docx',
+                XLS = 'xls',
+                XLSX = 'xlsx',
+                PPT = 'ppt',
+                PPTX = 'pptx',
+                PDF = 'pdf',
+                ZIP = 'zip',
+                MP4 = 'mp4',
+                WEBM = 'webm',
+                UNKNOWN = 'unknown',
+            }
+
+            const files: FileEmum[] = [
+                FileEmum.DOC,
+                FileEmum.DOCX,
+                FileEmum.XLS,
+                FileEmum.XLSX,
+                FileEmum.PPT,
+                FileEmum.PPTX,
+                FileEmum.PDF,
+                FileEmum.ZIP,
+                FileEmum.MP4,
+                FileEmum.WEBM,
+                FileEmum.UNKNOWN,
+            ];
+
+            const columnCount = 4;
+            const fileWidth = 300;
+            const fileHeight = 300;
+            const fileMargin = 10;
+
+            files.forEach((file, index) => {
+                const column = index % columnCount;
+                const row = Math.floor(index / columnCount);
+                const left = 200 + column * (fileWidth + fileMargin);
+                const top = 200 + row * (fileHeight + fileMargin);
+
+                const newFile = new fabric.XFile({
+                    left: left,
+                    top: top,
+                    width: fileWidth,
+                    height: fileHeight,
+                    fill: 'red',
+                    stroke: 'blue',
+                    strokeWidth: 2,
+                    objectCaching: false,
+                    transparentCorners: false,
+                    cornerColor: 'blue',
+                    fileName: `file${index}.${file}`,
+                    fileSrc: `https://www.example.com/${file}.pdf`,
+                    id: Math.random().toString(36).substring(7),
+                });
+
+                canvas.add(newFile);
+                newFile.dirty = true;
+
+            });
+            canvas.renderAll();
 
             // // create a polygon object
             // var points = [{

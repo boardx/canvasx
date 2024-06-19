@@ -31,39 +31,39 @@ const IndexPage: NextPage = () => {
 
 
 
-            var rect1 = new fabric.Rect({
-                left: 50,
-                top: 50,
-                fill: 'red',
-                width: 100,
-                height: 100
-            });
+            // var rect1 = new fabric.Rect({
+            //     left: 50,
+            //     top: 50,
+            //     fill: 'red',
+            //     width: 100,
+            //     height: 100
+            // });
 
-            var rect2 = new fabric.Rect({
-                left: 200,
-                top: 50,
-                fill: 'green',
-                width: 100,
-                height: 100
-            });
+            // var rect2 = new fabric.Rect({
+            //     left: 200,
+            //     top: 50,
+            //     fill: 'green',
+            //     width: 100,
+            //     height: 100
+            // });
 
-            var rect3 = new fabric.Rect({
-                left: 350,
-                top: 50,
-                fill: 'blue',
-                width: 100,
-                height: 100
-            });
+            // var rect3 = new fabric.Rect({
+            //     left: 350,
+            //     top: 50,
+            //     fill: 'blue',
+            //     width: 100,
+            //     height: 100
+            // });
 
-            var rect4 = new fabric.Rect({
-                left: 500,
-                top: 50,
-                fill: 'yellow',
-                width: 100,
-                height: 100
-            });
+            // var rect4 = new fabric.Rect({
+            //     left: 500,
+            //     top: 50,
+            //     fill: 'yellow',
+            //     width: 100,
+            //     height: 100
+            // });
 
-            canvas.add(rect1, rect2, rect3, rect4);
+            // canvas.add(rect1, rect2, rect3, rect4);
 
             // // Create 10 RectNotes
             const rectNote1 = new fabric.XRectNotes(textValue, {
@@ -268,7 +268,7 @@ const IndexPage: NextPage = () => {
             <Canvas ref={ref} onLoad={onLoad} />
             <Typography level='body-md' style={{ backgroundColor: 'white', position: 'absolute', width: 500, right: 10, top: 10 }}>
                 {mouseInfo.map((info) => (
-                    <Box key={info}>
+                    <Box key={Math.random()}>
                         <p>{info}</p>
                     </Box>
                 ))}

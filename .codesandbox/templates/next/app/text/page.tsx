@@ -24,7 +24,7 @@ const IndexPage: NextPage = () => {
 
             // Create 10 RectNotes
             for (let i = 0; i < 1; i++) {
-                const rectNote = new fabric.FabricText(textValue, {
+                const rectNote = new fabric.XTextbox(textValue, {
                     originX: 'center',
                     originY: 'center',
                     top: 220 + i * 60,

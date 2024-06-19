@@ -10,7 +10,7 @@ export { XTextbox } from './XTextbox';
 // export { X_Object } from './X_Object';
 export { XImage } from './XImage';
 export { XConnector } from './XConnector';
-export { XFile } from './XFile';
+export { XFile } from './XFile/index';
 export { XGroup } from './XGroup';
 export { XURL } from './XURL';
 

@@ -11,7 +11,7 @@ export enum WidgetType {
   XConnector = 'XConnector',
   WBCircle = 'WBCircle',
   XCircleNotes = 'XCircleNotes',
-  WBFile = 'WBFile',
+  XFile = 'XFile',
   WBGroup = 'WBGroup',
   WBImage = 'WBImage',
   WBIText = 'WBIText',

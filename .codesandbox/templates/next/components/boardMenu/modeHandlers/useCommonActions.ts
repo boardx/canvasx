@@ -10,7 +10,7 @@ import { handleSetClassForCursor } from '../../../redux/features/board.slice';
 import { getBrushCursorWithColor } from '../modeHandlers/utils';
 import { getEraserCursor } from './utils';
 
-import { noteSvg } from '../../svg/noteSvg';
+import { Rectangle, Circle, Square } from '../../svg/noteSvg';
 import { cursorInner } from '../../svg/cursorInner';
 import { BoardService } from '../../../services';
 
@@ -29,9 +29,20 @@ const useCommonActions = () => {
   const cursorColorOfPen = useSelector(
     (state: RootState) => state.board.cursorColorOfPen
   );
+  const noteType = useSelector(
+    (state: RootState) => state.widget.stickNote.noteType
+  );
 
-  const cursorNote = noteSvg;
+  const backgroundColor = useSelector(
+    (state: RootState) => state.widget.stickNote.backgroundColor
+  );
 
+  const cursorNote =
+    noteType === 'rect'
+      ? Rectangle(backgroundColor)
+      : noteType === 'circle'
+      ? Circle(backgroundColor)
+      : Square(backgroundColor);
   const handleCommonBefore = useCallback(() => {
     if (!canvas) return;
 
@@ -41,6 +52,20 @@ const useCommonActions = () => {
 
     canvas.requestRenderAll();
   }, [canvas]);
+
+  const setCursor = (cursor: any) => {
+    console.log('$$2cursor');
+    canvas.setCursor(cursor);
+    // canvas.hoverCursor = cursor;
+    canvas.getObjects().forEach((o: any) => {
+      if (o.objType === 'common') return;
+
+      o.dirty = true;
+      o.hoverCursor = cursor;
+      o.defaultCursor = cursor;
+    });
+    canvas.requestRenderAll();
+  };
 
   const handleCommonAfter = useCallback(() => {
     if (!canvas) return;
@@ -58,12 +83,12 @@ const useCommonActions = () => {
     if (!canvas) return;
     //default mode
     if (modeType === 'default') {
-      canvas.setCursor('default');
+      // canvas.setCursor('default');
 
-      canvas.defaultCursor = 'default';
+      // canvas.defaultCursor = 'default';
 
-      canvas.hoverCursor = 'move';
-
+      // canvas.hoverCursor = 'move';
+      setCursor('move');
       canvas.selection = true;
 
       //cancel drawing
@@ -79,28 +104,26 @@ const useCommonActions = () => {
     }
     //pan mode
     if (modeType === 'pan') {
-      canvas.setCursor('grab');
+      // canvas.setCursor('grab');
 
-      canvas.defaultCursor = 'grab';
+      // canvas.defaultCursor = 'grab';
 
-      canvas.hoverCursor = 'move';
-
+      // canvas.hoverCursor = 'move';
+      setCursor('grab');
       canvas.selection = true;
-
-      //cancel drawing
       canvas.freeDrawingBrush = null;
-
       canvas.isDrawingMode = false;
-
       canvas.requestRenderAll();
     }
 
     //draw mode
     if (modeType === 'draw') {
       //change mouse
-      canvas.defaultCursor = getBrushCursorWithColor(brushColor);
+      const cursor = getBrushCursorWithColor(brushColor);
 
-      canvas.hoverCursor = getBrushCursorWithColor(brushColor);
+      // canvas.hoverCursor = getBrushCursorWithColor(brushColor);
+
+      setCursor(cursor);
 
       //change mode of fabricjs
       canvas.isDrawingMode = true;
@@ -116,9 +139,12 @@ const useCommonActions = () => {
     //eraser mode
     if (modeType === 'eraser') {
       //change mouse
-      canvas.hoverCursor = getEraserCursor();
+      // canvas.hoverCursor = getEraserCursor();
 
-      canvas.defaultCursor = getEraserCursor();
+      // canvas.defaultCursor = getEraserCursor();
+      const cursor = getEraserCursor();
+
+      setCursor(cursor);
 
       canvas.selection = false;
 
@@ -132,11 +158,12 @@ const useCommonActions = () => {
     }
 
     if (modeType === 'stickNote') {
-      canvas.setCursor(`url("${cursorNote}") 0 0, auto`);
+      const cursor = `url("${cursorNote}") 0 0, auto`;
 
-      canvas.hoverCursor = `url("${cursorNote}") 0 0, auto`;
+      // canvas.hoverCursor = `url("${cursorNote}") 0 0, auto`;
 
-      canvas.defaultCursor = `url("${cursorNote}") 0 0, auto`;
+      // canvas.defaultCursor = `url("${cursorNote}") 0 0, auto`;
+      setCursor(cursor);
 
       canvas.selection = true;
 
@@ -145,18 +172,18 @@ const useCommonActions = () => {
 
       canvas.isDrawingMode = false;
 
-      //unlock objects
-      canvas.unlockObjectsInCanvas();
+      // //unlock objects
+      // canvas.unlockObjectsInCanvas();
 
       canvas.requestRenderAll();
     }
 
     if (modeType === 'text') {
-      canvas.setCursor('text');
+      setCursor('text');
 
-      canvas.defaultCursor = 'text';
+      // canvas.defaultCursor = 'text';
 
-      canvas.hoverCursor = 'text';
+      // canvas.hoverCursor = 'text';
 
       canvas.selection = true;
 
@@ -165,19 +192,19 @@ const useCommonActions = () => {
 
       canvas.isDrawingMode = false;
 
-      //unlock objects
-      canvas.unlockObjectsInCanvas();
+      // //unlock objects
+      // canvas.unlockObjectsInCanvas();
 
       canvas.requestRenderAll();
     }
 
     if (modeType === 'line') {
       //change mouse
-      canvas.setCursor('crosshair');
+      setCursor('crosshair');
 
-      canvas.hoverCursor = 'crosshair';
+      // canvas.hoverCursor = 'crosshair';
 
-      canvas.defaultCursor = 'crosshair';
+      // canvas.defaultCursor = 'crosshair';
 
       canvas.selection = false;
 
@@ -194,11 +221,11 @@ const useCommonActions = () => {
 
     if (modeType === 'shapeNote') {
       //change mouse
-      canvas.setCursor('crosshair');
+      setCursor('crosshair');
 
-      canvas.hoverCursor = 'crosshair';
+      // canvas.hoverCursor = 'crosshair';
 
-      canvas.defaultCursor = 'crosshair';
+      // canvas.defaultCursor = 'crosshair';
 
       canvas.selection = false;
 

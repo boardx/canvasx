@@ -24,7 +24,7 @@ import UtilityService from '../UtilityService';
 //* Utils  */
 // import update from "../board/render";
 // import SyncService from "../SyncService";
-import { XCanvas } from '@boardxus/canvasx';
+import { XCanvas } from '../../../../../fabric';
 
 export default class BoardService {
   public canvas: XCanvas;
@@ -44,6 +44,11 @@ export default class BoardService {
   public onlineUsersSubscription = null;
 
   public whiteBoardSubscription = null;
+
+  // public instanceOfConnector: XConnector | null = null;
+  // public startPointOfConnector: any = null;
+  // public endPointOfConnector: any = null;
+  // public dockingWidget: any = null;
 
   static getInstance(): BoardService {
     if (BoardService.service == null) {
@@ -723,7 +728,7 @@ export default class BoardService {
     //   // Set mobile-specific rendering properties for certain object types.
     //   if (
     //     store.getState().system.currentUIType === "mobile" &&
-    //     (obj.objType !== "WBFile" || obj.objType !== "WBImage")
+    //     (obj.objType !== "XFile" || obj.objType !== "WBImage")
     //   ) {
     //     obj.selectable = false;
     //     obj.lockUniScaling = true;

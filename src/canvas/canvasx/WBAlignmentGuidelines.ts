@@ -65,7 +65,7 @@ export class alignmentGuideLines {
           x,
           y
         );
-        if (this.canvas.getActiveObject().isActiveSelection())
+        if (this.canvas.getActiveObject().parent)
           this.ctx.fillText(JSON.stringify(this.activeObject), x, y + 20);
       }
       if (this.debug) {

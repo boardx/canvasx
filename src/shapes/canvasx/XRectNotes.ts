@@ -1,14 +1,9 @@
 import { classRegistry } from '../../ClassRegistry';
 import { XTextbox as Textbox } from './XTextbox';
-import { createRectNotesDefaultControls } from '../../controls/X_commonControls';
-import type {
-  TBBox,
-  TClassProperties,
-  TOriginX,
-  TOriginY,
-} from '../../typedefs';
+import type { TClassProperties, TOriginX, TOriginY } from '../../typedefs';
 import { Point } from '../../Point';
 import { XConnector } from './XConnector';
+import { createRectNotesDefaultControls } from '../../controls/X_commonControls';
 
 // this will be a separated effort
 export const rectNotesDefaultValues: Partial<TClassProperties<XRectNotes>> = {
@@ -40,7 +35,7 @@ export class XRectNotes extends Textbox {
    * @default
    */
   declare minWidth: number;
-
+  static type = 'XRectNotes';
   declare locked: boolean;
 
   declare verticalAlign: string;
@@ -96,10 +91,7 @@ export class XRectNotes extends Textbox {
   static getDefaults() {
     return {
       ...super.getDefaults(),
-      controls: {
-        ...createRectNotesDefaultControls(),
-        // mr: { /* add your desired value here */ },
-      },
+
       ...XRectNotes.ownDefaults,
     };
   }
@@ -108,6 +100,12 @@ export class XRectNotes extends Textbox {
     options: Partial<TClassProperties<XRectNotes>> = {}
   ) {
     super(text, options);
+    Object.assign(this, {
+      controls: {
+        ...createRectNotesDefaultControls(this),
+        // mr: { /* add your desired value here */ },
+      },
+    });
     this.initializeEvent();
   }
 
@@ -118,55 +116,6 @@ export class XRectNotes extends Textbox {
       .filter((widget: any) => widget.id === id);
     if (obj.length === 0) return null;
     return obj[0];
-  }
-
-  calculateControlPoint(boundingBox: TBBox, connectingPoint: Point): Point {
-    const left = boundingBox.left;
-    const top = boundingBox.top;
-    const width = boundingBox.width;
-    const height = boundingBox.height;
-
-    const right = left + width;
-    const bottom = top + height;
-
-    const connectingX = connectingPoint.x;
-    const connectingY = connectingPoint.y;
-
-    let controlX: number = 0;
-    let controlY: number = 0;
-
-    // Find the nearest border and calculate the control point outside the bounding box
-    const distances = [
-      { side: 'left', distance: Math.abs(connectingX - left) },
-      { side: 'right', distance: Math.abs(connectingX - right) },
-      { side: 'top', distance: Math.abs(connectingY - top) },
-      { side: 'bottom', distance: Math.abs(connectingY - bottom) },
-    ];
-
-    const nearestBorder = distances.reduce((min, current) =>
-      current.distance < min.distance ? current : min
-    );
-
-    switch (nearestBorder.side) {
-      case 'left':
-        controlX = left - 220;
-        controlY = connectingY;
-        break;
-      case 'right':
-        controlX = right + 220;
-        controlY = connectingY;
-        break;
-      case 'top':
-        controlX = connectingX;
-        controlY = top - 220;
-        break;
-      case 'bottom':
-        controlX = connectingX;
-        controlY = bottom + 220;
-        break;
-    }
-
-    return new Point(controlX, controlY);
   }
 
   updateConnector(point: any, connector: XConnector, type: string) {
@@ -213,8 +162,8 @@ export class XRectNotes extends Textbox {
       const transformedPoint = this.transformPointToCanvas(point);
 
       //use the connectorId to find the connector and then update the connector
-      //ts-ignore
-      const connectorObj = this.findById(connector.connectorId);
+      //@ts-ignore
+      const connectorObj = this.canvas?.findById(connector.connectorId);
 
       if (!connectorObj) return;
       console.log('connectorObj', connectorObj);

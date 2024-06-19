@@ -71,6 +71,7 @@ const useEraserActions = () => {
       }
 
       canvas.removeWidget(e.target);
+      canvas.requestRenderAll();
     },
     [canvas]
   );

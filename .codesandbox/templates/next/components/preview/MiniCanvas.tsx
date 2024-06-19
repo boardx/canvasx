@@ -1,5 +1,5 @@
 //** Import react
-import React from "react";
+import React, { useEffect } from "react";
 
 
 import IconButton from "@mui/joy/IconButton";
@@ -36,14 +36,14 @@ export default function MiniCanvas({ canvas }: { canvas: fabric.XCanvas }) {
   // const [timers, setTimers] = React.useState([]);
   // const zoomCallBack: any = React.useRef();
 
-  // useEffect(() => {
-  //   let valueSlider = 0;
-  //   valueSlider = parseInt(
-  //     ((zoomFactor == undefined ? 1 : zoomFactor) * 100).toString() || "10",
-  //     10
-  //   );
-  //   setMiniMapSize(valueSlider);
-  // }, [zoomFactor]);
+  useEffect(() => {
+    let valueSlider = 0;
+    valueSlider = parseInt(
+      ((zoomFactor == undefined ? 1 : zoomFactor) * 100).toString() || "10",
+      10
+    );
+    setMiniMapSize(valueSlider);
+  }, [zoomFactor]);
 
   // useEffect(() => {
   //   EventService.getInstance().register(
@@ -64,6 +64,7 @@ export default function MiniCanvas({ canvas }: { canvas: fabric.XCanvas }) {
     }
     handleChange(zoom);
     setMiniMapSize(zoom);
+    store.dispatch(handleSetZoomFactor(zoom / 100));
     // if (zoom === 100) {
     //   timers.forEach((timer) => {
     //     clearInterval(timer);
@@ -80,7 +81,7 @@ export default function MiniCanvas({ canvas }: { canvas: fabric.XCanvas }) {
   const handleFitToScreen = async () => {
     const zoom = await canvas?.zoomToViewAllObjects();
     handleChange(zoom);
-    // setMiniMapSize(zoom);
+    setMiniMapSize(zoom);
   };
 
   const returnDefaultZoom = () => {

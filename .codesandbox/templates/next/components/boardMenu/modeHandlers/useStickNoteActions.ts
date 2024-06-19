@@ -17,8 +17,8 @@ import { WidgetService } from '../../../services';
 import useCommonActions from './useCommonActions';
 import { stickyNoteSvg } from '../../svg/noteSvg';
 import { BoardService } from '../../../services';
-import { XCircleNotes } from '@boardxus/canvasx';
-import { XRectNotes } from '@boardxus/canvasx';
+import { XCircleNotes } from '../../../../../../fabric';
+import { XRectNotes } from '../../../../../../fabric';
 
 const cursorNote = stickyNoteSvg;
 

@@ -1,5 +1,5 @@
 //**Fabric */
-import * as fabric from '@boardxus/canvasx';
+import * as fabric from '../../../../../../fabric';
 
 //**Redux store */
 import store from '../../../redux/store';

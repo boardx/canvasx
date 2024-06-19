@@ -114,7 +114,7 @@
 //   //   sel.add(...toInsertWidgetArr);
 //   //   canvas.setActiveObject(sel);
 //   //   const currentWidget = canvas.getActiveObject();
-//   //   if (currentWidget.isActiveSelection()) {
+//   //   if (currentWidget.parent) {
 //   //     currentWidget._objects.forEach((obj) => {
 //   //       if (obj.objType === "XConnector") {
 //   //         let startObj = obj.connectorStart;
@@ -384,7 +384,7 @@
 //   //     sel.add(...toInsertWidgetArr);
 //   //     canvas.setActiveObject(sel);
 //   //     const currentWidget = canvas.getActiveObject();
-//   //     if (currentWidget.isActiveSelection()) {
+//   //     if (currentWidget.parent) {
 //   //       currentWidget._objects.forEach((obj) => {
 //   //         if (obj.objType === "XConnector") {
 //   //           let startObj = obj.connectorStart;

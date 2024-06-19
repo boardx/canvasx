@@ -36,6 +36,8 @@ import { ActiveSelection, XCanvas, XFile } from "../../../../../fabric";
 
 export default function ({ canvas }: { canvas: XCanvas }) {
 
+  // const canvas: any = BoardService.getInstance().getBoard();
+
   const [formats, setFormats] = React.useState(() => ["bold", "italic"]);
   const [left, setLeft] = React.useState(400);
   const [top, setTop] = React.useState(500);
@@ -495,11 +497,12 @@ export default function ({ canvas }: { canvas: XCanvas }) {
         ) : null} */}
         {widgetMenuList.includes("fileName") ? (
           <FileName
-            fileName={
+            canvas={canvas}
+            fileName={canvas &&
               canvas!.getActiveObject() &&
-                canvas!.getActiveObject()?.objType === "XFile"
-                ? (canvas!.getActiveObject() as XFile)?.name
-                : ""
+              canvas!.getActiveObject()?.objType === "XFile"
+              ? (canvas!.getActiveObject() as XFile)?.fileName
+              : ""
             }
           />
         ) : null}
@@ -519,7 +522,7 @@ export default function ({ canvas }: { canvas: XCanvas }) {
             fileName={
               canvas!.getActiveObject() &&
                 canvas!.getActiveObject()?.objType === "XFile"
-                ? (canvas!.getActiveObject() as XFile)?.name
+                ? (canvas!.getActiveObject() as XFile)?.fileName
                 : ""
             }
           />

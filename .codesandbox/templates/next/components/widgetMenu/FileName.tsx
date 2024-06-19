@@ -9,8 +9,9 @@ import Typography from "@mui/joy/Typography";
 import Box from "@mui/joy/Box";
 
 
-export default function FileName({ fileName }: { fileName: string }) {
+export default function FileName({ fileName, canvas }: { fileName: string, canvas: any }) {
   const { t } = useTranslation("menu");
+  const file = canvas?.getActiveObject()?.get("fileName");
   return (
     <Box
       sx={{
@@ -34,7 +35,7 @@ export default function FileName({ fileName }: { fileName: string }) {
           sx={{ fontSize: "14px", fontWeight: 400, color: "#171A1C" }}
           noWrap
         >
-          {fileName ? fileName : t("board.filedrop.fileNameError")}
+          {file ? file : t("fileNameError")}
         </Typography>
       </ToggleButton>
     </Box>
