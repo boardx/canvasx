@@ -14,4 +14,8 @@ export { XFile } from './XFile/index';
 export { XGroup } from './XGroup';
 export { XURL } from './XURL';
 
+export { XMarkdown } from './XMarkdown';
+export { XChart } from './XChart';
+export { XFrame } from './XFrame';
+
 import '../../canvas/canvasx/initializeCanvasEvents';

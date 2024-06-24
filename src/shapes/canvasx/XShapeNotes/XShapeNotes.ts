@@ -50,6 +50,16 @@ export const XShapeNotesDefaultValues: Partial<TClassProperties<XShapeNotes>> =
 interface XShapeNotesProps extends XTextboxProps {
   shapeName: string;
   id: string;
+  originX: string;
+  originY: string;
+  top: number;
+  left: number;
+  textAlign: string;
+  width: number;
+  height: number;
+  backgroundColor: string;
+  scaleX: number;
+  scaleY: number;
 }
 
 export class XShapeNotes extends XTextbox {
@@ -59,6 +69,7 @@ export class XShapeNotes extends XTextbox {
   minHeight: number = 20;
 
   static type = 'XShapeNotes';
+  objType = 'XShapeNotes';
 
   constructor(text: string, options: Partial<XShapeNotesProps>) {
     super(text, options);
@@ -273,7 +284,7 @@ export class XShapeNotes extends XTextbox {
       'aiassist',
     ];
   }
-  getWidgetMenuLength() {
+  getWidgetMenuLength(): any {
     if (this.locked) {
       return 50;
     }

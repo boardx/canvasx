@@ -268,6 +268,7 @@ export function initializeCanvasEvents(canvas: XCanvas) {
     // canvas.mouse.moved = false;
 
     // If the active object is in edit mode, we return and do nothing.
+    //@ts-ignore
     if (canvas.getActiveObject() && canvas.getActiveObject()!.isEditing) return;
 
     //If the shift key was pressed during the event, we add the target to the active selection.

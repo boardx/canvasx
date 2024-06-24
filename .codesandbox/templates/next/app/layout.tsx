@@ -101,6 +101,26 @@ export default function MyApp({ children }: { children: React.ReactNode }) {
                                 >
                                     VIEWPORT
                                 </Link>
+                                <Divider orientation="vertical" />
+                                <Link
+                                    href=" /markdown"
+                                >
+                                    MARKDOWN
+                                </Link>
+
+                                <Divider orientation="vertical" />
+                                <Link
+                                    href=" /chart"
+                                >
+                                    CHART
+                                </Link>
+
+                                <Divider orientation="vertical" />
+                                <Link
+                                    href=" /frame"
+                                >
+                                    FRAME
+                                </Link>
                             </Sheet>
                         </Container>
                     </Navbar>

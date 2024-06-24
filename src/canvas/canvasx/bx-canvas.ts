@@ -37,9 +37,8 @@ import { Circle } from '../../shapes/Circle';
 import { invertTransform, transformPoint } from '../../util';
 import { XURL } from '../../shapes/canvasx/XURL';
 import { WidgetType } from '../../shapes/canvasx/types';
-import { Textbox } from '../../shapes/Textbox';
 import { XFile } from '../../shapes/canvasx/XFile';
-import { XCircleNotes, XShapeNotes } from '../../shapes/canvasx';
+import { XCircleNotes, XImage, XShapeNotes } from '../../shapes/canvasx';
 import { isActiveSelection } from '../../util/typeAssertions';
 import { Rect } from '../../shapes/Rect';
 
@@ -2508,38 +2507,20 @@ export class XCanvas extends Canvas implements BXCanvasInterface {
         return widget;
 
       case WidgetType.XImage:
-      // // If source for image is empty, exit function
-      // if (options.src === '' || !options.src) return;
+        // If source for image is empty, exit function
+        if (options.src === '' || !options.src) return;
 
-      // // Replace 'smallPic/' with 'bigPic/' in source URL
-      // options.src = options.src.replace('smallPic/', 'bigPic/');
+        // Replace 'smallPic/' with 'bigPic/' in source URL
+        // options.src = options.src.replace('smallPic/', 'bigPic/');
 
-      // // Set original width, height and apply lock to uniform scaling
-      // options.oWidth = options.width;
-      // options.oHeight = options.height;
-      // options.lockUniScaling = true;
+        // Set original width, height and apply lock to uniform scaling
+        options.oWidth = options.width;
+        options.oHeight = options.height;
+        options.lockUniScaling = true;
 
-      // // Return a new promise
-      // return new Promise((resolve, reject) => {
-      //   // Create a new Image object
-      //   const pugImg = new Image();
-      //   pugImg.crossOrigin = 'anonymous';
-
-      //   pugImg.onload = function (img) {
-      //     // Create a '@/x-canvas/fabric' Image object and set its coords
-      //     const pug = new Image(pugImg, options);
-      //     pug.setCoords();
-
-      //     // Resolve the promise with the created image
-      //     resolve(pug);
-      //   };
-
-      //   // Set the source of the image to be the URL from the function getImageResizedURL
-      //   // pugImg.src = getImageResizedURL(
-      //   //   options,
-      //   //   store.getState().board.zoomFactor
-      //   // );
-      // });
+        widget = new XImage(options.src, options);
+        await widget.setSrc(options.src);
+        return widget;
 
       case WidgetType.XGroup:
       // // Lock the uniform scaling option to maintain proportional resizing
@@ -2627,7 +2608,7 @@ export class XCanvas extends Canvas implements BXCanvasInterface {
       // });
 
       // Case when the widget type is WBTextbox
-      case 'WBTextbox':
+      case 'XTextbox':
         // Split string where the grapheme cluster break is allowed
         options.splitByGrapheme = true;
 
@@ -2643,7 +2624,7 @@ export class XCanvas extends Canvas implements BXCanvasInterface {
         options.oneLine = false;
 
         // Create a new Textbox widget with the specified text and options
-        widget = new Textbox(options.text, options);
+        widget = new XTextbox(options.text, options);
 
         // Return the newly created widget
         return widget;
@@ -2664,7 +2645,7 @@ export class XCanvas extends Canvas implements BXCanvasInterface {
         options.oneLine = false;
 
         // Create a new Text widget with the specified text and options
-        widget = new Textbox(options.text, options);
+        widget = new XTextbox(options.text, options);
         // widget.resetResizeControls();
         // Return the newly created widget
         return widget;

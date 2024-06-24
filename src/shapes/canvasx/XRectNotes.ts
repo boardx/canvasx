@@ -36,6 +36,7 @@ export class XRectNotes extends Textbox {
    */
   declare minWidth: number;
   static type = 'XRectNotes';
+  objType: string = 'XRectNotes';
   declare locked: boolean;
 
   declare verticalAlign: string;

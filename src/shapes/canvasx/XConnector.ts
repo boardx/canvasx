@@ -113,6 +113,7 @@ const getPath = (
 
 class XConnector extends Path {
   static type = 'XConnector';
+  objType = 'Xconnector';
 
   fromPoint: XY | null;
   toPoint: XY | null;

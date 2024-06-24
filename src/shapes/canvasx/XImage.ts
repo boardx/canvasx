@@ -2,7 +2,7 @@ import { classRegistry } from '../../ClassRegistry';
 import { FabricImage } from '../Image';
 
 export class XImage extends FabricImage {
-  declare objType: string;
+  objType: string = 'XImage';
   declare zIndex: number;
   declare locked: boolean;
 

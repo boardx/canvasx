@@ -28,6 +28,14 @@ export const circleNotesDefaultValues: Partial<TClassProperties<XCircleNotes>> =
 
 export interface CircleNotesProps extends XTextboxProps {
   id: string;
+  originX: string;
+  originY: string;
+  top: number;
+  left: number;
+  textAlign: string;
+  width: number;
+  height: number;
+  backgroundColor: string;
 }
 
 /**
@@ -48,11 +56,10 @@ export class XCircleNotes extends XTextbox {
   declare radius: number;
 
   static type = 'XCircleNotes';
+  objType = 'XCircleNotes';
 
   /* boardx cusotm function */
   declare id: string;
-
-  declare objType: string;
 
   declare locked: boolean;
 

@@ -182,6 +182,9 @@ export {
   XFile,
   XGroup,
   XURL,
+  XMarkdown,
+  XChart,
+  XFrame,
 } from './src/shapes/canvasx';
 
 export { XCanvas } from './src/canvas/canvasx/bx-canvas';

@@ -11,7 +11,7 @@ import MenuBar from './boardMenu/MenuBar';
 import { BoardService } from '../services';
 import { changeMode } from '../redux/features/mode.slice';
 import store from '../redux/store';
-import useLineActions from '../components/boardMenu/modeHandlers/useLineActions';
+import loadCopyPasteService from './copyPasteService';
 
 // declare global {
 //   var canvas: fabric.XCanvas | undefined;
@@ -24,15 +24,11 @@ export const Canvas = React.forwardRef<
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [canvas, setCanvas] = useState(null as fabric.XCanvas | null);
 
-  const { handleLineBefore,
-    handleLineAfter,
-    handleLineMouseDown,
-    handleLineMouseMove,
-    handleLineMouseUp,
-    handleLineShortCut } = useLineActions();
+
 
   useEffect(() => {
-    if (!canvasRef.current) {
+
+    if (!canvasRef.current || canvas) {
       return;
     }
 
@@ -47,6 +43,11 @@ export const Canvas = React.forwardRef<
     BoardService.getInstance().setBoard(canvasInstance);
 
     setCanvas(canvasInstance); // Update the type of the setCanvas argument
+    // EventService.getInstance().listenCanvasDomEvents();
+    // EventService.getInstance().listenWindowEvents();
+    // EventService.getInstance().listenTriggerEvents();
+    // EventService.getInstance().listenCanvasActionEvents();
+    loadCopyPasteService(canvasInstance);
 
     const alignmentGuidelines = new fabric.alignmentGuideLines(canvasInstance);
     alignmentGuidelines.initializeEvents();
@@ -213,10 +214,11 @@ export const Canvas = React.forwardRef<
       // and should not affect react
       canvasInstance.dispose();
     };
-  }, [canvasRef, onLoad]);
+  }, []);
 
   return <>
-    <canvas ref={canvasRef} />
+
+    <canvas tabIndex={0} ref={canvasRef} />
     <MiniCanvas canvas={canvas!} />
     {canvas && <WidgetMenu canvas={canvas!} />}
     <MenuBar />

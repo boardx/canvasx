@@ -4,12 +4,12 @@
 
 //**Services */
 import EventNames from './EventNames';
-// import { bindEvents } from "../board/canvas/initialize/initializeShortcut";
+import { bindEvents } from './InitializeShortcut';
 // import filedropUploadCallback from "../board/components/filedropUploadCallback";
 // import { switchInteractionMode } from "../board/canvas/initialize/initializeCanvasEvents";
 
 //**Hammerjs */
-// const Hammer = require("hammerjs");
+// const Hammer = require('hammerjs');
 
 //**rxjs */
 
@@ -42,7 +42,7 @@ export default class EventService {
 
     this._listenTriggerEventsHandlers = false;
 
-    this.listenWindowEvents();
+    // this.listenWindowEvents();
 
     // this.handleCanvasCutBound = (e: any) => this.handleCanvasCut(e);
 
@@ -53,18 +53,18 @@ export default class EventService {
     return this._eventHandlers;
   }
 
-  listenWindowEvents() {
-    window.addEventListener('resize', (e: any) =>
-      this.trigger(EventNames.WINDOW_RESIZE, e)
-    );
-    window.addEventListener('gesturestart', (e: any) =>
-      this.trigger(EventNames.WINDOW_GESTURE_START, e)
-    );
-    window.addEventListener('gesturechange', (e: any) =>
-      this.trigger(EventNames.WINDOW_GESTURE_CHANGE, e)
-    );
-    window.addEventListener('contextmenu', this.handleContextmenu, true);
-  }
+  // listenWindowEvents() {
+  //   window.addEventListener('resize', (e: any) =>
+  //     this.trigger(EventNames.WINDOW_RESIZE, e)
+  //   );
+  //   window.addEventListener('gesturestart', (e: any) =>
+  //     this.trigger(EventNames.WINDOW_GESTURE_START, e)
+  //   );
+  //   window.addEventListener('gesturechange', (e: any) =>
+  //     this.trigger(EventNames.WINDOW_GESTURE_CHANGE, e)
+  //   );
+  //   window.addEventListener('contextmenu', this.handleContextmenu, true);
+  // }
 
   listenCanvasDomEvents() {
     const canvas: XCanvas = BoardService.getInstance().getBoard();
@@ -73,7 +73,7 @@ export default class EventService {
     // switchInteractionMode(canvas.interactionMode);
 
     //bing shortcut key events
-    // bindEvents();
+    bindEvents(canvas);
     //listen dragover event on canvas
     document.addEventListener('dragover', this.onCanvasDragOver, true);
     //listen paste event on canvas
@@ -92,7 +92,7 @@ export default class EventService {
   }
 
   unMountCanvasDomEvents() {
-    window.removeEventListener('contextmenu', this.handleContextmenu, true);
+    // window.removeEventListener('contextmenu', this.handleContextmenu, true);
     document.removeEventListener('dragover', this.onCanvasDragOver, true);
     // document.removeEventListener("paste", this.handleCanvasPaste, true);
     document.removeEventListener('cut', this.handleCanvasCutBound, true);

@@ -6,7 +6,7 @@ import { useRef, useCallback } from 'react';
 import { Canvas } from '../../components/Canvas';
 
 // import { RectNotes } from '../../../../src/shapes/RectNotes';
-export const shapeList = [
+const shapeList = [
     {
         name: 'rect',
         path: 'M-50,-50L50,-50 50,50 -50,50z',

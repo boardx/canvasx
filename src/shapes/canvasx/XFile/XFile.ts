@@ -20,6 +20,15 @@ export type XFileProps = ImageProps & {
   fileName: string;
   previewImage: string;
   fileType: FileType;
+
+  originX: string;
+  originY: string;
+  top: number;
+  left: number;
+
+  width: number;
+  height: number;
+  backgroundColor: string;
 };
 
 export const XFileDefaultValues: Partial<XFileProps> = {

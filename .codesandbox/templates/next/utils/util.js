@@ -7,7 +7,7 @@ import * as fabric from "../../../../../fabric";
 //todo
 import store from "../redux/store";
 //**Import i18n */
-import WebFont from "webfontloader";
+// import WebFont from "webfontloader";
 import {
   handleSetArrowSelected,
   handleSetFileSelected,
@@ -162,15 +162,15 @@ Util.getRightObject = function (objects) {
 };
 
 Util.loadWebFont = async function (font) {
-  const WebFontConfig = {
-    google: {
-      api: "https://fonts.googleapis.com/css",
-      families: [font],
-    },
-    timeout: 3000, // Set the timeout to two seconds
-  };
+  // const WebFontConfig = {
+  //   google: {
+  //     api: "https://fonts.googleapis.com/css",
+  //     families: [font],
+  //   },
+  //   timeout: 3000, // Set the timeout to two seconds
+  // };
 
-  await WebFont.load(WebFontConfig);
+  // await WebFont.load(WebFontConfig);
 };
 
 // 将dataURI转换为blob

@@ -35,6 +35,7 @@ export const XTextboxProps: Partial<TClassProperties<XTextbox>> = {};
  */
 export class XTextbox extends Textbox {
   static type = 'XTextbox';
+  static objType = 'XTextbox';
   /**
    * Minimum width of textbox, in pixels.
    * @type Number
@@ -42,8 +43,7 @@ export class XTextbox extends Textbox {
    */
   declare minWidth: number;
 
-  /* boardx cusotm function */
-  declare objType: string;
+ 
   declare tempTop: number;
 
   declare hasNoText: boolean;
