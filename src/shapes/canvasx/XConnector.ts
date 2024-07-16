@@ -1,6 +1,6 @@
 import { Path } from '../Path';
 import { Control } from '../../controls/Control';
-import { invertTransform, multiplyTransformMatrices } from '../../util';
+import { multiplyTransformMatrices, sendPointToPlane } from '../../util';
 import { Point, XY } from '../../Point';
 import { TMat2D } from '../../typedefs';
 import { InteractiveFabricObject } from '../Object/InteractiveObject';
@@ -8,6 +8,8 @@ import { createObjectDefaultControls } from '../../controls/commonControls';
 import { FabricObject } from '../Object/Object';
 import { Transform } from '../../EventTypeDefs';
 import { classRegistry } from '../../ClassRegistry';
+import { iMatrix } from '../../constants';
+import { createPathControls } from '../../controls/pathControl';
 
 const getPath = (
   fromPoint: XY,
@@ -47,66 +49,66 @@ const getPath = (
   let startPath = '';
   let endPath = '';
 
-  if (pathArrowTip === 'start' || pathArrowTip === 'both') {
-    const startArrowSize = 10; // Adjust the size of the start arrow tip
-    let startAngle;
+  // if (pathArrowTip === 'start' || pathArrowTip === 'both') {
+  //   const startArrowSize = 10; // Adjust the size of the start arrow tip
+  //   let startAngle;
 
-    if (pathType === 'straightPath')
-      startAngle =
-        Math.atan2(fromPoint.y - toPoint.y, fromPoint.x - toPoint.x) + Math.PI;
-    else
-      startAngle = Math.atan2(
-        control1.y - fromPoint.y,
-        control1.x - fromPoint.x
-      );
+  //   if (pathType === 'straightPath')
+  //     startAngle =
+  //       Math.atan2(fromPoint.y - toPoint.y, fromPoint.x - toPoint.x) + Math.PI;
+  //   else
+  //     startAngle = Math.atan2(
+  //       control1.y - fromPoint.y,
+  //       control1.x - fromPoint.x
+  //     );
 
-    const startArrow1X =
-      fromPoint.x +
-      offsetX +
-      startArrowSize * Math.cos(startAngle + Math.PI / 6);
-    const startArrow1Y =
-      fromPoint.y +
-      offsetY +
-      startArrowSize * Math.sin(startAngle + Math.PI / 6);
-    const startArrow2X =
-      fromPoint.x +
-      offsetX +
-      startArrowSize * Math.cos(startAngle - Math.PI / 6);
-    const startArrow2Y =
-      fromPoint.y +
-      offsetY +
-      startArrowSize * Math.sin(startAngle - Math.PI / 6);
+  //   const startArrow1X =
+  //     fromPoint.x +
+  //     offsetX +
+  //     startArrowSize * Math.cos(startAngle + Math.PI / 6);
+  //   const startArrow1Y =
+  //     fromPoint.y +
+  //     offsetY +
+  //     startArrowSize * Math.sin(startAngle + Math.PI / 6);
+  //   const startArrow2X =
+  //     fromPoint.x +
+  //     offsetX +
+  //     startArrowSize * Math.cos(startAngle - Math.PI / 6);
+  //   const startArrow2Y =
+  //     fromPoint.y +
+  //     offsetY +
+  //     startArrowSize * Math.sin(startAngle - Math.PI / 6);
 
-    startPath = `M ${startArrow1X} ${startArrow1Y} L ${fromPoint.x + offsetX} ${
-      fromPoint.y + offsetY
-    } L ${startArrow2X} ${startArrow2Y}`;
-  }
+  //   startPath = `M ${startArrow1X} ${startArrow1Y} L ${fromPoint.x + offsetX} ${
+  //     fromPoint.y + offsetY
+  //   } L ${startArrow2X} ${startArrow2Y}`;
+  // }
 
-  if (pathArrowTip === 'end' || pathArrowTip === 'both') {
-    const endArrowSize = 10; // Adjust the size of the end arrow tip
-    let endAngle;
-    if (pathType === 'straightPath') {
-      endAngle = Math.atan2(toPoint.y - fromPoint.y, toPoint.x - fromPoint.x);
-    } else {
-      endAngle = Math.atan2(toPoint.y - control2.y, toPoint.x - control2.x);
-    }
+  // if (pathArrowTip === 'end' || pathArrowTip === 'both') {
+  //   const endArrowSize = 10; // Adjust the size of the end arrow tip
+  //   let endAngle;
+  //   if (pathType === 'straightPath') {
+  //     endAngle = Math.atan2(toPoint.y - fromPoint.y, toPoint.x - fromPoint.x);
+  //   } else {
+  //     endAngle = Math.atan2(toPoint.y - control2.y, toPoint.x - control2.x);
+  //   }
 
-    const endArrow1X =
-      toPoint.x + offsetX - endArrowSize * Math.cos(endAngle - Math.PI / 6);
-    const endArrow1Y =
-      toPoint.y + offsetY - endArrowSize * Math.sin(endAngle - Math.PI / 6);
-    const endArrow2X =
-      toPoint.x + offsetX - endArrowSize * Math.cos(endAngle + Math.PI / 6);
-    const endArrow2Y =
-      toPoint.y + offsetY - endArrowSize * Math.sin(endAngle + Math.PI / 6);
+  //   const endArrow1X =
+  //     toPoint.x + offsetX - endArrowSize * Math.cos(endAngle - Math.PI / 6);
+  //   const endArrow1Y =
+  //     toPoint.y + offsetY - endArrowSize * Math.sin(endAngle - Math.PI / 6);
+  //   const endArrow2X =
+  //     toPoint.x + offsetX - endArrowSize * Math.cos(endAngle + Math.PI / 6);
+  //   const endArrow2Y =
+  //     toPoint.y + offsetY - endArrowSize * Math.sin(endAngle + Math.PI / 6);
 
-    endPath = `M ${endArrow1X} ${endArrow1Y} L ${toPoint.x + offsetX} ${
-      toPoint.y + offsetY
-    } L ${endArrow2X} ${endArrow2Y}`;
-  }
+  //   endPath = `M ${endArrow1X} ${endArrow1Y} L ${toPoint.x + offsetX} ${
+  //     toPoint.y + offsetY
+  //   } L ${endArrow2X} ${endArrow2Y}`;
+  // }
 
   // Combine all parts of the path
-  path = `${startPath} ${path} ${endPath}`;
+  // path = `${startPath} ${path} ${endPath}`;
 
   return path;
 };
@@ -146,6 +148,7 @@ class XConnector extends Path {
       { x: 0, y: 0 },
       style
     );
+    console.log({ path });
     super(path, options);
     this.initialize();
     this.type = 'XConnector';
@@ -171,6 +174,7 @@ class XConnector extends Path {
       this,
       new Point(control2)
     );
+
     // if (!this.canvas) return;
     // let from = new Point(fromPoint).transform(this.canvas!.viewportTransform);
     // let to = new Point(toPoint).transform(this.canvas!.viewportTransform);
@@ -191,54 +195,55 @@ class XConnector extends Path {
 
     this.controls = {
       ...createObjectDefaultControls,
-      start: new Control({
-        x: 0,
-        y: 0,
-        offsetX: localFromPoint.x,
-        offsetY: localFromPoint.y,
-        mouseDownHandler: this._mouseDownControl.bind(this),
-        mouseUpHandler: this._mouseUpControl.bind(this),
-        positionHandler: this._positionControl.bind(this),
-        actionHandler: this.dragActionHandler.bind(this, 'start'),
-        cursorStyle: 'crosshair',
-        render: this._renderControl.bind(this, 'start'),
-      }),
-      end: new Control({
-        x: 0,
-        y: 0,
-        offsetX: localToPoint.x,
-        offsetY: localToPoint.y,
-        mouseDownHandler: this._mouseDownControl.bind(this),
-        mouseUpHandler: this._mouseUpControl.bind(this),
-        positionHandler: this._positionControl.bind(this),
-        actionHandler: this.dragActionHandler.bind(this, 'end'),
-        cursorStyle: 'crosshair',
-        render: this._renderControl.bind(this, 'end'),
-      }),
-      control1: new Control({
-        x: 0,
-        y: 0,
-        offsetX: localControl1.x,
-        offsetY: localControl1.y,
-        mouseDownHandler: this._mouseDownControl.bind(this),
-        mouseUpHandler: this._mouseUpControl.bind(this),
-        positionHandler: this._positionControl.bind(this),
-        actionHandler: this.dragActionHandler.bind(this, 'control1'),
-        cursorStyle: 'crosshair',
-        render: this._renderControl.bind(this, 'control1'),
-      }),
-      control2: new Control({
-        x: 0,
-        y: 0,
-        offsetX: localControl2.x,
-        offsetY: localControl2.y,
-        mouseDownHandler: this._mouseDownControl.bind(this),
-        mouseUpHandler: this._mouseUpControl.bind(this),
-        positionHandler: this._positionControl.bind(this),
-        actionHandler: this.dragActionHandler.bind(this, 'control2'),
-        cursorStyle: 'crosshair',
-        render: this._renderControl.bind(this, 'control2'),
-      }),
+      ...createPathControls(this),
+      // start: new Control({
+      //   x: 0,
+      //   y: 0,
+      //   offsetX: localFromPoint.x,
+      //   offsetY: localFromPoint.y,
+      //   mouseDownHandler: this._mouseDownControl.bind(this),
+      //   mouseUpHandler: this._mouseUpControl.bind(this),
+      //   positionHandler: this._positionControl.bind(this),
+      //   actionHandler: this.dragActionHandler.bind(this, 'start'),
+      //   cursorStyle: 'crosshair',
+      //   render: this._renderControl.bind(this, 'start'),
+      // }),
+      // end: new Control({
+      //   x: 0,
+      //   y: 0,
+      //   offsetX: localToPoint.x,
+      //   offsetY: localToPoint.y,
+      //   mouseDownHandler: this._mouseDownControl.bind(this),
+      //   mouseUpHandler: this._mouseUpControl.bind(this),
+      //   positionHandler: this._positionControl.bind(this),
+      //   actionHandler: this.dragActionHandler.bind(this, 'end'),
+      //   cursorStyle: 'crosshair',
+      //   render: this._renderControl.bind(this, 'end'),
+      // }),
+      // control1: new Control({
+      //   x: 0,
+      //   y: 0,
+      //   offsetX: localControl1.x,
+      //   offsetY: localControl1.y,
+      //   mouseDownHandler: this._mouseDownControl.bind(this),
+      //   mouseUpHandler: this._mouseUpControl.bind(this),
+      //   positionHandler: this._positionControl.bind(this),
+      //   actionHandler: this.dragActionHandler.bind(this, 'control1'),
+      //   cursorStyle: 'crosshair',
+      //   render: this._renderControl.bind(this, 'control1'),
+      // }),
+      // control2: new Control({
+      //   x: 0,
+      //   y: 0,
+      //   offsetX: localControl2.x,
+      //   offsetY: localControl2.y,
+      //   mouseDownHandler: this._mouseDownControl.bind(this),
+      //   mouseUpHandler: this._mouseUpControl.bind(this),
+      //   positionHandler: this._positionControl.bind(this),
+      //   actionHandler: this.dragActionHandler.bind(this, 'control2'),
+      //   cursorStyle: 'crosshair',
+      //   render: this._renderControl.bind(this, 'control2'),
+      // }),
     };
   }
 
@@ -723,25 +728,12 @@ export { XConnector };
 export const TransformPointFromObjectToCanvas = (
   object: FabricObject,
   point: Point
-) => {
-  const mObject = object.calcOwnMatrix();
-  // const mCanvas = object.getViewportTransform();
-  // const matrix = multiplyTransformMatrices(mCanvas, mObject);
-  const transformedPoint = point.transform(mObject); // transformPoint(point, matrix);
-  return transformedPoint;
-};
+) => sendPointToPlane(point, object.calcOwnMatrix(), iMatrix);
 
 export const TransformPointFromCanvasToObject = (
   object: FabricObject,
   point: Point
-) => {
-  const mObject = object.calcOwnMatrix();
-  // const mCanvas = object.canvas!.viewportTransform;
-  // const matrix = multiplyTransformMatrices(mCanvas, mObject);
-  const invertedMatrix = invertTransform(mObject);
-  const transformedPoint = point.transform(invertedMatrix);
-  return transformedPoint;
-};
+) => sendPointToPlane(point, iMatrix, object.calcOwnMatrix());
 
 export const TransformPointFromObjectToCanvas2 = (
   object: FabricObject,
