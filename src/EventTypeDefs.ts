@@ -102,7 +102,8 @@ export type TModificationEvents =
   | 'rotating'
   | 'skewing'
   | 'resizing'
-  | 'modifyPoly';
+  | 'modifyPoly'
+  | 'modifyPath';
 
 export interface ModifiedEvent<E extends Event = TPointerEvent> {
   e?: E;

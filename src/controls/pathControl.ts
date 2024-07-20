@@ -12,13 +12,13 @@ import type {
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import type { TSimpleParseCommandType } from '../util/path/typedefs';
-import { iMatrix, MODIFY_PATH } from '../constants';
+import { iMatrix } from '../constants';
 import type {
   ControlRenderer,
   ControlRenderingStyleOverride,
 } from './controlRendering';
 
-const ACTION_NAME: TModificationEvents = MODIFY_PATH;
+const ACTION_NAME: TModificationEvents = 'modifyPath';
 
 type TTransformAnchor = Transform & {
   pointIndex: number;

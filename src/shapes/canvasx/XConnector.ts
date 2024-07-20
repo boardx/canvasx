@@ -27,35 +27,6 @@ const getPath = (
   }
 };
 
-/**
- * 
- *   
-  }
-
-  if (pathArrowTip === 'end' || pathArrowTip === 'both') {
-    const endArrowSize = 10; // Adjust the size of the end arrow tip
-    let endAngle;
-    if (pathType === 'straightPath') {
-      endAngle = Math.atan2(toPoint.y - fromPoint.y, toPoint.x - fromPoint.x);
-    } else {
-      endAngle = Math.atan2(toPoint.y - control2.y, toPoint.x - control2.x);
-    }
-
-    const endArrow1X =
-      toPoint.x + offsetX - endArrowSize * Math.cos(endAngle - Math.PI / 6);
-    const endArrow1Y =
-      toPoint.y + offsetY - endArrowSize * Math.sin(endAngle - Math.PI / 6);
-    const endArrow2X =
-      toPoint.x + offsetX - endArrowSize * Math.cos(endAngle + Math.PI / 6);
-    const endArrow2Y =
-      toPoint.y + offsetY - endArrowSize * Math.sin(endAngle + Math.PI / 6);
-
-    endPath = `M ${endArrow1X} ${endArrow1Y} L ${toPoint.x + offsetX} ${
-      toPoint.y + offsetY
-    } L ${endArrow2X} ${endArrow2Y}`;
-  }
- */
-
 class XConnector extends Path {
   static type = 'XConnector';
   objType = 'Xconnector';
@@ -72,18 +43,18 @@ class XConnector extends Path {
   preTransform: TMat2D | null;
   fromObjectId: string;
   toObjectId: string;
-  declare pathType: 'curvePath' | 'straightPath' = 'curvePath';
-  declare pathArrowTip: 'none' | 'start' | 'end' | 'both' = 'both';
+  declare pathType: 'curvePath' | 'straightPath';
+  declare pathArrowTip: 'none' | 'start' | 'end' | 'both';
 
   /**
    * Contains the path to draw the arrow tip start
    */
-  declare pathStart: TSimpleParsedCommand;
+  declare pathStart: TSimpleParsedCommand[];
 
   /**
    * Contains the path to draw the arrow tip end
    */
-  declare pathEnd: TSimpleParsedCommand;
+  declare pathEnd: TSimpleParsedCommand[];
 
   constructor(
     fromPoint: XY,
@@ -113,26 +84,36 @@ class XConnector extends Path {
       //   actionHandler: this.dragActionHandler.bind(this, 'control2'),
       //   render: this._renderControl.bind(this, 'control2'),
     };
+    this.on('modifyPath', function (this: XConnector) {
+      this.calcStartEndPath();
+    });
   }
 
   /**
    * calculate the connector tips command.
    */
   calcStartEndPath() {
-    if (this.pathArrowTip === 'start' || this.pathArrowTip === 'both') {
+    this.pathStart = [];
+    this.pathEnd = [];
+
+    const { pathType, pathArrowTip } = this;
+    const firstCommand = this.path[0];
+    const lastCommand = this.path[this.path.length - 1];
+
+    const fromPoint = new Point(firstCommand[1]!, firstCommand[2]!);
+    const toPoint =
+      lastCommand[0] === 'L'
+        ? new Point(lastCommand[1]!, lastCommand[2]!)
+        : new Point(lastCommand[5]!, lastCommand[6]!);
+
+    /* Calculate Path START */
+    if (pathArrowTip === 'start' || pathArrowTip === 'both') {
       const startArrowSize = 10; // Adjust the size of the start arrow tip
 
-      const firstCommand = this.path[0];
-      const lastCommand = this.path[this.path.length - 1];
-
-      const fromPoint = new Point(firstCommand[1]!, firstCommand[2]!);
-
       const startAngle =
-        this.pathType === 'straightPath'
-          ? Math.atan2(
-              fromPoint.y - lastCommand[2]!,
-              fromPoint.x - lastCommand[1]!
-            ) + Math.PI
+        pathType === 'straightPath'
+          ? Math.atan2(fromPoint.y - toPoint.y, fromPoint.x - toPoint.x) +
+            Math.PI
           : Math.atan2(
               lastCommand[2]! - fromPoint.y,
               lastCommand[1]! - fromPoint.x
@@ -147,7 +128,37 @@ class XConnector extends Path {
       const startArrow2Y =
         fromPoint.y + startArrowSize * Math.sin(startAngle - Math.PI / 6);
 
-      this.startPath = `M ${startArrow1X} ${startArrow1Y} L ${fromPoint.x} ${fromPoint.y} L ${startArrow2X} ${startArrow2Y}`;
+      this.pathStart = [
+        ['M', startArrow1X, startArrow1Y],
+        ['L', fromPoint.x, fromPoint.y],
+        ['L', startArrow2X, startArrow2Y],
+      ];
+    }
+    /* Calculate Path End */
+    if (pathArrowTip === 'end' || pathArrowTip === 'both') {
+      const endArrowSize = 10; // Adjust the size of the end arrow tip
+      const endAngle =
+        pathType === 'straightPath'
+          ? Math.atan2(toPoint.y - fromPoint.y, toPoint.x - fromPoint.x)
+          : Math.atan2(
+              toPoint.y - lastCommand[4]!,
+              toPoint.x - lastCommand[3]!
+            );
+
+      const endArrow1X =
+        toPoint.x - endArrowSize * Math.cos(endAngle - Math.PI / 6);
+      const endArrow1Y =
+        toPoint.y - endArrowSize * Math.sin(endAngle - Math.PI / 6);
+      const endArrow2X =
+        toPoint.x - endArrowSize * Math.cos(endAngle + Math.PI / 6);
+      const endArrow2Y =
+        toPoint.y - endArrowSize * Math.sin(endAngle + Math.PI / 6);
+
+      this.pathEnd = [
+        ['M', endArrow1X, endArrow1Y],
+        ['L', toPoint.x, toPoint.y],
+        ['L', endArrow2X, endArrow2Y],
+      ];
     }
   }
 
@@ -167,37 +178,24 @@ class XConnector extends Path {
         this,
         this.path[1][0] === 'L'
           ? new Point(this.path[1][1]!, this.path[1][2]!)
-          : new Point(this.path[1][4]!, this.path[1][5]!)
+          : new Point(this.path[1][5]!, this.path[1][6]!)
       );
     }
 
-    if (control1) {
-      newControl1 = control1;
-      localControl1 = TransformPointFromCanvasToObject(
-        this,
-        new Point(control1)
-      );
-    } else {
-      localControl1 = this.control1;
-      newControl1 = TransformPointFromObjectToCanvas(
+    if (!control1) {
+      control1 = TransformPointFromObjectToCanvas(
         this,
         new Point(this.control1!)
       );
     }
 
-    if (control2) {
-      newControl2 = control2;
-      localControl2 = TransformPointFromCanvasToObject(
-        this,
-        new Point(control2)
-      );
-    } else {
-      localControl2 = this.control2;
-      newControl2 = TransformPointFromObjectToCanvas(
+    if (!control2) {
+      control2 = TransformPointFromObjectToCanvas(
         this,
         new Point(this.control2!)
       );
     }
+
     if (style) {
       this.style = style;
     }
