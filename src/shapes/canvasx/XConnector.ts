@@ -1,9 +1,11 @@
 import { Path } from '../Path';
-import { Control } from '../../controls/Control';
-import { multiplyTransformMatrices, sendPointToPlane } from '../../util';
+import {
+  multiplyTransformMatrices,
+  sendPointToPlane,
+  TSimpleParsedCommand,
+} from '../../util';
 import { Point, XY } from '../../Point';
 import { TMat2D } from '../../typedefs';
-import { InteractiveFabricObject } from '../Object/InteractiveObject';
 import { createObjectDefaultControls } from '../../controls/commonControls';
 import { FabricObject } from '../Object/Object';
 import { Transform } from '../../EventTypeDefs';
@@ -16,38 +18,43 @@ const getPath = (
   toPoint: XY,
   control1: XY,
   control2: XY,
-  offset: XY,
-  style: any,
-  isMoving = false,
-  pathType: 'curvePath' | 'straightPath' = 'curvePath',
-  pathArrowTip: 'none' | 'start' | 'end' | 'both' = 'both'
+  pathType: 'curvePath' | 'straightPath' = 'curvePath'
 ) => {
-  let path: string = '';
-  let offsetX = 0;
-  let offsetY = 0;
-
-  if (!isMoving) {
-    offsetX = -1;
-    offsetY = -1;
-  } else {
-    offsetX = offset.x;
-    offsetY = offset.y;
-  }
-
   if (pathType === 'curvePath') {
-    path = `M ${fromPoint.x + offsetX} ${fromPoint.y + offsetY} C ${
-      control1.x + offsetX
-    }, ${control1.y + offsetY}, ${control2.x + offsetX} ${
-      control2.y + offsetY
-    }, ${toPoint.x + offsetX} ${toPoint.y + offsetY}`;
+    return `M ${fromPoint.x} ${fromPoint.y} C ${control1.x}, ${control1.y}, ${control2.x} ${control2.y}, ${toPoint.x} ${toPoint.y}`;
   } else {
-    path = `M ${fromPoint.x + offsetX} ${fromPoint.y + offsetY} L ${
-      toPoint.x + offsetX
-    } ${toPoint.y + offsetY}`;
+    return `M ${fromPoint.x} ${fromPoint.y} L ${toPoint.x} ${toPoint.y}`;
+  }
+};
+
+/**
+ * 
+ *   
   }
 
-  return path;
-};
+  if (pathArrowTip === 'end' || pathArrowTip === 'both') {
+    const endArrowSize = 10; // Adjust the size of the end arrow tip
+    let endAngle;
+    if (pathType === 'straightPath') {
+      endAngle = Math.atan2(toPoint.y - fromPoint.y, toPoint.x - fromPoint.x);
+    } else {
+      endAngle = Math.atan2(toPoint.y - control2.y, toPoint.x - control2.x);
+    }
+
+    const endArrow1X =
+      toPoint.x + offsetX - endArrowSize * Math.cos(endAngle - Math.PI / 6);
+    const endArrow1Y =
+      toPoint.y + offsetY - endArrowSize * Math.sin(endAngle - Math.PI / 6);
+    const endArrow2X =
+      toPoint.x + offsetX - endArrowSize * Math.cos(endAngle + Math.PI / 6);
+    const endArrow2Y =
+      toPoint.y + offsetY - endArrowSize * Math.sin(endAngle + Math.PI / 6);
+
+    endPath = `M ${endArrow1X} ${endArrow1Y} L ${toPoint.x + offsetX} ${
+      toPoint.y + offsetY
+    } L ${endArrow2X} ${endArrow2Y}`;
+  }
+ */
 
 class XConnector extends Path {
   static type = 'XConnector';
@@ -65,8 +72,18 @@ class XConnector extends Path {
   preTransform: TMat2D | null;
   fromObjectId: string;
   toObjectId: string;
-  pathType: 'curvePath' | 'straightPath' = 'curvePath';
-  pathArrowTip: 'none' | 'start' | 'end' | 'both' = 'both';
+  declare pathType: 'curvePath' | 'straightPath' = 'curvePath';
+  declare pathArrowTip: 'none' | 'start' | 'end' | 'both' = 'both';
+
+  /**
+   * Contains the path to draw the arrow tip start
+   */
+  declare pathStart: TSimpleParsedCommand;
+
+  /**
+   * Contains the path to draw the arrow tip end
+   */
+  declare pathEnd: TSimpleParsedCommand;
 
   constructor(
     fromPoint: XY,
@@ -76,163 +93,84 @@ class XConnector extends Path {
     style: any = {},
     options: any = {}
   ) {
-    const path = getPath(
-      fromPoint,
-      toPoint,
-      control1,
-      control2,
-      { x: 0, y: 0 },
-      style
-    );
-    console.log({ path });
+    const path = getPath(fromPoint, toPoint, control1, control2);
     super(path, options);
-    this.initialize();
     this.type = 'XConnector';
     this.objectCaching = false;
     this.pathType = options.pathType || 'curvePath';
     this.pathArrowTip = options.pathArrowTip || 'both';
     this.fromId = options.fromId;
     this.toId = options.toId;
-
-    const localFromPoint = TransformPointFromCanvasToObject(
-      this,
-      new Point(fromPoint)
-    );
-    const localToPoint = TransformPointFromCanvasToObject(
-      this,
-      new Point(toPoint)
-    );
-    const localControl1 = TransformPointFromCanvasToObject(
-      this,
-      new Point(control1)
-    );
-    const localControl2 = TransformPointFromCanvasToObject(
-      this,
-      new Point(control2)
-    );
-
-    // if (!this.canvas) return;
-    // let from = new Point(fromPoint).transform(this.canvas!.viewportTransform);
-    // let to = new Point(toPoint).transform(this.canvas!.viewportTransform);
-    // let control11 = new Point(control1).transform(
-    //   this.canvas!.viewportTransform
-    // );
-    // let control21 = new Point(control2).transform(
-    //   this.canvas!.viewportTransform
-    // );
-
-    this.set({
-      fromPoint: localFromPoint,
-      toPoint: localToPoint,
-      control1: localControl1,
-      control2: localControl2,
-      style,
-    });
-
+    this.style = style;
+    this.calcStartEndPath();
     this.controls = {
       ...createObjectDefaultControls,
       ...createPathControls(this, {
         mouseDownHandler: this._mouseDownControl.bind(this),
         mouseUpHandler: this._mouseUpControl.bind(this),
+        cursorStyle: 'crosshair',
       }),
-      // start: new Control({
-      //   x: 0,
-      //   y: 0,
-      //   offsetX: localFromPoint.x,
-      //   offsetY: localFromPoint.y,
-      //   mouseDownHandler: this._mouseDownControl.bind(this),
-      //   mouseUpHandler: this._mouseUpControl.bind(this),
-      //   positionHandler: this._positionControl.bind(this),
-      //   actionHandler: this.dragActionHandler.bind(this, 'start'),
-      //   cursorStyle: 'crosshair',
-      //   render: this._renderControl.bind(this, 'start'),
-      // }),
-      // end: new Control({
-      //   x: 0,
-      //   y: 0,
-      //   offsetX: localToPoint.x,
-      //   offsetY: localToPoint.y,
-      //   mouseDownHandler: this._mouseDownControl.bind(this),
-      //   mouseUpHandler: this._mouseUpControl.bind(this),
-      //   positionHandler: this._positionControl.bind(this),
-      //   actionHandler: this.dragActionHandler.bind(this, 'end'),
-      //   cursorStyle: 'crosshair',
-      //   render: this._renderControl.bind(this, 'end'),
-      // }),
-      // control1: new Control({
-      //   x: 0,
-      //   y: 0,
-      //   offsetX: localControl1.x,
-      //   offsetY: localControl1.y,
-      //   mouseDownHandler: this._mouseDownControl.bind(this),
-      //   mouseUpHandler: this._mouseUpControl.bind(this),
-      //   positionHandler: this._positionControl.bind(this),
-      //   actionHandler: this.dragActionHandler.bind(this, 'control1'),
-      //   cursorStyle: 'crosshair',
-      //   render: this._renderControl.bind(this, 'control1'),
-      // }),
-      // control2: new Control({
-      //   x: 0,
-      //   y: 0,
-      //   offsetX: localControl2.x,
-      //   offsetY: localControl2.y,
-      //   mouseDownHandler: this._mouseDownControl.bind(this),
-      //   mouseUpHandler: this._mouseUpControl.bind(this),
-      //   positionHandler: this._positionControl.bind(this),
       //   actionHandler: this.dragActionHandler.bind(this, 'control2'),
-      //   cursorStyle: 'crosshair',
       //   render: this._renderControl.bind(this, 'control2'),
-      // }),
     };
   }
 
-  initialize() {
-    // this.setDimensions();
+  /**
+   * calculate the connector tips command.
+   */
+  calcStartEndPath() {
+    if (this.pathArrowTip === 'start' || this.pathArrowTip === 'both') {
+      const startArrowSize = 10; // Adjust the size of the start arrow tip
 
-    const { left, top, width, height, pathOffset } = this._calcDimensions();
-    console.log(' path initialize ', left, top, width, height, pathOffset);
-    this.set({
-      left,
-      top,
-      width,
-      height,
-      pathOffset,
-    });
-    this.canvas?.renderAll();
+      const firstCommand = this.path[0];
+      const lastCommand = this.path[this.path.length - 1];
+
+      const fromPoint = new Point(firstCommand[1]!, firstCommand[2]!);
+
+      const startAngle =
+        this.pathType === 'straightPath'
+          ? Math.atan2(
+              fromPoint.y - lastCommand[2]!,
+              fromPoint.x - lastCommand[1]!
+            ) + Math.PI
+          : Math.atan2(
+              lastCommand[2]! - fromPoint.y,
+              lastCommand[1]! - fromPoint.x
+            );
+
+      const startArrow1X =
+        fromPoint.x + startArrowSize * Math.cos(startAngle + Math.PI / 6);
+      const startArrow1Y =
+        fromPoint.y + startArrowSize * Math.sin(startAngle + Math.PI / 6);
+      const startArrow2X =
+        fromPoint.x + startArrowSize * Math.cos(startAngle - Math.PI / 6);
+      const startArrow2Y =
+        fromPoint.y + startArrowSize * Math.sin(startAngle - Math.PI / 6);
+
+      this.startPath = `M ${startArrow1X} ${startArrow1Y} L ${fromPoint.x} ${fromPoint.y} L ${startArrow2X} ${startArrow2Y}`;
+    }
   }
 
-  update({ fromPoint, toPoint, control1, control2, style }: any) {
-    let localFromPoint, localToPoint, localControl1, localControl2;
-
-    let newFrom, newTo, newControl1, newControl2;
-
-    this.prevLeft = this.left;
-    this.prevTop = this.top;
-    this.preCenter = this.getCenterPoint();
-    this.preTransform = this.calcTransformMatrix();
-
-    if (fromPoint) {
-      newFrom = fromPoint;
-      localFromPoint = TransformPointFromCanvasToObject(
+  /**
+   * Given the points in scene coordinates, updates the path
+   */
+  update({ fromPoint, toPoint, control1, control2, style }: any = {}) {
+    if (!fromPoint) {
+      fromPoint = TransformPointFromObjectToCanvas(
         this,
-        new Point(fromPoint)
-      );
-    } else {
-      localFromPoint = this.fromPoint;
-      newFrom = TransformPointFromObjectToCanvas(
-        this,
-        new Point(this.fromPoint!)
+        new Point(this.path[0][1]!, this.path[0][2]!)
       );
     }
 
-    if (toPoint) {
-      newTo = toPoint;
-      localToPoint = TransformPointFromCanvasToObject(this, new Point(toPoint));
-      //   this.toPoint = localToPoint;
-    } else {
-      localToPoint = this.toPoint;
-      newTo = TransformPointFromObjectToCanvas(this, new Point(this.toPoint!));
+    if (!toPoint) {
+      toPoint = TransformPointFromObjectToCanvas(
+        this,
+        this.path[1][0] === 'L'
+          ? new Point(this.path[1][1]!, this.path[1][2]!)
+          : new Point(this.path[1][4]!, this.path[1][5]!)
+      );
     }
+
     if (control1) {
       newControl1 = control1;
       localControl1 = TransformPointFromCanvasToObject(
@@ -264,57 +202,12 @@ class XConnector extends Path {
       this.style = style;
     }
 
-    Object.assign(this, {
-      fromPoint: newFrom,
-      toPoint: newTo,
-      control1: newControl1,
-      control2: newControl2,
-      style,
-    });
-    // console.log(
-    //   'update path fromPoint',
-    //   newFrom,
-    //   'toPoint',
-    //   newTo,
-    //   'control1',
-    //   newControl1,
-    //   'control2',
-    //   newControl2,
-    //   'style',
-    //   style
-    // );
-    this.updatePath(false);
-    // const path = getPath(
-    //   newFrom,
-    //   newTo,
-    //   newControl1,
-    //   newControl2,
-    //   { x: 0, y: 0 },
-    //   style,
-    //   false
-    // );
-    // this.path = new Path(path).path;
-    // console.log('path', JSON.stringify(this.path));
+    const path = getPath(fromPoint, toPoint, control1, control2, this.style);
+    this.path = new Path(path).path;
+    this.calcStartEndPath();
+    this.dirty = true;
 
-    this.set({
-      fromPoint: localFromPoint,
-      toPoint: localToPoint,
-      control1: localControl1,
-      control2: localControl2,
-      style,
-    });
-    // this.initialize();
-
-    this.updatePath(false);
-    this.setBoundingBox(false);
-    this.setCoords();
-    // loop all the controls and update the offset
-    this.prevLeft = 0;
-    this.prevTop = 0;
-    this.preCenter = new Point(0, 0);
-    this.preTransform = null;
-
-    this.canvas?.renderAll();
+    this.canvas?.requestRenderAll();
   }
 
   _mouseDownControl(
@@ -334,6 +227,17 @@ class XConnector extends Path {
     // target.canvas!.instanceOfConnector = target;
   }
 
+  /**
+   * Compared to Path, it will render the official Path + the arrow tips.
+   * @param ctx
+   */
+  _renderPathCommands(ctx: CanvasRenderingContext2D) {
+    const path = this.path;
+    this.path = [...this.pathStart, ...this.path, ...this.pathEnd];
+    super._renderPathCommands(ctx);
+    this.path = path;
+  }
+
   _mouseUpControl(eventData: any, transform: Transform, x: number, y: number) {
     const { target } = transform;
     if (!target.canvas) {
@@ -344,22 +248,6 @@ class XConnector extends Path {
     target.dirty = true;
     target.setCoords();
     transform.target.canvas?.requestRenderAll();
-  }
-
-  _positionControl(
-    dim: Point,
-    finalMatrix: TMat2D,
-    fabricObject: InteractiveFabricObject,
-    currentControl: Control
-  ) {
-    const point = {
-      x: currentControl.offsetX,
-      y: currentControl.offsetY,
-    };
-    //@ts-ignore
-    const result = fabricObject.transformPointToViewport(point);
-
-    return result;
   }
 
   getControlPointOnCanvas(obj: any, controlName: string) {
@@ -390,6 +278,10 @@ class XConnector extends Path {
     let targetX = x,
       targetY = y;
     const currentDockingObject = target.canvas?.dockingWidget;
+
+    // Andrea, followup: currentDockingObject.hoveringControl relies on a mousemove event that gets added
+    // and removed when we start the connector drag.
+    // this logic should be resolved inside the connector.
 
     if (
       currentDockingObject &&
@@ -482,20 +374,7 @@ class XConnector extends Path {
           });
         }
         break;
-      case 'control1':
-        target.set({ control1: relevantPoint });
-        target.controls['control1'].offsetX = relevantPoint.x;
-        target.controls['control1'].offsetY = relevantPoint.y;
-
-        break;
-      case 'control2':
-        target.set({ control2: relevantPoint });
-        target.controls['control2'].offsetX = relevantPoint.x;
-        target.controls['control2'].offsetY = relevantPoint.y;
-
-        break;
     }
-
     const isMoving = true;
     target.dirty = true;
     return true;
@@ -551,36 +430,6 @@ class XConnector extends Path {
     ctx.fill();
     ctx.stroke();
     ctx.restore();
-  }
-
-  updatePath(isMoving = true) {
-    const path = getPath(
-      this.fromPoint!,
-      this.toPoint!,
-      this.control1!,
-      this.control2!,
-      this.pathOffset,
-      this.style,
-      isMoving
-    );
-
-    this.path = new Path(path).path;
-    this.dirty = true;
-  }
-  setBoundingBox(adjustPosition?: boolean) {
-    const preMatrix = this.calcTransformMatrix();
-    const { left, top, width, height, pathOffset } = this._calcDimensions();
-
-    //the new left/top after transformation
-    const newLeftTop = new Point(left, top).transform(preMatrix);
-
-    this.set({
-      left: newLeftTop.x,
-      top: newLeftTop.y,
-      width,
-      height,
-      pathOffset,
-    });
   }
 }
 
