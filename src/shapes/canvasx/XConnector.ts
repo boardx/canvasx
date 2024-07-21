@@ -30,12 +30,6 @@ const getPath = (
 class XConnector extends Path {
   static type = 'XConnector';
   objType = 'Xconnector';
-
-  fromPoint: XY | null;
-  toPoint: XY | null;
-  control1: XY | null;
-  control2: XY | null;
-  offset: XY;
   style: any;
   prevLeft: number;
   prevTop: number;
@@ -296,8 +290,6 @@ class XConnector extends Path {
       switch (commandIndex) {
         // command 0 means start of the path
         case 0:
-          target.set({ control1: relevantControlPoint });
-
           if (target.fromId) {
             const fromObject = target.canvas?.findById(target.fromId);
             if (fromObject) {
@@ -311,8 +303,6 @@ class XConnector extends Path {
 
           break;
         case this.path.length - 1:
-          target.set({ control2: relevantControlPoint });
-
           if (target.toId) {
             const toObject = target.canvas?.findById(target.toId);
             if (toObject) {
