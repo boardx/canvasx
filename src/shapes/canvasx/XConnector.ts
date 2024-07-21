@@ -5,7 +5,6 @@ import {
   TSimpleParsedCommand,
 } from '../../util';
 import { Point, XY } from '../../Point';
-import { TMat2D } from '../../typedefs';
 import { createObjectDefaultControls } from '../../controls/commonControls';
 import { FabricObject } from '../Object/Object';
 import { Transform } from '../../EventTypeDefs';
@@ -13,6 +12,7 @@ import { classRegistry } from '../../ClassRegistry';
 import { iMatrix } from '../../constants';
 import { createPathControls } from '../../controls/pathControl';
 import { makePathSimpler, parsePath } from '../../util/path';
+
 const getPath = (
   fromPoint: XY,
   toPoint: XY,
@@ -31,12 +31,8 @@ class XConnector extends Path {
   static type = 'XConnector';
   objType = 'Xconnector';
   style: any;
-  prevLeft: number;
-  prevTop: number;
-  preCenter: Point;
-  preTransform: TMat2D | null;
-  fromObjectId: string;
-  toObjectId: string;
+  declare fromObjectId: string;
+  declare toObjectId: string;
   declare pathType: 'curvePath' | 'straightPath';
   declare pathArrowTip: 'none' | 'start' | 'end' | 'both';
 
