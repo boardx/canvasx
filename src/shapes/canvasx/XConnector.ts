@@ -12,7 +12,7 @@ import { Transform } from '../../EventTypeDefs';
 import { classRegistry } from '../../ClassRegistry';
 import { iMatrix } from '../../constants';
 import { createPathControls } from '../../controls/pathControl';
-
+import { makePathSimpler, parsePath } from '../../util/path';
 const getPath = (
   fromPoint: XY,
   toPoint: XY,
@@ -84,13 +84,14 @@ class XConnector extends Path {
       //   actionHandler: this.dragActionHandler.bind(this, 'control2'),
       //   render: this._renderControl.bind(this, 'control2'),
     };
-    this.on('modifyPath', function (this: XConnector) {
+    this.on('modifyPath', function (this: XConnector, evtOpt) {
       this.calcStartEndPath();
+      this.dragActionEventHandler(evtOpt.commandIndex, evtOpt.pointIndex);
     });
   }
 
   /**
-   * calculate the connector tips command.
+   * calculate the drawing commands for the connector tips
    */
   calcStartEndPath() {
     this.pathStart = [];
@@ -164,6 +165,7 @@ class XConnector extends Path {
 
   /**
    * Given the points in scene coordinates, updates the path
+   * This function is called by other objects that are moving or changing properties
    */
   update({ fromPoint, toPoint, control1, control2, style }: any = {}) {
     if (!fromPoint) {
@@ -173,26 +175,28 @@ class XConnector extends Path {
       );
     }
 
+    const finalCommand = this.path[this.path.length - 1];
+
     if (!toPoint) {
       toPoint = TransformPointFromObjectToCanvas(
         this,
-        this.path[1][0] === 'L'
-          ? new Point(this.path[1][1]!, this.path[1][2]!)
-          : new Point(this.path[1][5]!, this.path[1][6]!)
+        finalCommand[0] === 'L'
+          ? new Point(finalCommand[1]!, finalCommand[2]!)
+          : new Point(finalCommand[5]!, finalCommand[6]!)
       );
     }
 
     if (!control1) {
       control1 = TransformPointFromObjectToCanvas(
         this,
-        new Point(this.control1!)
+        new Point(finalCommand[3]!, finalCommand[4]!)
       );
     }
 
     if (!control2) {
       control2 = TransformPointFromObjectToCanvas(
         this,
-        new Point(this.control2!)
+        new Point(finalCommand[5]!, finalCommand[6]!)
       );
     }
 
@@ -200,8 +204,8 @@ class XConnector extends Path {
       this.style = style;
     }
 
-    const path = getPath(fromPoint, toPoint, control1, control2, this.style);
-    this.path = new Path(path).path;
+    const path = getPath(fromPoint, toPoint, control1, control2, this.pathType);
+    this.path = makePathSimpler(parsePath(path));
     this.calcStartEndPath();
     this.dirty = true;
 
@@ -217,12 +221,6 @@ class XConnector extends Path {
     const target = transform.target;
     target.objectCaching = false;
     transform.target.canvas?.initializeConnectorMode();
-
-    // target.canvas?.fire('mouse:down:before', {
-    //   ...eventData,
-    //   isSecondEvent: true,
-    // });
-    // target.canvas!.instanceOfConnector = target;
   }
 
   /**
@@ -259,22 +257,16 @@ class XConnector extends Path {
     return transformedPoint;
   }
 
-  //responding to control movement
-  //control is the control being moved
-  //eventData is the mouse event
-  dragActionHandler(
-    controlType: string,
-    eventData: any,
-    transform: Transform,
-    x: number,
-    y: number
-  ) {
-    const target = transform.target;
+  /**
+   * Responds to the path points being moved calculating the docking.
+   * @param commandIndex The command index in the path we are dragging
+   * @param pointIndex  the index of the X coordinate of the point we are moving in .path[commandIndex]
+   * @returns
+   */
+  dragActionEventHandler(commandIndex: number, pointIndex: number) {
+    const target = this;
     // const relevantPoint = getLocalPoint(transform, 'center', 'top', x, y);
     //@ts-ignore
-
-    let targetX = x,
-      targetY = y;
     const currentDockingObject = target.canvas?.dockingWidget;
 
     // Andrea, followup: currentDockingObject.hoveringControl relies on a mousemove event that gets added
@@ -283,35 +275,27 @@ class XConnector extends Path {
 
     if (
       currentDockingObject &&
-      currentDockingObject.controls[currentDockingObject.hoveringControl]
+      currentDockingObject.controls[currentDockingObject.hoveringControl] &&
+      currentDockingObject.calculateControlPoint
     ) {
       const hoverPoint = this.getControlPointOnCanvas(
         currentDockingObject,
         currentDockingObject.hoveringControl
       );
 
-      targetX = hoverPoint.x;
-      targetY = hoverPoint.y;
-    }
-    const relevantPoint = target.transformPointFromCanvas(
-      new Point(targetX, targetY)
-    );
+      const targetX = hoverPoint.x;
+      const targetY = hoverPoint.y;
+      const controlPoint = currentDockingObject.calculateControlPoint(
+        currentDockingObject.getBoundingRect(),
+        new Point(targetX, targetY)
+      );
+      const relevantControlPoint = target
+        .transformPointFromCanvas(controlPoint)
+        .add(this.pathOffset);
 
-    switch (controlType) {
-      case 'start':
-        target.set({ fromPoint: relevantPoint });
-        target.controls['start'].offsetX = relevantPoint.x;
-        target.controls['start'].offsetY = relevantPoint.y;
-        if (
-          currentDockingObject &&
-          currentDockingObject.calculateControlPoint
-        ) {
-          const controlPoint = currentDockingObject.calculateControlPoint(
-            currentDockingObject.getBoundingRect(),
-            new Point(targetX, targetY)
-          );
-          const relevantControlPoint =
-            target.transformPointFromCanvas(controlPoint);
+      switch (commandIndex) {
+        // command 0 means start of the path
+        case 0:
           target.set({ control1: relevantControlPoint });
 
           if (target.fromId) {
@@ -322,32 +306,11 @@ class XConnector extends Path {
               );
             }
           }
+          // register docking of this object
           target.fromId = currentDockingObject.id;
-          if (!currentDockingObject.connectors)
-            currentDockingObject.connectors = [];
-          currentDockingObject.connectors.push({
-            connectorId: target.id,
-            point: {
-              x: targetX - currentDockingObject.left,
-              y: targetY - currentDockingObject.top,
-            },
-          });
-        }
-        break;
-      case 'end':
-        target.set({ toPoint: relevantPoint });
-        target.controls['end'].offsetX = relevantPoint.x;
-        target.controls['end'].offsetY = relevantPoint.y;
-        if (
-          currentDockingObject &&
-          currentDockingObject.calculateControlPoint
-        ) {
-          const controlPoint = currentDockingObject.calculateControlPoint(
-            currentDockingObject.getBoundingRect(),
-            new Point(targetX, targetY)
-          );
-          const relevantControlPoint =
-            target.transformPointFromCanvas(controlPoint);
+
+          break;
+        case this.path.length - 1:
           target.set({ control2: relevantControlPoint });
 
           if (target.toId) {
@@ -359,23 +322,24 @@ class XConnector extends Path {
               toObject.connectors = newConnectors;
             }
           }
-
+          // register docking of this object
           target.toId = currentDockingObject.id;
-          if (!currentDockingObject.connectors)
-            currentDockingObject.connectors = [];
-          currentDockingObject.connectors.push({
-            connectorId: target.id,
-            point: {
-              x: targetX - currentDockingObject.left,
-              y: targetY - currentDockingObject.top,
-            },
-          });
-        }
-        break;
+
+          break;
+      }
+
+      if (!currentDockingObject.connectors) {
+        currentDockingObject.connectors = [];
+      }
+
+      currentDockingObject.connectors.push({
+        connectorId: target.id,
+        point: {
+          x: targetX - currentDockingObject.left,
+          y: targetY - currentDockingObject.top,
+        },
+      });
     }
-    const isMoving = true;
-    target.dirty = true;
-    return true;
   }
 
   _renderControl(
@@ -435,14 +399,14 @@ export { XConnector };
 
 // todo: why TransformPointFromObjectToCanvas and TransformPointFromObjectToCanvas2 is different? why it works for one doesn't work for another?
 export const TransformPointFromObjectToCanvas = (
-  object: FabricObject,
+  object: XConnector,
   point: Point
-) => sendPointToPlane(point, object.calcOwnMatrix(), iMatrix);
-
-export const TransformPointFromCanvasToObject = (
-  object: FabricObject,
-  point: Point
-) => sendPointToPlane(point, iMatrix, object.calcOwnMatrix());
+) =>
+  sendPointToPlane(
+    point.subtract(object.pathOffset),
+    object.calcOwnMatrix(),
+    iMatrix
+  );
 
 export const TransformPointFromObjectToCanvas2 = (
   object: FabricObject,
