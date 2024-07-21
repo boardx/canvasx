@@ -279,44 +279,20 @@ class XConnector extends Path {
 
       const targetX = hoverPoint.x;
       const targetY = hoverPoint.y;
-      const controlPoint = currentDockingObject.calculateControlPoint(
-        currentDockingObject.getBoundingRect(),
-        new Point(targetX, targetY)
-      );
-      const relevantControlPoint = target
-        .transformPointFromCanvas(controlPoint)
-        .add(this.pathOffset);
 
-      switch (commandIndex) {
-        // command 0 means start of the path
-        case 0:
-          if (target.fromId) {
-            const fromObject = target.canvas?.findById(target.fromId);
-            if (fromObject) {
-              fromObject.connectors = fromObject.connectors?.filter(
-                (connector: any) => connector.connectorId !== target.id
-              );
-            }
-          }
-          // register docking of this object
-          target.fromId = currentDockingObject.id;
+      const property = commandIndex === 0 ? 'fromId' : 'toId';
+      const existingConnectionId = target[property];
 
-          break;
-        case this.path.length - 1:
-          if (target.toId) {
-            const toObject = target.canvas?.findById(target.toId);
-            if (toObject) {
-              const newConnectors = toObject.connectors?.filter(
-                (connector: any) => connector.connectorId !== target.id
-              );
-              toObject.connectors = newConnectors;
-            }
-          }
-          // register docking of this object
-          target.toId = currentDockingObject.id;
-
-          break;
+      if (existingConnectionId) {
+        const connectedObject = target.canvas?.findById(existingConnectionId);
+        if (connectedObject) {
+          connectedObject.connectors = connectedObject.connectors?.filter(
+            (connector: any) => connector.connectorId !== target.id
+          );
+        }
       }
+
+      target[commandIndex === 0 ? 'fromId' : 'toId'] = currentDockingObject.id;
 
       if (!currentDockingObject.connectors) {
         currentDockingObject.connectors = [];
