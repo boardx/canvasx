@@ -75,8 +75,6 @@ class XConnector extends Path {
         mouseUpHandler: this._mouseUpControl.bind(this),
         cursorStyle: 'crosshair',
       }),
-      //   actionHandler: this.dragActionHandler.bind(this, 'control2'),
-      //   render: this._renderControl.bind(this, 'control2'),
     };
     this.on('modifyPath', function (this: XConnector, evtOpt) {
       this.calcStartEndPath();
