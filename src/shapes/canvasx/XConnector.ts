@@ -177,14 +177,14 @@ class XConnector extends Path {
     if (!control1) {
       control1 = TransformPointFromObjectToCanvas(
         this,
-        new Point(finalCommand[3]!, finalCommand[4]!)
+        new Point(finalCommand[1]!, finalCommand[2]!)
       );
     }
 
     if (!control2) {
       control2 = TransformPointFromObjectToCanvas(
         this,
-        new Point(finalCommand[5]!, finalCommand[6]!)
+        new Point(finalCommand[3]!, finalCommand[4]!)
       );
     }
 
