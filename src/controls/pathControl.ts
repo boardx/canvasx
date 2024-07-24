@@ -28,6 +28,11 @@ type TTransformAnchor = Transform & {
 export function wrapRenderWithConnection(
   commandIndex: number,
   pointIndex: number,
+  isControlPoint: boolean,
+  options?: Partial<Control> & {
+    cpOverrides?: ControlRenderingStyleOverride;
+    pointOverrides?: ControlRenderingStyleOverride;
+  },
   commandIndexPrevious?: number,
   pointIndexPrevious?: number
 ): ControlRenderer<Path> {
@@ -39,23 +44,48 @@ export function wrapRenderWithConnection(
     styleOverride: ControlRenderingStyleOverride | undefined,
     fabricObject: Path
   ) {
+    console.log('rendering', {
+      isControlPoint,
+      commandIndex,
+      pointIndex,
+      commandIndexPrevious,
+      pointIndexPrevious,
+      options,
+    });
     const point = createPathPositionHandler(commandIndex, pointIndex)(
       ZERO,
       iMatrix,
       fabricObject
     );
-    if (commandIndexPrevious && pointIndexPrevious) {
-      const point2 = createPathPositionHandler(
-        commandIndexPrevious,
-        pointIndexPrevious
-      )(ZERO, iMatrix, fabricObject);
-      ctx.moveTo(point2.x, point2.y);
-      ctx.lineTo(left, top);
-    } else {
-      ctx.moveTo(left, top);
+    if (isControlPoint) {
+      ctx.save();
+      if (options?.cpOverrides?.cornerStrokeColor) {
+        ctx.strokeStyle = options?.cpOverrides?.cornerStrokeColor;
+      }
+      if (options?.cpOverrides?.cornerDashArray) {
+        ctx.setLineDash(options?.cpOverrides?.cornerDashArray);
+      }
+      if (commandIndexPrevious && pointIndexPrevious) {
+        const point2 = createPathPositionHandler(
+          commandIndexPrevious,
+          pointIndexPrevious
+        )(ZERO, iMatrix, fabricObject);
+        ctx.moveTo(point2.x, point2.y);
+        ctx.lineTo(left, top);
+      } else {
+        ctx.moveTo(left, top);
+      }
+      ctx.lineTo(point.x, point.y);
+      ctx.stroke();
+      if (options?.cpOverrides?.cornerColor) {
+        styleOverride = {
+          ...styleOverride,
+          cornerColor: options.cpOverrides.cornerColor,
+          cornerStrokeColor: options.cpOverrides.cornerStrokeColor,
+        };
+      }
+      ctx.restore();
     }
-    ctx.lineTo(point.x, point.y);
-    ctx.stroke();
     return Control.prototype.render.call(
       this,
       ctx,
@@ -178,7 +208,11 @@ const indexFromPrevCommand = (previousCommandType: TSimpleParseCommandType) =>
 const createControl = (
   commandIndexPos: number,
   pointIndexPos: number,
-  options?: Partial<Control>,
+  isControlPoint: boolean,
+  options?: Partial<Control> & {
+    cpOverrides?: ControlRenderingStyleOverride;
+    pointOverrides?: ControlRenderingStyleOverride;
+  },
   commandIndexConnect?: number,
   pointIndexConnect?: number,
   commandIndexConnect2?: number,
@@ -193,17 +227,23 @@ const createControl = (
           render: wrapRenderWithConnection(
             commandIndexConnect,
             pointIndexConnect,
+            isControlPoint,
+            options,
             commandIndexConnect2,
             pointIndexConnect2
           ),
         }
       : {}),
     ...options,
+    isControlPoint,
   });
 
 export function createPathControls(
   path: Path,
-  options?: Partial<Control>
+  options?: Partial<Control> & {
+    cpOverrides?: ControlRenderingStyleOverride;
+    pointOverrides?: ControlRenderingStyleOverride;
+  }
 ): Record<string, Control> {
   const controls = {} as Record<string, Control>;
   let previousCommandType: TSimpleParseCommandType = 'M';
@@ -214,6 +254,7 @@ export function createPathControls(
       controls[`c_${commandIndex}_${commandType}`] = createControl(
         commandIndex,
         command.length - 2,
+        false,
         options
       );
     }
@@ -222,6 +263,7 @@ export function createPathControls(
         controls[`c_${commandIndex}_${commandType}_CP_1`] = createControl(
           commandIndex,
           1,
+          true,
           options,
           commandIndex - 1,
           indexFromPrevCommand(previousCommandType)
@@ -229,6 +271,7 @@ export function createPathControls(
         controls[`c_${commandIndex}_${commandType}_CP_2`] = createControl(
           commandIndex,
           3,
+          true,
           options,
           commandIndex,
           5
@@ -238,6 +281,7 @@ export function createPathControls(
         controls[`c_${commandIndex}_${commandType}_CP_1`] = createControl(
           commandIndex,
           1,
+          true,
           options,
           commandIndex,
           3,

@@ -5,7 +5,6 @@ import {
   TSimpleParsedCommand,
 } from '../../util';
 import { Point, XY } from '../../Point';
-import { createObjectDefaultControls } from '../../controls/commonControls';
 import { FabricObject } from '../Object/Object';
 import { Transform } from '../../EventTypeDefs';
 import { classRegistry } from '../../ClassRegistry';
@@ -56,6 +55,10 @@ class XConnector extends Path {
   ) {
     const path = getPath(fromPoint, toPoint, control1, control2);
     super(path, options);
+    this.cornerColor = 'white';
+    this.cornerStyle = 'circle';
+    this.transparentCorners = false;
+    this.cornerStrokeColor = 'gray';
     this.type = 'XConnector';
     this.objectCaching = false;
     this.pathType = options.pathType || 'curvePath';
@@ -65,11 +68,15 @@ class XConnector extends Path {
     this.style = style;
     this.calcStartEndPath();
     this.controls = {
-      ...createObjectDefaultControls,
       ...createPathControls(this, {
         mouseDownHandler: this._mouseDownControl.bind(this),
         mouseUpHandler: this._mouseUpControl.bind(this),
         cursorStyle: 'crosshair',
+        cpOverrides: {
+          cornerColor: 'blue',
+          cornerDashArray: [5, 5],
+          cornerStrokeColor: 'gray',
+        },
       }),
     };
     this.on('modifyPath', function (this: XConnector, evtOpt) {
@@ -300,58 +307,6 @@ class XConnector extends Path {
         },
       });
     }
-  }
-
-  _renderControl(
-    controlType: string,
-    ctx: any,
-    left: number,
-    top: number,
-    styleOverride: any,
-    fabricObject: FabricObject
-  ) {
-    let color = 'white';
-    if (controlType === 'control1' || controlType === 'control2') {
-      color = 'blue';
-    }
-
-    const drawDottedLine = (targetControl: string) => {
-      const point = TransformPointFromObjectToCanvas2(
-        fabricObject,
-        new Point({
-          x: this.controls[targetControl].offsetX,
-          y: this.controls[targetControl].offsetY,
-        })
-      );
-
-      ctx.save();
-      ctx.strokeStyle = 'gray';
-      ctx.setLineDash([5, 5]); // Set the line dash pattern
-      ctx.beginPath();
-      ctx.moveTo(left, top);
-      ctx.lineTo(point.x, point.y);
-      ctx.closePath();
-      ctx.stroke();
-      ctx.restore();
-    };
-
-    if (controlType === 'control1') {
-      drawDottedLine('start');
-    }
-
-    if (controlType === 'control2') {
-      drawDottedLine('end');
-    }
-
-    ctx.save();
-    ctx.fillStyle = color;
-    ctx.strokeStyle = 'gray';
-    ctx.beginPath();
-    ctx.arc(left, top, 5, 0, Math.PI * 2, false);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-    ctx.restore();
   }
 }
 
