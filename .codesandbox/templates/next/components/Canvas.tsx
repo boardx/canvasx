@@ -222,5 +222,6 @@ export const Canvas = React.forwardRef<
     <MiniCanvas canvas={canvas!} />
     {canvas && <WidgetMenu canvas={canvas!} />}
     <MenuBar />
+
   </>
 });

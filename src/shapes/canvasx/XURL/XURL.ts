@@ -8,6 +8,7 @@ import { FabricObject } from '../../Object/FabricObject';
 import { Rect } from '../../Rect';
 
 import { WidgetMenuList } from '../MenuType';
+import { XObjectInterface } from '../XObjectInterface';
 
 export type XURLProps = ImageProps & {
   id: string;
@@ -18,6 +19,11 @@ export type XURLProps = ImageProps & {
   fileName: string;
   description: string;
   previewImage: string;
+  userId: string;
+  clientId: number;
+  zIndex: number;
+  locked: boolean;
+  boardId: string;
 };
 
 export const XURLDefaultValues: Partial<XURLProps> = {
@@ -30,7 +36,7 @@ export const XURLDefaultValues: Partial<XURLProps> = {
   transparentCorners: false,
 };
 
-export class XURL extends FabricObject {
+export class XURL extends FabricObject implements XObjectInterface {
   static objType = 'XURL';
   static type = 'XURL';
   transcription: string;
@@ -47,6 +53,13 @@ export class XURL extends FabricObject {
     'transcription',
     'vectorSrc',
     'fileSrc',
+    'previewImage',
+    'description',
+    'userId',
+    'clientId',
+    'zIndex',
+    'locked',
+    'boardId',
   ];
   constructor(options: Partial<XURLProps>) {
     super(options);
@@ -61,6 +74,12 @@ export class XURL extends FabricObject {
     this.set('vectorSrc', options.vectorSrc || '');
     this.set('fileSrc', options.fileSrc || '');
     this.set('previewImage', previewImage || '');
+    this.set('description', options.description || '');
+    this.set('userId', options.userId || '');
+    this.set('clientId', options.clientId || 0);
+    this.set('zIndex', options.zIndex || 0);
+    this.set('locked', options.locked || false);
+    this.set('boardId', options.boardId || '');
 
     this.on('mousedblclick', this.onDoubleClick.bind(this));
 
@@ -89,6 +108,38 @@ export class XURL extends FabricObject {
     this.width = 230;
     this.height = 248;
     this.loadPreviewImage(previewImage, options.fileName!);
+  }
+  extendedProperties: string[];
+
+  getContextMenuList() {
+    let menuList;
+    if (this.locked) {
+      menuList = [
+        'Bring forward',
+        'Bring to front',
+        'Send backward',
+        'Send to back',
+      ];
+    } else {
+      menuList = [
+        'Bring forward',
+        'Bring to front',
+        'Send backward',
+        'Send to back',
+        'Duplicate',
+        'Copy',
+        'Paste',
+        'Cut',
+        'Delete',
+      ];
+    }
+
+    if (this.locked) {
+      menuList.push('Unlock');
+    } else {
+      menuList.push('Lock');
+    }
+    return menuList;
   }
 
   // static getDefaults() {

@@ -32,10 +32,9 @@ const IndexPage: NextPage = () => {
                 new XMarkdown('# Title\n## Subtitle\n\n- Point 1\n- Point 2\n\n> Quote\n\n[Link](https://example.com)\n\n\n\n\n\n', { width: 500, height: 300 })
             ];
 
-            const rows = Math.ceil(components.length / 4);
+            // const rows = Math.ceil(components.length / 4);
             const spacing = 20; // spacing between components
-            const totalHeight = rows * (500 + spacing);
-            const totalWidth = 4 * (500 + spacing);
+
 
             components.forEach((component, index) => {
                 const row = Math.floor(index / 4);

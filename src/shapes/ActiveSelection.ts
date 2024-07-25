@@ -256,7 +256,7 @@ export class ActiveSelection extends Group {
 
   //  override the default behavior of `getText` to return a concatenated string of all text objects\
   // canvasX custoom method
-  getText() {
+  getText(): any {
     if (this.getObjects().length > 1) {
       const textsArray = this.getObjects().map((item) => item.getText());
       return textsArray.join('/n').trim();

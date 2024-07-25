@@ -1,14 +1,22 @@
-import { TBBox, TClassProperties, TOriginX, TOriginY } from '../../typedefs';
+import {
+  TBBox,
+  TClassProperties,
+  TOptions,
+  TOriginX,
+  TOriginY,
+} from '../../typedefs';
 import { IText } from '../IText/IText';
 import { classRegistry } from '../../ClassRegistry';
 import { createTextboxDefaultControls } from '../../controls/X_commonControls';
 import { EventName, TextAlign, WidgetType, Origin } from './types';
-import { Textbox } from '../Textbox';
+import { SerializedTextboxProps, Textbox, TextboxProps } from '../Textbox';
 
 import { isTransformCentered, getLocalPoint } from '../../controls/util';
 import { Point } from '../../Point';
 import { XConnector } from './XConnector';
 import { FabricObject } from '../Object/Object';
+import { XObjectInterface } from './XObjectInterface';
+import { ITextEvents } from '../IText/ITextBehavior';
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
 // regexes, list of properties that are not suppose to change by instances, magic consts.
 // this will be a separated effort
@@ -33,7 +41,14 @@ export const XTextboxProps: Partial<TClassProperties<XTextbox>> = {};
  * user can only change width. Height is adjusted automatically based on the
  * wrapping of lines.
  */
-export class XTextbox extends Textbox {
+export class XTextbox<
+    Props extends TOptions<TextboxProps> = Partial<TextboxProps>,
+    SProps extends SerializedTextboxProps = SerializedTextboxProps,
+    EventSpec extends ITextEvents = ITextEvents
+  >
+  extends Textbox
+  implements XObjectInterface
+{
   static type = 'XTextbox';
   static objType = 'XTextbox';
   /**
@@ -43,7 +58,6 @@ export class XTextbox extends Textbox {
    */
   declare minWidth: number;
 
- 
   declare tempTop: number;
 
   declare hasNoText: boolean;
@@ -75,6 +89,49 @@ export class XTextbox extends Textbox {
 
   static ownDefaults: Record<string, any> = textboxDefaultValues;
 
+  extendedProperties = [
+    'id', // string, the id of the object
+    'angle', //  integer, angle for recording rotating
+    'backgroundColor', // string,  background color, works when the image is transparent
+    'fill', // the font color
+    'width', // integer, width of the object
+    'height', // integer, height of the object
+    'left', // integer left for position
+    'lines', // array, the arrows array [{…}]
+    'locked', // boolean, lock status for the widget， this is connected to lock
+    'lockMovementX', // boolean, lock the verticle movement
+    'lockMovementY', // boolean, lock the horizontal movement
+    'lockScalingFlip', // boolean,  make it can not be inverted by pulling the width to the negative side
+    'objType', // object type
+    'originX', // string, Horizontal origin of transformation of an object (one of "left", "right", "center") See http://jsfiddle.net/1ow02gea/244/ on how originX/originY affect objects in groups
+    'originY', // string, Vertical origin of transformation of an object (one of "top", "bottom", "center") See http://jsfiddle.net/1ow02gea/244/ on how originX/originY affect objects in groups
+    'scaleX', // nunber, Object scale factor (horizontal)
+    'scaleY', // number, Object scale factor (vertical)
+    'selectable', // boolean, When set to `false`, an object can not be selected for modification (using either point-click-based or group-based selection). But events still fire on it.
+    'top', // integer, Top position of an object. Note that by default it's relative to object top. You can change this by setting originY={top/center/bottom}
+    'userId', // string, user identity
+    'boardId', // whiteboard id, string
+    'zIndex', // the index for the object on whiteboard, integer
+    'version', // version of the app, string
+    'isPanel', // is this a panel, boolean
+    'panelObj', // if this is a panel, the id of the panel, string
+    'relationship', // array, viewporttransform
+    'subObjList', // ["5H9qYfNGt4vizhcuS"] array list id for sub objects
+    'fontFamily', // string, font family
+    'fontSize', // integer, font size
+    'fontWeight', // integer, font weight
+    'lineHeight', // integer, font height
+    'text', // string, text
+    'textAlign', // string, alignment
+    'editable',
+    'shapeScaleX',
+    'shapeScaleY',
+    'maxHeight',
+    'tempTop',
+    'fixedScaleChange',
+    'preTop',
+  ];
+
   static getDefaults() {
     return {
       ...super.getDefaults(),
@@ -88,8 +145,51 @@ export class XTextbox extends Textbox {
     // if (this.objType !== 'WBText' && this.objType !== 'WBTextbox') {
     // this.addControls();
     // }
-    this.InitializeEvent();
-    this.resetResizeControls();
+    // this.InitializeEvent();
+    // this.resetResizeControls();
+  }
+  /* boardx extend function */
+
+  getContextMenuList() {
+    let menuList;
+    if (this.locked) {
+      menuList = [
+        'Export board',
+        'Exporting selected area',
+        'Create Share Back',
+        'Bring forward',
+        'Bring to front',
+        'Send backward',
+        'Send to back',
+        'Copy as image',
+        'Copy As Text',
+      ];
+    } else {
+      menuList = [
+        'Export board',
+        'Exporting selected area',
+        'Create Share Back',
+        'Bring forward',
+        'Bring to front',
+        'Send backward',
+        'Send to back',
+        'Duplicate',
+        'Copy',
+        'Copy as image',
+        'Copy As Text',
+        'Paste',
+        'Cut',
+        'Edit',
+        'Delete',
+      ];
+    }
+    menuList.push('Select All');
+    if (this.locked) {
+      menuList.push('Unlock');
+    } else {
+      menuList.push('Lock');
+    }
+    return menuList;
   }
 
   calculateControlPoint(boundingBox: TBBox, connectingPoint: Point): Point {
@@ -261,75 +361,6 @@ export class XTextbox extends Textbox {
     }
     return true;
   }
-
-  // /**
-  //  * @param {Number} lineIndex
-  //  * @param {Number} charIndex
-  //  * @param {Object} style
-  //  * @private
-  //  */
-  // _setStyleDeclaration(lineIndex: number, charIndex: number, style: object) {
-  //   const map = this._styleMap[lineIndex];
-  //   lineIndex = map.line;
-  //   charIndex = map.offset + charIndex;
-
-  //   this.styles[lineIndex][charIndex] = style;
-  // }
-
-  // /**
-  //  * @param {Number} lineIndex
-  //  * @param {Number} charIndex
-  //  * @private
-  //  */
-  // _deleteStyleDeclaration(lineIndex: number, charIndex: number) {
-  //   const map = this._styleMap[lineIndex];
-  //   lineIndex = map.line;
-  //   charIndex = map.offset + charIndex;
-  //   delete this.styles[lineIndex][charIndex];
-  // }
-
-  // /**
-  //  * probably broken need a fix
-  //  * Returns the real style line that correspond to the wrapped lineIndex line
-  //  * Used just to verify if the line does exist or not.
-  //  * @param {Number} lineIndex
-  //  * @returns {Boolean} if the line exists or not
-  //  * @private
-  //  */
-  // _getLineStyle(lineIndex: number): boolean {
-  //   const map = this._styleMap[lineIndex];
-  //   return !!this.styles[map.line];
-  // }
-
-  // /**
-  //  * Set the line style to an empty object so that is initialized
-  //  * @param {Number} lineIndex
-  //  * @param {Object} style
-  //  * @private
-  //  */
-  // _setLineStyle(lineIndex: number) {
-  //   const map = this._styleMap[lineIndex];
-  //   this.styles[map.line] = {};
-  // }
-
-  // /**
-  //  * Wraps text using the 'width' property of Textbox. First this function
-  //  * splits text on newlines, so we preserve newlines entered by the user.
-  //  * Then it wraps each line using the width of the Textbox by calling
-  //  * _wrapLine().
-  //  * @param {Array} lines The string array of text that is split into lines
-  //  * @param {Number} desiredWidth width you want to wrap to
-  //  * @returns {Array} Array of lines
-  //  */
-  // _wrapText(lines: Array<any>, desiredWidth: number): Array<any> {
-  //   const wrapped = [];
-  //   this.isWrapping = true;
-  //   for (let i = 0; i < lines.length; i++) {
-  //     wrapped.push(...this._wrapLine(lines[i], i, desiredWidth));
-  //   }
-  //   this.isWrapping = false;
-  //   return wrapped;
-  // }
 
   /**
    * Helper function to measure a string of text, given its lineIndex and charIndex offset
@@ -559,150 +590,8 @@ export class XTextbox extends Textbox {
     return Math.max(this.minWidth, this.dynamicMinWidth);
   }
 
-  // _removeExtraneousStyles() {
-  //   const linesToKeep = {};
-  //   for (const prop in this._styleMap) {
-  //     if (this._textLines[prop]) {
-  //       linesToKeep[this._styleMap[prop].line] = 1;
-  //     }
-  //   }
-  //   for (const prop in this.styles) {
-  //     if (!linesToKeep[prop]) {
-  //       delete this.styles[prop];
-  //     }
-  //   }
-  // }
-  // addControls() {
-  //   function renderCustomControl(ctx, left, top, fabricObject) {
-  //     const styleOverride1 = {
-  //       cornerSize: 10,
-  //       cornerStrokeColor: this.isHovering ? '#31A4F5' : '#b3cdfd',
-  //       cornerColor: this.isHovering ? '#31A4F5' : '#b3cdfd',
-  //       lineWidth: 2,
-  //     };
-  //     renderCircleControl.call(
-  //       fabricObject,
-  //       ctx,
-  //       left,
-  //       top,
-  //       styleOverride1,
-  //       fabricObject
-  //     );
-  //   }
-
-  //   this.controls.mtaStart = new Control({
-  //     x: 0,
-  //     y: -0.5,
-  //     offsetX: 0,
-  //     offsetY: -20,
-  //     render: renderCustomControl,
-  //     mouseDownHandler: (eventData, transformData) => {
-  //       this.controlMousedownProcess(transformData, 0.0, -0.5);
-  //       return true;
-  //     },
-  //     name: 'mtaStart',
-  //   });
-
-  //   this.controls.mbaStart = new Control({
-  //     x: 0,
-  //     y: 0.5,
-  //     offsetX: 0,
-  //     offsetY: 20,
-  //     render: renderCustomControl,
-  //     mouseDownHandler: (eventData, transformData) => {
-  //       this.controlMousedownProcess(transformData, 0.0, 0.5);
-  //       return true;
-  //     },
-  //     name: 'mbaStart',
-  //   });
-
-  //   this.controls.mlaStart = new Control({
-  //     x: -0.5,
-  //     y: 0,
-  //     offsetX: -20,
-  //     offsetY: 0,
-  //     render: renderCustomControl,
-  //     mouseDownHandler: (eventData, transformData) => {
-  //       this.controlMousedownProcess(transformData, -0.5, 0.0);
-  //       return true;
-  //     },
-  //     name: 'mlaStart',
-  //   });
-
-  //   this.controls.mraStart = new Control({
-  //     x: 0.5,
-  //     y: 0,
-  //     offsetX: 20,
-  //     offsetY: 0,
-  //     render: renderCustomControl,
-  //     mouseDownHandler: (eventData, transformData) => {
-  //       this.controlMousedownProcess(transformData, 0.5, 0.0);
-  //       return true;
-  //     },
-  //     name: 'mraStart',
-  //   });
-  // }
-
   controlMousedownProcess(transformData: any, rx: any, ry: any) {
     return;
-  }
-  /**
-   * Returns object representation of an instance
-   * @method toObject
-   * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-   * @return {Object} object representation of an instance
-   */
-
-  getObject() {
-    const object = {};
-
-    const keys = [
-      'id', // string, the id of the object
-      'angle', //  integer, angle for recording rotating
-      'backgroundColor', // string,  background color, works when the image is transparent
-      'fill', // the font color
-      'width', // integer, width of the object
-      'height', // integer, height of the object
-      'left', // integer left for position
-      'lines', // array, the arrows array [{…}]
-      'locked', // boolean, lock status for the widget， this is connected to lock
-      'lockMovementX', // boolean, lock the verticle movement
-      'lockMovementY', // boolean, lock the horizontal movement
-      'lockScalingFlip', // boolean,  make it can not be inverted by pulling the width to the negative side
-      'objType', // object type
-      'originX', // string, Horizontal origin of transformation of an object (one of "left", "right", "center") See http://jsfiddle.net/1ow02gea/244/ on how originX/originY affect objects in groups
-      'originY', // string, Vertical origin of transformation of an object (one of "top", "bottom", "center") See http://jsfiddle.net/1ow02gea/244/ on how originX/originY affect objects in groups
-      'scaleX', // nunber, Object scale factor (horizontal)
-      'scaleY', // number, Object scale factor (vertical)
-      'selectable', // boolean, When set to `false`, an object can not be selected for modification (using either point-click-based or group-based selection). But events still fire on it.
-      'top', // integer, Top position of an object. Note that by default it's relative to object top. You can change this by setting originY={top/center/bottom}
-      'userId', // string, user identity
-      'whiteboardId', // whiteboard id, string
-      'zIndex', // the index for the object on whiteboard, integer
-      'version', // version of the app, string
-      'isPanel', // is this a panel, boolean
-      'panelObj', // if this is a panel, the id of the panel, string
-      'relationship', // array, viewporttransform
-      'subObjList', // ["5H9qYfNGt4vizhcuS"] array list id for sub objects
-      'fontFamily', // string, font family
-      'fontSize', // integer, font size
-      'fontWeight', // integer, font weight
-      'lineHeight', // integer, font height
-      'text', // string, text
-      'textAlign', // string, alignment
-      'editable',
-      'shapeScaleX',
-      'shapeScaleY',
-      'maxHeight',
-      'tempTop',
-      'fixedScaleChange',
-      'preTop',
-    ];
-    keys.forEach((key) => {
-      //@ts-ignore
-      object[key] = this[key];
-    });
-    return object;
   }
 
   moveOrScaleHandler(e: any) {
@@ -738,14 +627,14 @@ export class XTextbox extends Textbox {
       new Point(point.x, point.y)
     );
 
-    console.log(
-      'updateConnector: point:',
-      point,
-      'control point:',
-      controlPoint,
-      connector,
-      type
-    );
+    // console.log(
+    //   'updateConnector: point:',
+    //   point,
+    //   'control point:',
+    //   controlPoint,
+    //   connector,
+    //   type
+    // );
     //if the connector is from the object, then the startpoint should be updated
     //if the connector is to the object, then the endpoint should be updated
 

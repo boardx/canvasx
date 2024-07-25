@@ -18,6 +18,9 @@ class XChart extends FabricObject {
   private canvasElement: HTMLCanvasElement | null = null;
   private needsUpdate: boolean = true; // Flag to track if update is needed
 
+  static type = 'XChart';
+  static objType = 'XChart';
+
   constructor(options: Partial<ChartObjectOptions>) {
     super(options);
     this.chartConfig = options.chartConfig!;

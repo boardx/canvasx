@@ -8,6 +8,7 @@ import { createObjectDefaultControls } from '../../controls/commonControls';
 import { FabricObject } from '../Object/Object';
 import { Transform } from '../../EventTypeDefs';
 import { classRegistry } from '../../ClassRegistry';
+import { XCanvas } from '../../canvas/canvasx/bx-canvas';
 
 const getPath = (
   fromPoint: XY,
@@ -413,7 +414,8 @@ class XConnector extends Path {
     this.prevTop = transform.target.top;
     this.preCenter = transform.target.getCenterPoint();
     this.preTransform = transform.target.calcTransformMatrix();
-    transform.target.canvas?.initializeConnectorMode();
+    const canvas = transform.target.canvas as XCanvas;
+    canvas?.initializeConnectorMode();
 
     // target.canvas?.fire('mouse:down:before', {
     //   ...eventData,
@@ -423,8 +425,9 @@ class XConnector extends Path {
   }
 
   _mouseUpControl(eventData: any, transform: Transform, x: number, y: number) {
-    transform.target.canvas?.exitConnectorMode();
-    transform.target.canvas.dockingWidget! = null;
+    const canvas = transform.target.canvas as XCanvas;
+    canvas?.exitConnectorMode();
+    canvas.dockingWidget! = null;
     transform.target.dirty = true;
     this.updatePath(false);
     this.setBoundingBox(false);
@@ -440,7 +443,7 @@ class XConnector extends Path {
     this.prevTop = 0;
     this.preCenter = new Point(0, 0);
     this.preTransform = null;
-    transform.target.canvas?.requestRenderAll();
+    canvas?.requestRenderAll();
   }
 
   _positionControl(
@@ -480,13 +483,14 @@ class XConnector extends Path {
     x: number,
     y: number
   ) {
-    const target = transform.target;
+    const target = transform.target as XConnector;
     // const relevantPoint = getLocalPoint(transform, 'center', 'top', x, y);
     //@ts-ignore
 
     let targetX = x,
       targetY = y;
-    const currentDockingObject = target.canvas?.dockingWidget;
+    const canvas = target.canvas as XCanvas;
+    const currentDockingObject = canvas?.dockingWidget;
 
     if (
       currentDockingObject &&
@@ -500,7 +504,8 @@ class XConnector extends Path {
       targetX = hoverPoint.x;
       targetY = hoverPoint.y;
     }
-    const relevantPoint = target.transformPointFromCanvas(
+    const relevantPoint = TransformPointFromCanvasToObject(
+      target,
       new Point(targetX, targetY)
     );
 
@@ -521,13 +526,16 @@ class XConnector extends Path {
             currentDockingObject.getBoundingRect(),
             new Point(targetX, targetY)
           );
-          const relevantControlPoint =
-            target.transformPointFromCanvas(controlPoint);
+          const relevantControlPoint = TransformPointFromCanvasToObject(
+            target,
+            controlPoint
+          );
           target.set({ control1: relevantControlPoint });
 
           if (target.fromId) {
-            const fromObject = target.canvas?.findById(target.fromId);
+            const fromObject = canvas?.findById(target.fromId);
             if (fromObject) {
+              //@ts-ignore
               fromObject.connectors = fromObject.connectors?.filter(
                 (connector: any) => connector.connectorId !== target.id
               );
@@ -557,11 +565,14 @@ class XConnector extends Path {
             currentDockingObject.getBoundingRect(),
             new Point(targetX, targetY)
           );
-          const relevantControlPoint =
-            target.transformPointFromCanvas(controlPoint);
+          const relevantControlPoint = TransformPointFromCanvasToObject(
+            target,
+            controlPoint
+          );
           target.set({ control2: relevantControlPoint });
 
           if (target.toId) {
+            //@ts-ignore
             const toObject = target.canvas?.findById(target.toId);
             if (toObject) {
               const newConnectors = toObject.connectors?.filter(

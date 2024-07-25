@@ -1,18 +1,18 @@
 import { classRegistry } from '../../ClassRegistry';
 import { XTextbox } from '../canvasx/XTextbox';
-import { XTextboxProps } from '../canvasx/XTextbox';
-
-import markdownit from 'markdown-it';
 import html2canvas from 'html2canvas';
 import { FabricImage } from '../../shapes/Image';
 import hljs from 'highlight.js'; // https://highlightjs.org
 
-hljs.registerLanguage(
-  'javascript',
-  require('highlight.js/lib/languages/javascript')
-);
+//@ts-ignore
+import markdownit from 'markdown-it';
+//@ts-ignore
+import javascript from 'highlight.js/lib/languages/javascript';
+import { XObjectInterface } from './XObjectInterface';
 
-interface MarkdownTextOptions extends XTextboxProps {
+hljs.registerLanguage('javascript', javascript);
+
+interface MarkdownTextOptions {
   left?: number;
   top?: number;
   width?: number;
@@ -20,12 +20,14 @@ interface MarkdownTextOptions extends XTextboxProps {
   markdownText?: string;
 }
 
-class XMarkdown extends XTextbox {
+class XMarkdown extends XTextbox implements XObjectInterface {
   public markdownText: string;
   isEditing: boolean = false;
   private renderedImage: FabricImage | null = null;
   private md: any;
 
+  static type = 'XMarkdown';
+  static objType = 'XMarkdown';
   constructor(text: string, options?: MarkdownTextOptions) {
     super(text, options);
     this.markdownText = options?.markdownText || text;
@@ -63,7 +65,7 @@ class XMarkdown extends XTextbox {
       // Highlighter function. Should return escaped HTML,
       // or '' if the source string is not changed and should be escaped externally.
       // If result starts with <pre... internal wrapper is skipped.
-      highlight: function (str, lang) {
+      highlight: function (str: string, lang: string) {
         if (lang && hljs.getLanguage(lang)) {
           try {
             return hljs.highlight(str, { language: lang }).value;

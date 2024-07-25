@@ -2,10 +2,12 @@ import { classRegistry } from '../../../ClassRegistry';
 import { createRectNotesDefaultControls } from '../../../controls/X_commonControls';
 import { getFabricDocument } from '../../../env';
 import { TClassProperties, TFiller } from '../../../typedefs';
-import { XTextbox, XTextboxProps } from '../XTextbox';
+import { XTextbox } from '../XTextbox';
 
 import { shapeList } from './types';
 import { shapeType } from './types';
+
+import { XObjectInterface } from '../XObjectInterface';
 
 export type shapeInfo = {
   name: shapeType;
@@ -47,7 +49,7 @@ export const XShapeNotesDefaultValues: Partial<TClassProperties<XShapeNotes>> =
     transparentCorners: false,
   };
 
-interface XShapeNotesProps extends XTextboxProps {
+interface XShapeNotesProps {
   shapeName: string;
   id: string;
   originX: string;
@@ -60,9 +62,17 @@ interface XShapeNotesProps extends XTextboxProps {
   backgroundColor: string;
   scaleX: number;
   scaleY: number;
+  stroke: string;
+  strokeWidth: number;
+  zIndex: number;
+  locked: boolean;
+  boardId: string;
+  userId: string;
+  clientId: number;
+  timestamp: number;
 }
 
-export class XShapeNotes extends XTextbox {
+export class XShapeNotes extends XTextbox implements XObjectInterface {
   bgShape: shapeInfo | null;
   verticalAlign = 'middle';
   maxHeight: number = 138;
@@ -82,6 +92,7 @@ export class XShapeNotes extends XTextbox {
     this.id = options.id || '';
     this.verticalAlign = this.bgShape?.verticalAlign || 'middle';
     this.textAlign = this.bgShape?.textAlign || 'center';
+
     this.resetSplitByGrapheme();
     Object.assign(this, {
       controls: { ...createRectNotesDefaultControls(this) },
@@ -91,6 +102,18 @@ export class XShapeNotes extends XTextbox {
     this.on('modified', this.handleModified);
     this.on('changed', this.handleModified);
   }
+  extendedProperties = [
+    'shapeName',
+    'id',
+    'objType',
+    'zIndex',
+    'locked',
+    'boardId',
+    'userId',
+    'clientId',
+    'timestamp',
+  ];
+
   handleModified() {
     this.canvas!.uniformScaling = false;
     this.resetSplitByGrapheme();
@@ -119,7 +142,7 @@ export class XShapeNotes extends XTextbox {
 
     const newScaleX = this.get('scaleX');
     const newScaleY = this.get('scaleY');
-    console.log(newScaleX, newScaleY);
+
     this.width *= newScaleX;
     this.height *= newScaleY;
 

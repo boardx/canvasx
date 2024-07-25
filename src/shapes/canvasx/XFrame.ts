@@ -11,6 +11,8 @@ class XFrame extends FabricObject {
   body: Rect;
   objects: Group;
   layoutManager: LayoutManager;
+  static type = 'XFrame';
+  static objType = 'XFrame';
 
   constructor(
     canvas: any,
@@ -83,7 +85,9 @@ class XFrame extends FabricObject {
     });
 
     this.objects.on('moving', (event) => {
+      //@ts-ignore
       const deltaX = event.movementX;
+      //@ts-ignore
       const deltaY = event.movementY;
 
       this.objects.getObjects().forEach((obj) => {

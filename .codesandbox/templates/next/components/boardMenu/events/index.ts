@@ -663,7 +663,7 @@ export function calcControlPointOfObjectInActiveSelection(
 }
 
 export const createShapeNote = (target: any, iconType: any) => {
-  const canvas: any = BoardService.getInstance().getBoard();
+  // const canvas: any = BoardService.getInstance().getBoard();
   const widget: any = {
     angle: 0,
     width: 1,

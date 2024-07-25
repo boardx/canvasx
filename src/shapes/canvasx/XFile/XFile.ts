@@ -10,6 +10,7 @@ import { Rect } from '../../Rect';
 import { WidgetMenuList } from '../MenuType';
 import { FileEmum } from './fileType';
 import { FileType } from './fileType';
+import { XObjectInterface } from '../XObjectInterface';
 
 export type XFileProps = ImageProps & {
   id: string;
@@ -41,7 +42,7 @@ export const XFileDefaultValues: Partial<XFileProps> = {
   transparentCorners: false,
 };
 
-export class XFile extends FabricObject {
+export class XFile extends FabricObject implements XObjectInterface {
   static objType = 'XFile';
   static type = 'XFile';
   transcription: string;
@@ -59,6 +60,13 @@ export class XFile extends FabricObject {
     'transcription',
     'vectorSrc',
     'fileSrc',
+    'userId',
+    'clientId',
+    'zIndex',
+    'locked',
+    'boardId',
+    'fileType',
+    'previewImage',
   ];
   constructor(options: Partial<XFileProps>) {
     super(options);
@@ -99,7 +107,37 @@ export class XFile extends FabricObject {
     this.height = 248;
     this.loadPreviewImage(previewImage, options.fileName!);
   }
+  extendedProperties: string[];
+  getContextMenuList() {
+    let menuList;
+    if (this.locked) {
+      menuList = [
+        'Bring forward',
+        'Bring to front',
+        'Send backward',
+        'Send to back',
+      ];
+    } else {
+      menuList = [
+        'Bring forward',
+        'Bring to front',
+        'Send backward',
+        'Send to back',
+        'Duplicate',
+        'Copy',
+        'Paste',
+        'Cut',
+        'Delete',
+      ];
+    }
+    if (this.locked) {
+      menuList.push('Unlock');
+    } else {
+      menuList.push('Lock');
+    }
 
+    return menuList;
+  }
   // static getDefaults() {
   //   return {
   //     ...super.getDefaults(),

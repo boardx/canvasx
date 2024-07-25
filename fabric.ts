@@ -188,4 +188,3 @@ export {
 } from './src/shapes/canvasx';
 
 export { XCanvas } from './src/canvas/canvasx/bx-canvas';
-export { initializeCanvasEvents } from './src/canvas/canvasx/initializeCanvasEvents';

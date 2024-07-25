@@ -1,86 +1,80 @@
 import { classRegistry } from '../../ClassRegistry';
 import { Group } from '../Group';
+import { XObjectInterface } from './XObjectInterface';
 
-export class XGroup extends Group {
-  declare objType: string;
+export class XGroup extends Group implements XObjectInterface {
   static type = 'XGroup';
-  getObject() {
-    // const object = {};
-    // const keys = [
-    //   'id',
-    //   'angle',
-    //   'backgroundColor',
-    //   'fill',
-    //   'fontFamily',
-    //   'fontSize',
-    //   'height',
-    //   'width',
-    //   'left',
-    //   'lines', // the arrows array [{…}]
-    //   'lockUniScaling',
-    //   'locked',
-    //   'fontWeight',
-    //   'lineHeight',
-    //   'obj_type',
-    //   'originX',
-    //   'originY',
-    //   'panelObj', // the parent panel string
-    //   'relationship', // relationship with panel for transform  [1.43, 0, 0, 1.43, 7.031931057304291, 16.531768328466796]
-    //   'scaleX',
-    //   'scaleY',
-    //   'selectable',
-    //   'text',
-    //   'textAlign',
-    //   'top',
-    //   'userNo',
-    //   'userId',
-    //   'whiteboardId',
-    //   'zIndex',
-    //   'version',
-    //   'isPanel',
-    //   'editable',
-    // ];
-    // keys.forEach((key) => {
-    //   //@ts-ignore
-    //   object[key] = this[key];
-    // });
-    // const objArr: any[] = [];
-    // this.getObjects().forEach((obj) => {
-    //   objArr.push(obj.getObject());
-    // });
-    // object.objectArr = objArr;
-    // return object;
+  static objType = 'XGroup';
+
+  extendedProperties = [
+    'subTargetCheck',
+    'objType',
+    'boardId',
+    'userId',
+    'timestamp',
+    'zIndex',
+    'locked',
+    'verticalAlign',
+    'lines',
+    'icon',
+    'id',
+    'selectable',
+    'objectArr',
+    'subObjList',
+    'userNo',
+  ];
+
+  getWidgetMenuList() {
+    if (this.locked) {
+      return ['objectLock'];
+    }
+    return ['objectLock', 'delete', 'aiassist'];
+  }
+
+  getWidgetMenuLength() {
+    return 60;
+  }
+
+  //  override the default behavior of `getText` to return a concatenated string of all text objects\
+  // canvasX custoom method
+  getText(): any {
+    if (this.getObjects().length > 1) {
+      const textsArray = this.getObjects().map((item) => item.getText());
+      return textsArray.join('/n').trim();
+    } else {
+      return '';
+    }
   }
 
   getContextMenuList() {
-    // let menuList;
-    // if (this.locked) {
-    //   menuList = [
-    //     'Bring forward',
-    //     'Bring to front',
-    //     'Send backward',
-    //     'Send to back',
-    //   ];
-    // } else {
-    //   menuList = [
-    //     'Ungroup',
-    //     'Bring forward',
-    //     'Bring to front',
-    //     'Send backward',
-    //     'Send to back',
-    //     'Duplicate',
-    //     'Copy',
-    //     'Paste',
-    //     'Cut',
-    //     'Delete',
-    //   ];
-    // }
-    // if (this.locked) {
-    //   menuList.push('Unlock');
-    // } else {
-    //   menuList.push('Lock');
-    // }
-    // return menuList;
+    let menuList;
+    if (this.locked) {
+      menuList = [
+        'Bring forward',
+        'Bring to front',
+        'Send backward',
+        'Send to back',
+      ];
+    } else {
+      menuList = [
+        'Ungroup',
+        'Bring forward',
+        'Bring to front',
+        'Send backward',
+        'Send to back',
+        'Duplicate',
+        'Copy',
+        'Paste',
+        'Cut',
+        'Delete',
+      ];
+    }
+    if (this.locked) {
+      menuList.push('Unlock');
+    } else {
+      menuList.push('Lock');
+    }
+    return menuList;
   }
 }
 classRegistry.setClass(XGroup);

@@ -1,6 +1,6 @@
 import { TClassProperties } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
-import { XTextbox, XTextboxProps } from './XTextbox';
+import { XTextbox } from './XTextbox';
 import { createRectNotesDefaultControls } from '../../controls/X_commonControls';
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
 // regexes, list of properties that are not suppose to change by instances, magic consts.
@@ -26,7 +26,7 @@ export const circleNotesDefaultValues: Partial<TClassProperties<XCircleNotes>> =
     transparentCorners: false,
   };
 
-export interface CircleNotesProps extends XTextboxProps {
+export interface CircleNotesProps {
   id: string;
   originX: string;
   originY: string;
@@ -687,7 +687,7 @@ export class XCircleNotes extends XTextbox {
       'aiassist',
     ];
   }
-  getWidgetMenuLength() {
+  getWidgetMenuLength(): any {
     if (this.locked) return 50;
     // if (this.isDraw) {
     //   return 308;

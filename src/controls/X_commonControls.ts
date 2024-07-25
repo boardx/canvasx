@@ -139,7 +139,7 @@ export const createObjectArrowControls = () => ({
   }),
 });
 
-export const createObjectConnectorControls = (targetObject: any) => {
+export const createObjectConnectorControls = function (targetObject: any) {
   function renderCustomControl(control, ctx, left, top, fabricObject) {
     let cornerSize, cornerColor;
 

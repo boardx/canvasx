@@ -1634,6 +1634,15 @@ export class FabricObject<
   ) {
     return this._fromObject(object, options);
   }
+
+  getText() {
+    //@ts-ignore
+    return this.text & this.text?.join('\n');
+  }
+
+  saveData(type: string, fields: string[]): boolean {
+    return true;
+  }
 }
 
 // import '../canvasx/X_Object';

@@ -50,6 +50,11 @@ export class InteractiveFabricObject<
   //canvasx specific
   declare id: string;
   declare objType: string;
+  declare userId: string;
+  declare clientId: number;
+  declare zIndex: number;
+  declare boardId: string;
+  declare locked: boolean;
 
   declare noScaleCache: boolean;
 

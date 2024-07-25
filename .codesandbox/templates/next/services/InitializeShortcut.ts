@@ -803,7 +803,7 @@ function onKeyUpDownLeftRightDownMove(e: any) {
   if (widget) {
     if (e.shiftKey) changePosition = 10;
     else changePosition = 1;
-    if (widget.obj_type === 'WBArrow') {
+    if (widget.obj_type === 'XArrow') {
       if (!widget.connectorStart && !widget.connectorEnd) {
         let { left, top } = widget;
         switch (e.keyCode) {

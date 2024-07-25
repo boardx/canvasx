@@ -1,5 +1,4 @@
 import './XActiveSelection';
-import './XObject';
 
 export { alignmentGuideLines } from '../../canvas/canvasx/WBAlignmentGuidelines';
 
@@ -17,5 +16,3 @@ export { XURL } from './XURL';
 export { XMarkdown } from './XMarkdown';
 export { XChart } from './XChart';
 export { XFrame } from './XFrame';
-
-import '../../canvas/canvasx/initializeCanvasEvents';
