@@ -72,10 +72,10 @@ class XConnector extends Path {
         mouseDownHandler: this._mouseDownControl.bind(this),
         mouseUpHandler: this._mouseUpControl.bind(this),
         cursorStyle: 'crosshair',
-        cpOverrides: {
-          cornerColor: 'blue',
-          cornerDashArray: [5, 5],
-          cornerStrokeColor: 'gray',
+        controlPointStyle: {
+          controlFill: 'blue',
+          connectionDashArray: [5, 5],
+          controlStroke: 'gray',
         },
       }),
     };
