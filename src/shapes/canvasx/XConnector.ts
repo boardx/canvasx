@@ -270,8 +270,6 @@ class XConnector extends Path {
     // and removed when we start the connector drag.
     // this logic should be resolved inside the connector.
 
-    // early return if we are dragging a control point
-
     if (
       currentDockingObject &&
       currentDockingObject.controls[currentDockingObject.hoveringControl] &&
