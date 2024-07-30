@@ -19,9 +19,9 @@ const ACTION_NAME: TModificationEvents = 'modifyPath' as const;
 type TTransformAnchor = Transform;
 
 export type PathPointControlStyle = {
-  controlFill: string;
-  controlStroke: string;
-  connectionDashArray: number[];
+  controlFill?: string;
+  controlStroke?: string;
+  connectionDashArray?: number[];
 };
 
 export const calcPathPointPosition = (
@@ -127,6 +127,7 @@ export function pathActionHandler(
       pointIndex,
     });
   }
+  return actionPerformed;
 }
 
 const indexFromPrevCommand = (previousCommandType: TSimpleParseCommandType) =>
@@ -152,6 +153,7 @@ class PathPointControl extends Control {
       ...styleOverride,
       cornerColor: this.controlFill,
       cornerStrokeColor: this.controlStroke,
+      transparentCorners: !this.controlFill,
     };
     super.render(ctx, left, top, overrides, fabricObject);
   }
@@ -216,7 +218,7 @@ const createControl = (
   commandIndexPos: number,
   pointIndexPos: number,
   isControlPoint: boolean,
-  options?: Partial<Control> & {
+  options: Partial<Control> & {
     controlPointStyle?: PathPointControlStyle;
     pointStyle?: PathPointControlStyle;
   },
@@ -232,15 +234,15 @@ const createControl = (
     connectToCommandIndex,
     connectToPointIndex,
     ...options,
-    ...(isControlPoint && options ? options.controlPointStyle : {}),
+    ...(isControlPoint ? options.controlPointStyle : options.pointStyle),
   } as Partial<PathControlPointControl>);
 
 export function createPathControls(
   path: Path,
-  options?: Partial<Control> & {
+  options: Partial<Control> & {
     controlPointStyle?: PathPointControlStyle;
     pointStyle?: PathPointControlStyle;
-  }
+  } = {}
 ): Record<string, Control> {
   const controls = {} as Record<string, Control>;
   let previousCommandType: TSimpleParseCommandType = 'M';
