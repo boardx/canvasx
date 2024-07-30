@@ -1,16 +1,10 @@
 import { Path } from '../Path';
-import {
-  multiplyTransformMatrices,
-  sendPointToPlane,
-  TSimpleParsedCommand,
-} from '../../util';
+import { sendPointToPlane, TSimpleParsedCommand } from '../../util';
 import { Point, XY } from '../../Point';
-import { FabricObject } from '../Object/Object';
 import { Transform } from '../../EventTypeDefs';
 import { classRegistry } from '../../ClassRegistry';
 import { iMatrix } from '../../constants';
 import { createPathControls } from '../../controls/pathControl';
-import { makePathSimpler, parsePath } from '../../util/path';
 
 const getPath = (
   fromPoint: XY,
@@ -163,36 +157,37 @@ class XConnector extends Path {
    * This function is called by other objects that are moving or changing properties
    */
   update({ fromPoint, toPoint, control1, control2, style }: any = {}) {
-    if (!fromPoint) {
-      fromPoint = TransformPointFromObjectToCanvas(
-        this,
-        new Point(this.path[0][1]!, this.path[0][2]!)
-      );
-    }
-
     const finalCommand = this.path[this.path.length - 1];
 
-    if (!toPoint) {
-      toPoint = TransformPointFromObjectToCanvas(
-        this,
-        finalCommand[0] === 'L'
-          ? new Point(finalCommand[1]!, finalCommand[2]!)
-          : new Point(finalCommand[5]!, finalCommand[6]!)
-      );
-    }
-
     if (!control1) {
-      control1 = TransformPointFromObjectToCanvas(
+      control1 = TransformPointFromPathToCanvas(
         this,
         new Point(finalCommand[1]!, finalCommand[2]!)
       );
     }
 
     if (!control2) {
-      control2 = TransformPointFromObjectToCanvas(
+      control2 = TransformPointFromPathToCanvas(
         this,
         new Point(finalCommand[3]!, finalCommand[4]!)
       );
+    }
+
+    if (!fromPoint) {
+      fromPoint = TransformPointFromPathToCanvas(
+        this,
+        new Point(this.path[0][1]!, this.path[0][2]!)
+      );
+    }
+
+    if (!toPoint) {
+      toPoint = TransformPointFromPathToCanvas(
+        this,
+        finalCommand[0] === 'L'
+          ? new Point(finalCommand[1]!, finalCommand[2]!)
+          : new Point(finalCommand[5]!, finalCommand[6]!)
+      );
+      finalCommand[0] === 'L' ? 1 : 5;
     }
 
     if (style) {
@@ -200,11 +195,12 @@ class XConnector extends Path {
     }
 
     const path = getPath(fromPoint, toPoint, control1, control2, this.pathType);
-    this.path = makePathSimpler(parsePath(path));
+    const { path: newPath } = new Path(path);
+    this.path = newPath;
+    this.setBoundingBox(true);
+
     this.calcStartEndPath();
     this.dirty = true;
-
-    this.canvas?.requestRenderAll();
   }
 
   _mouseDownControl(
@@ -312,8 +308,7 @@ class XConnector extends Path {
 
 export { XConnector };
 
-// todo: why TransformPointFromObjectToCanvas and TransformPointFromObjectToCanvas2 is different? why it works for one doesn't work for another?
-export const TransformPointFromObjectToCanvas = (
+export const TransformPointFromPathToCanvas = (
   object: XConnector,
   point: Point
 ) =>
@@ -322,16 +317,5 @@ export const TransformPointFromObjectToCanvas = (
     object.calcOwnMatrix(),
     iMatrix
   );
-
-export const TransformPointFromObjectToCanvas2 = (
-  object: FabricObject,
-  point: Point
-) => {
-  const mObject = object.calcTransformMatrix();
-  const mCanvas = object.canvas!.viewportTransform;
-  const matrix = multiplyTransformMatrices(mCanvas, mObject);
-  const transformedPoint = point.transform(matrix); // transformPoint(point, matrix);
-  return transformedPoint;
-};
 
 classRegistry.setClass(XConnector);
