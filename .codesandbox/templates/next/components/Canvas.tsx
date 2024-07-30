@@ -5,7 +5,6 @@ import showMenu from './widgetMenu/ShowMenu';
 
 const DEV_MODE = process.env.NODE_ENV === 'development';
 
-import { initializeCanvasEvents } from '../../../../fabric';
 import WidgetMenu from './widgetMenu/WidgetMenu';
 import MenuBar from './boardMenu/MenuBar';
 import { BoardService } from '../services';
@@ -49,9 +48,9 @@ export const Canvas = React.forwardRef<
     // EventService.getInstance().listenCanvasActionEvents();
     loadCopyPasteService(canvasInstance);
 
-    const alignmentGuidelines = new fabric.alignmentGuideLines(canvasInstance);
-    alignmentGuidelines.initializeEvents();
-    initializeCanvasEvents(canvasInstance);
+    // const alignmentGuidelines = new fabric.alignmentGuideLines(canvasInstance);
+    // alignmentGuidelines.initializeEvents();
+    // initializeCanvasEvents(canvasInstance);
     const handleResize = () => {
       canvasInstance.setHeight(document.documentElement.clientHeight - 60);
       canvasInstance.setWidth(document.documentElement.clientWidth);

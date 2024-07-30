@@ -14,5 +14,5 @@ export const getPositionOnCanvas = function (xy: XY, canvas: XCanvas) {
   );
 
   // Returns the transformed coordinates in an object format
-  return { x: originalPoint.x, y: originalPoint.y };
+  return { left: originalPoint.x, top: originalPoint.y };
 };

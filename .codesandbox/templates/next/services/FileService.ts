@@ -237,7 +237,7 @@ export default class FileService {
   // }
 
   // async readContentFromFileAsync(object) {
-  //   server.call('readContentFromFile', { id: object.id, name: object.name, boardId: object.whiteboardId, src: object.src, objType: object.objType, url: object.url }).then(res => {
+  //   server.call('readContentFromFile', { id: object.id, name: object.name, boardId: object.boardId, src: object.src, objType: object.objType, url: object.url }).then(res => {
 
   //   }).catch(err => {
   //     console.log(err)

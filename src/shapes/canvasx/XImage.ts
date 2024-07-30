@@ -90,7 +90,7 @@ export class XImage<
   static type = 'XImage';
   static objType = 'XImage';
 
-  public extendPropeties = [
+  public extendedProperties = [
     'id',
     'angle',
     'backgroundColor',

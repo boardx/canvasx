@@ -199,9 +199,9 @@ function onDocumentKeydownListener(e: any) {
 
   if (
     object &&
-    (object.obj_type === 'WBRectNotes' ||
-      object.obj_type === 'WBCircleNotes' ||
-      (object.obj_type === 'WBShapeNotes' && !object.isPanel)) &&
+    (object.objType === 'XRectNotes' ||
+      object.objType === 'XCircleNotes' ||
+      (object.objType === 'XShapeNotes' && !object.isPanel)) &&
     e.keyCode >= 65 &&
     e.keyCode <= 90 &&
     !e.ctrlKey &&
@@ -366,7 +366,9 @@ function DrawToCreateMouseUpListener(e: any) {
   if (!canvas.drawTempWidget) return;
 
   // Get the object properties of the temporary drawing widget
-  const toCreateWidget = canvas.drawTempWidget.getObject();
+  const toCreateWidget = canvas.drawTempWidget.toObject(
+    canvas.drawTempWidget.extendedProperties
+  );
 
   // Use the widget service to insert the widget into the canvas
   WidgetService.getInstance().insertWidget(toCreateWidget);
@@ -435,21 +437,21 @@ function DrawToCreateMouseDownListener(e: any) {
     // Save the starting position for the drawing on the canvas
     canvas.drawStartPosition = { x, y };
 
-    // If the widget to be drawn is a 'WBText'
-    if (store.getState().board.drawToCreateWidget === 'WBText') {
-      // Use the drawing service to draw a 'WBText' on the canvas
-      DrawingService.getInstance().drawWBText(canvas);
+    // If the widget to be drawn is a 'XText'
+    if (store.getState().board.drawToCreateWidget === 'XText') {
+      // Use the drawing service to draw a 'XText' on the canvas
+      DrawingService.getInstance().drawXText(canvas);
 
-      // Cancel the drawing state of the widget, stopping further 'WBText' from being drawn until reselected
+      // Cancel the drawing state of the widget, stopping further 'XText' from being drawn until reselected
       cancelDrawToCreateWidget(false);
     }
 
-    // If the widget to be drawn is a 'WBRectNotes'
-    if (store.getState().board.drawToCreateWidget === 'WBRectNotes') {
-      // Use the drawing service to draw 'WBRectNotes' on the canvas
-      DrawingService.getInstance().drawWBRectNotes(canvas);
+    // If the widget to be drawn is a 'XRectNotes'
+    if (store.getState().board.drawToCreateWidget === 'XRectNotes') {
+      // Use the drawing service to draw 'XRectNotes' on the canvas
+      DrawingService.getInstance().drawXRectNotes(canvas);
 
-      // Cancel the drawing state of the widget, stopping further 'WBRectNotes' from being drawn until reselected
+      // Cancel the drawing state of the widget, stopping further 'XRectNotes' from being drawn until reselected
       cancelDrawToCreateWidget(false);
     }
   }
@@ -543,7 +545,7 @@ function onKeyACtrlDown(e: any) {
   const objects = canvas
     .getObjects()
     .filter(
-      (obj) => obj._id !== undefined && !obj.locked && obj.obj_type !== 'common'
+      (obj) => obj._id !== undefined && !obj.locked && obj.objType !== 'common'
     );
   if (objects && objects.length > 0) {
     const selectedObject = canvas.getActiveSelection();
@@ -563,11 +565,11 @@ function onKeyBCtrlDownBoldFont(e: any) {
   store.dispatch(handleSetIsPanMode(false));
   if ((isMac && !e.metaKey) || (!isMac && !e.ctrlKey)) return;
   if (
-    object.obj_type === 'WBRectNotes' ||
-    object.obj_type === 'WBCircleNotes' ||
-    object.obj_type === 'WBTextbox' ||
-    object.obj_type === 'WBText' ||
-    object.obj_type === 'WBShapeNotes'
+    object.objType === 'XRectNotes' ||
+    object.objType === 'XCircleNotes' ||
+    object.objType === 'XTextbox' ||
+    object.objType === 'XText' ||
+    object.objType === 'XShapeNotes'
   ) {
     if (object.fontWeight) {
       object.fontWeight = object.fontWeight === 400 ? 550 : 400;
@@ -587,7 +589,7 @@ function onKeyGCtrlShiftUngroup(e: any) {
   store.dispatch(handleSetIsPanMode(false));
   e.preventDefault();
   if (!object) return;
-  if (e.shiftKey && object && object.obj_type === 'WBGroup') {
+  if (e.shiftKey && object && object.objType === 'WBGroup') {
     canvas.ungroup(object);
   }
 }
@@ -685,7 +687,7 @@ function onKeyLDownDrawLine(e: any) {
 //     "data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M15.6863 0H0.313719C0.1405 0 0 0.1405 0 0.313719V15.6863C0 15.8595 0.1405 16 0.313719 16H11.5815C11.7548 16 16 11.6732 16 11.5V0.313719C16 0.1405 15.8595 0 15.6863 0ZM13.8977 13.5L12.0252 15.3726L15.3725 12.0252L13.8977 13.5ZM11.5815 14.9288V11.5815H14.9288L11.5815 14.9288ZM15.3726 10.954H11.2677C11.0945 10.954 10.954 11.0945 10.954 11.2677V15.3725H0.627437V0.627437H15.3725L15.3726 10.954Z' fill='%23232930'/%3E%3C/svg%3E";
 //   DrawingService.getInstance().getReadyToDrawWidget(
 //     `url("${cursorNote}") 0 0, auto`,
-//     'WBRectNotes',
+//     'XRectNotes',
 //     canvas,
 //   );
 //   keyUpCleanUp();
@@ -728,7 +730,7 @@ function onKeyFDownDrawPanel(e: any) {
 //   const cursorNote = 'text';
 //   DrawingService.getInstance().getReadyToDrawWidget(
 //     cursorNote,
-//     'WBText',
+//     'XText',
 //     canvas,
 //   );
 //   keyUpCleanUp();
@@ -803,7 +805,7 @@ function onKeyUpDownLeftRightDownMove(e: any) {
   if (widget) {
     if (e.shiftKey) changePosition = 10;
     else changePosition = 1;
-    if (widget.obj_type === 'XArrow') {
+    if (widget.objType === 'XArrow') {
       if (!widget.connectorStart && !widget.connectorEnd) {
         let { left, top } = widget;
         switch (e.keyCode) {

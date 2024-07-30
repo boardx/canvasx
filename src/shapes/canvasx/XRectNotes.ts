@@ -54,7 +54,7 @@ export class XRectNotes extends Textbox implements XObjectInterface {
   declare connectors: object[];
   declare id: string;
 
-  public extendPropeties = [
+  public extendedProperties = [
     'objType',
     'boardId',
     'userId',
@@ -62,12 +62,11 @@ export class XRectNotes extends Textbox implements XObjectInterface {
     'zIndex',
     'locked',
     'verticalAlign',
-    'lines',
     'id',
     'zIndex',
-    'relationship',
     'emoj',
     'userEmoji',
+    'connectors', //the connectors of the object
   ];
   /**
    * Minimum calculated width of a textbox, in pixels.

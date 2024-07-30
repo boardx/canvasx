@@ -16,12 +16,12 @@ export default class UtilityService {
     return UtilityService.service;
   }
 
-  // async uploadWebsite(whiteboardId, url, left, top) {
+  // async uploadWebsite(boardId, url, left, top) {
   //   const options = {
   //     url,
   //     left,
   //     top,
-  //     whiteboardId,
+  //     boardId,
   //     userNo: store.getState().user.userInfo.userNo,
   //     objType: "WBUrlImage",
   //   };

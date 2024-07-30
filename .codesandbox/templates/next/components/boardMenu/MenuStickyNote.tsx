@@ -182,7 +182,7 @@ export const doubleClickToCreateStickyNote = debounce(async (e: any) => {
     top: position.top,
     text: "",
     userId: store.getState().user.userInfo.userId,
-    whiteboardId: store.getState().board.board.id,
+    boardId: store.getState().board.board.id,
     timestamp: Date.now(),
     zIndex: Date.now() * 100,
     radius: 0,
@@ -202,7 +202,7 @@ export const doubleClickToCreateStickyNote = debounce(async (e: any) => {
   note.left = widget.left;
   note.top = widget.top;
   // if (widget.objType !== '') await canvas.checkIfBindtoPanelNoSaveData(widget);
-  WidgetService.getInstance().insertWidget(widget.getObject());
+  WidgetService.getInstance().insertWidget(widget.toObject(widget.extendedProperties));
   const newState = await widget.getUndoRedoState("ADDED");
   canvas.pushNewState(newState);
   canvas.setActiveObject(widget);

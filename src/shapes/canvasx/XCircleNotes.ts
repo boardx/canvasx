@@ -63,7 +63,7 @@ export class XCircleNotes extends XTextbox {
 
   declare locked: boolean;
 
-  declare whiteboardId: string;
+  declare boardId: string;
 
   declare userId: string;
 
@@ -81,9 +81,9 @@ export class XCircleNotes extends XTextbox {
 
   declare userEmoji: object[];
 
-  public extendPropeties = [
+  public extendedProperties = [
     'objType',
-    'whiteboardId',
+    'boardId',
     'userId',
     'timestamp',
     'zIndex',
@@ -591,7 +591,7 @@ export class XCircleNotes extends XTextbox {
       'top', // integer, Top position of an object. Note that by default it's relative to object top. You can change this by setting originY={top/center/bottom}
       'userNo', // string, the unique id for the user, one user id could open mutiple browser, each browser has unique user no
       'userId', // string, user identity
-      'whiteboardId', // whiteboard id, string
+      'boardId', // whiteboard id, string
       'zIndex', // the index for the object on whiteboard, integer
       'version', // version of the app, string
       'isPanel', // is this a panel, boolean
@@ -627,7 +627,7 @@ export class XCircleNotes extends XTextbox {
   //  */
   // toObject(propertiesToInclude: Array<any>): object {
   //   return super.toObject(
-  //     [...this.extendPropeties, 'minWidth', 'splitByGrapheme'].concat(
+  //     [...this.extendedProperties, 'minWidth', 'splitByGrapheme'].concat(
   //       propertiesToInclude
   //     )
   //   );

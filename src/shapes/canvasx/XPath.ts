@@ -26,14 +26,16 @@ import { createPathDefaultControls } from '../../controls/commonControls';
 interface UniquePathProps {
   sourcePath?: string;
   path?: TSimplePathData;
-  obj_type: 'XPath';
+  objType: 'XPath';
 }
 
 export interface SerializedPathProps
   extends SerializedObjectProps,
     UniquePathProps {}
 
-export interface PathProps extends FabricObjectProps, UniquePathProps {}
+export interface PathProps extends FabricObjectProps {
+  objType: 'XPath';
+}
 
 export interface IPathBBox extends TBBox {
   left: number;
@@ -41,7 +43,7 @@ export interface IPathBBox extends TBBox {
   pathOffset: Point;
 }
 
-export class Path<
+export class XPath<
   Props extends TOptions<PathProps> = Partial<PathProps>,
   SProps extends SerializedPathProps = SerializedPathProps,
   EventSpec extends ObjectEvents = ObjectEvents
@@ -61,12 +63,9 @@ export class Path<
 
   static cacheProperties = [...cacheProperties, 'path', 'fillRule'];
 
-  /*boardx custom declare*/
-  declare objType: string;
-
   declare locked: boolean;
 
-  declare whiteboardId: string;
+  declare boardId: string;
 
   declare userId: string;
 
@@ -94,7 +93,10 @@ export class Path<
 
   declare radius: any;
 
-  public extendPropeties = [
+  static objType = 'XPath';
+  static type = 'XPath';
+
+  public extendedProperties = [
     'objType',
     'boardId',
     'userId',
@@ -108,6 +110,7 @@ export class Path<
     'version',
     'lineWidth',
     'radius',
+    'path',
   ];
   /**
    * Constructor
@@ -254,7 +257,7 @@ export class Path<
     K extends keyof T = never
   >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return {
-      ...super.toObject([...propertiesToInclude, ...this.extendPropeties]),
+      ...super.toObject([...propertiesToInclude, ...this.extendedProperties]),
       path: cloneDeep(this.path),
     };
   }
@@ -450,7 +453,7 @@ export class Path<
    * @returns {Promise<Path>}
    */
   static fromObject<T extends TOptions<SerializedPathProps>>(object: T) {
-    return this._fromObject<Path>(object, {
+    return this._fromObject<XPath>(object, {
       extraParam: 'path',
     });
   }
@@ -530,7 +533,7 @@ export class Path<
   //       lockMovementX: this.lockMovementX,
   //       lockMovementY: this.lockMovementY,
   //       lockScalingFlip: this.lockScalingFlip,
-  //       obj_type: this.obj_type,
+  //       objType: this.objType,
   //       originX: this.originX,
   //       originY: this.originY,
   //       scaleX: this.scaleX,
@@ -539,7 +542,7 @@ export class Path<
   //       top: this.top,
   //       userNo: this.userNo,
   //       userId: this.userId,
-  //       whiteboardId: this.whiteboardId,
+  //       boardId: this.boardId,
   //       zIndex: this.zIndex,
   //       version: this.version,
   //       isPanel: this.isPanel,
@@ -561,7 +564,7 @@ export class Path<
   //   }
 }
 
-classRegistry.setClass(Path);
-classRegistry.setSVGClass(Path);
+classRegistry.setClass(XPath);
+classRegistry.setSVGClass(XPath);
 
 /* _FROM_SVG_START_ */

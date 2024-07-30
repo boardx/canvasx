@@ -116,7 +116,7 @@ export const getStickNoteOptions = (
   obj.backgroundColor = backgroundColor;
   obj.id = Math.random().toString(36).substr(2, 19);
   obj.userId = store.getState().user.userInfo.userId;
-  obj.whiteboardId = store.getState().board.board.id;
+  obj.boardId = store.getState().board.board.id;
   obj.timestamp = Date.now();
   obj.zIndex = Date.now() * 100;
 

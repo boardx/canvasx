@@ -34,7 +34,12 @@ import { invertTransform, transformPoint } from '../../util';
 import { XURL } from '../../shapes/canvasx/XURL';
 import { WidgetType } from '../../shapes/canvasx/types';
 import { XFile } from '../../shapes/canvasx/XFile';
-import { XCircleNotes, XImage, XShapeNotes } from '../../shapes/canvasx';
+import {
+  XCircleNotes,
+  XConnector,
+  XImage,
+  XShapeNotes,
+} from '../../shapes/canvasx';
 import { Rect } from '../../shapes/Rect';
 import { XTextbox } from '../../shapes/canvasx/XTextbox';
 import { XGroup } from '../../shapes/canvasx/XGroup';
@@ -743,7 +748,7 @@ export class XCanvas extends Canvas {
     let position = canvas.getNewPositionNextToActiveObject(direction);
     const activeObject: any = canvas.getActiveObject();
     const dataToPaste = activeObject?._objects
-      ? activeObject?._objects.map((r: any) => r.getObject())
+      ? activeObject?._objects.map((r: any) => r.toObject(r.extendedProperties))
       : [activeObject.getObject()];
 
     canvas.discardActiveObject();
@@ -1247,8 +1252,8 @@ export class XCanvas extends Canvas {
       (o: any) =>
         o.objType === 'XRectNotes' ||
         o.objType === 'XCircleNotes' ||
-        o.objType === 'WBTextbox' ||
-        o.objType === 'WBText'
+        o.objType === 'XTextbox' ||
+        o.objType === 'XText'
     );
 
     // If there are no objects of the specified types around the point, we return null
@@ -1488,7 +1493,7 @@ export class XCanvas extends Canvas {
     // position on screen by applying the canvas's viewportTransform on the point
     return util.transformPoint({ x: left, y: top }, self.viewportTransform);
   }
-  getPositionOnCanvas(left: number, top: number): XY {
+  getPositionOnCanvas(left: number, top: number): any {
     // If the horizontal or vertical coordinates are not defined, default them to 0
     if (!left) {
       left = 0;
@@ -1509,8 +1514,8 @@ export class XCanvas extends Canvas {
 
     // Returns the transformed coordinates in an object format
     return {
-      x: point.x,
-      y: point.y,
+      left: point.x,
+      top: point.y,
     };
   }
 
@@ -1763,7 +1768,7 @@ export class XCanvas extends Canvas {
           });
         });
 
-      case 'WBLine':
+      case 'XLine':
         // Lock the uniform scaling option to maintain proportional resizing
         options.lockUniScaling = true;
 
@@ -1778,17 +1783,33 @@ export class XCanvas extends Canvas {
 
       // Case when the widget type is XConnector
       case WidgetType.XConnector:
-      // // Lock the uniform scaling option to maintain proportional resizing
-      // options.lockUniScaling = true;
+        // // Lock the uniform scaling option to maintain proportional resizing
+        options.lockUniScaling = true;
 
-      // // Create a new arrow widget with the specified coordinates and options
-      // widget = new XConnector(
-      //   [options.x1, options.y1, options.x2, options.y2],
-      //   options
-      // );
+        const startPoint = {
+          x: options.startPoint.x + options.left,
+          y: options.startPoint.y + options.top,
+        };
+        const endPoint = {
+          x: options.endPoint.x + options.left,
+          y: options.endPoint.y + options.top,
+        };
+        const control1 = options.control1;
+        const control2 = options.control2;
+        const style = options.style;
 
-      // // Return the newly created arrow widget
-      // return widget;
+        // Create a new arrow widget with the specified coordinates and options
+        widget = new XConnector(
+          startPoint,
+          endPoint,
+          control1,
+          control2,
+          style,
+          options
+        );
+
+        // Return the newly created arrow widget
+        return widget;
 
       case 'sticker':
       // // Lock the uniform scaling option to maintain proportional resizing
@@ -1811,7 +1832,7 @@ export class XCanvas extends Canvas {
       //   );
       // });
 
-      // Case when the widget type is WBTextbox
+      // Case when the widget type is XTextbox
       case 'XTextbox':
         // Split string where the grapheme cluster break is allowed
         options.splitByGrapheme = true;
@@ -1833,7 +1854,7 @@ export class XCanvas extends Canvas {
         // Return the newly created widget
         return widget;
 
-      // Case when the widget type is WBText
+      // Case when the widget type is XText
       case 'XText':
         // Set the origin of the Text widget to its center
         options.originX = 'center';

@@ -185,6 +185,7 @@ export {
   XMarkdown,
   XChart,
   XFrame,
+  XPath,
 } from './src/shapes/canvasx';
 
 export { XCanvas } from './src/canvas/canvasx/bx-canvas';

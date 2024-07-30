@@ -1,12 +1,12 @@
 //**Redux Store */
-import store from "../redux/store";
+import store from '../redux/store';
 import {
-    handleSetIsPanMode,
-    handleSetConnectorMode,
-    handleSetArrowMode,
-    handleSetDrawToCreateWidget,
-} from "../redux/features/board.slice";
-import { UtilityService } from "./";
+  handleSetIsPanMode,
+  handleSetConnectorMode,
+  handleSetArrowMode,
+  handleSetDrawToCreateWidget,
+} from '../redux/features/board.slice';
+import { UtilityService } from './';
 
 export default class DrawingService {
   public _iconId: any;
@@ -37,10 +37,10 @@ export default class DrawingService {
   getReadyToDrawShape(iconId: any, canvas: any) {
     store.dispatch(handleSetIsPanMode(false));
     canvas.discardActiveObject();
-    canvas.setCursor("crosshair");
+    canvas.setCursor('crosshair');
     this.setIconId(iconId);
     canvas.requestRenderAll();
-    store.dispatch(handleSetDrawToCreateWidget("XShapeNotes"));
+    store.dispatch(handleSetDrawToCreateWidget('XShapeNotes'));
     store.dispatch(handleSetArrowMode(false));
     store.dispatch(handleSetConnectorMode(false));
   }
@@ -121,62 +121,62 @@ export default class DrawingService {
         locked: false,
         selectable: true,
         fill: null,
-        stroke: "#555555",
+        stroke: '#555555',
         strokeWidth: 4,
         objType: store.getState().board.drawToCreateWidget,
         userid: store.getState().user.userInfo.userId,
-        whiteboardId: store.getState().board.board.id,
+        boardId: store.getState().board.board.id,
         timestamp: Date.now(),
         zIndex: Date.now() * 100,
         isPanel: false,
         lockMovementX: false,
         lockMovementY: false,
         icon: this.getIconId(),
-        text: "",
+        text: '',
       };
-      if (widget.objType === "WBCircle") {
+      if (widget.objType === 'WBCircle') {
         widget.radius = 1;
       }
 
-      if (widget.objType === "WBRectPanel") {
+      if (widget.objType === 'WBRectPanel') {
         const text = this.getPanelText(canvas);
         widget.text = text;
-        widget.stroke = "#555555";
-        widget.fill = "white";
+        widget.stroke = '#555555';
+        widget.fill = 'white';
         widget.strokeWidth = 0.2;
         widget.isPanel = true;
       }
 
-      if (widget.objType === "XTextbox") {
-        widget.text = "Type here...";
-        widget.fontFamily = "Inter";
+      if (widget.objType === 'XTextbox') {
+        widget.text = 'Type here...';
+        widget.fontFamily = 'Inter';
         widget.fontSize = 20;
         widget.strokeWidth = 0;
       }
 
-      if (widget.objType === "XText") {
-        widget.text = "Type here...";
-        widget.fontFamily = "Inter";
+      if (widget.objType === 'XText') {
+        widget.text = 'Type here...';
+        widget.fontFamily = 'Inter';
         widget.fontSize = 20;
         widget.strokeWidth = 0;
       }
 
-      if (widget.objType === "XShapeNotes") {
-        widget.fontFamily = "Inter";
-        widget.stroke = "#555555";
-        widget.fill = "#555555";
+      if (widget.objType === 'XShapeNotes') {
+        widget.fontFamily = 'Inter';
+        widget.stroke = '#555555';
+        widget.fill = '#555555';
         widget.maxHeight = this.height;
         widget.strokeWidth = 0.2;
         widget.fixedStrokeWidth = 1;
-        widget.textAlign = "center";
-        widget.backgroundColor = "rgba(255, 255, 255, 1)";
+        widget.textAlign = 'center';
+        widget.backgroundColor = 'rgba(255, 255, 255, 1)';
         widget.fontSize = 26;
-        widget.text = "";
+        widget.text = '';
         widget.lineWidth = 2;
         widget.fixedLineWidth = 2;
         widget.isPanel = false;
         widget.maxHeight = 138;
-        widget.verticalAlign = "middle";
+        widget.verticalAlign = 'middle';
       }
 
       widget.id = UtilityService.getInstance().generateWidgetID();
@@ -194,11 +194,11 @@ export default class DrawingService {
         top: top + Math.abs(height / 2),
         selectable: true,
         fill: null,
-        stroke: "#555555",
+        stroke: '#555555',
         strokeWidth: 4,
         objType: store.getState().board.drawToCreateWidget,
         userid: store.getState().user.userInfo.userId,
-        whiteboardId: store.getState().board.board.id,
+        boardId: store.getState().board.board.id,
         timestamp: Date.now(),
         zIndex: Date.now() * 100,
         locked: false,
@@ -206,31 +206,31 @@ export default class DrawingService {
         lockMovementY: false,
         icon: this.getIconId(),
       };
-      if (widget.objType !== "WBRectPanel") {
-        widget.text = "";
+      if (widget.objType !== 'WBRectPanel') {
+        widget.text = '';
       }
 
-      if (widget.objType === "WBCircle") {
+      if (widget.objType === 'WBCircle') {
         widget.radius = Math.abs(width / 2);
       }
 
-      if (widget.objType === "XTextbox") {
-        widget.fill = "#555555";
-        widget.text = "Type here...";
+      if (widget.objType === 'XTextbox') {
+        widget.fill = '#555555';
+        widget.text = 'Type here...';
         widget.fontSize = 20;
         widget.strokeWidth = 0;
       }
 
-      if (widget.objType === "XText") {
-        widget.fill = "#555555";
-        widget.text = "Type here...";
+      if (widget.objType === 'XText') {
+        widget.fill = '#555555';
+        widget.text = 'Type here...';
         widget.fontSize = 20;
         widget.strokeWidth = 0;
       }
 
-      if (widget.objType === "WBRectPanel") {
+      if (widget.objType === 'WBRectPanel') {
         widget.stroke = null;
-        widget.fill = "white";
+        widget.fill = 'white';
         widget.strokeWidth = null;
         widget.isPanel = true;
         widget.hasBorders = false;
@@ -239,27 +239,27 @@ export default class DrawingService {
       /**
        * add placehold to XTextbox
        */
-      if (widget.objType === "XTextbox" && widget.text === "Type here...") {
-        widget.fill = "rgba(0, 0, 0, 0.48)";
+      if (widget.objType === 'XTextbox' && widget.text === 'Type here...') {
+        widget.fill = 'rgba(0, 0, 0, 0.48)';
         widget.dirty = true;
       }
 
-      if (widget.objType === "XText" && widget.text === "Type here...") {
-        widget.fill = "rgba(0, 0, 0, 0.48)";
+      if (widget.objType === 'XText' && widget.text === 'Type here...') {
+        widget.fill = 'rgba(0, 0, 0, 0.48)';
         widget.dirty = true;
       }
 
-      if (widget.objType === "XShapeNotes") {
+      if (widget.objType === 'XShapeNotes') {
         widget.strokeWidth = 0;
-        widget.fill = "#555555";
-        widget.stroke = "#555555";
-        widget.backgroundColor = "rgba(255, 255, 255, 1)";
+        widget.fill = '#555555';
+        widget.stroke = '#555555';
+        widget.backgroundColor = 'rgba(255, 255, 255, 1)';
         widget.maxHeight = height;
         widget.height = height;
         widget.fixedLineWidth = 2;
         widget.lineWidth = 2;
         widget.strokeWidth = 0.2;
-        if (widget.icon === 5) widget.verticalAlign = "bottom";
+        if (widget.icon === 5) widget.verticalAlign = 'bottom';
       }
       widget.lockMovementX = false;
       widget.lockMovementY = false;
@@ -267,16 +267,16 @@ export default class DrawingService {
       widget.locked = false;
       canvas.drawTempWidget.set(widget);
       canvas.setActiveObject(canvas.drawTempWidget);
-      if (widget.objType === "XTextbox") {
+      if (widget.objType === 'XTextbox') {
         canvas.drawTempWidget.initDimensions();
         canvas.drawTempWidget.dirty = true;
       }
-      if (widget.objType === "XText") {
+      if (widget.objType === 'XText') {
         canvas.drawTempWidget.initDimensions();
         canvas.drawTempWidget.dirty = true;
       }
-      if (widget.objType === "WBRectPanel") {
-        canvas.drawTempWidget.titlebox.text = canvas.drawTempWidget.text || "";
+      if (widget.objType === 'WBRectPanel') {
+        canvas.drawTempWidget.titlebox.text = canvas.drawTempWidget.text || '';
         canvas.drawTempWidget.setTitleboxText();
       }
       canvas.requestRenderAll();
@@ -287,11 +287,11 @@ export default class DrawingService {
     let number = 1;
     canvas.getObjects().forEach((o: any) => {
       if (
-        o.objType === "WBRectPanel" &&
+        o.objType === 'WBRectPanel' &&
         o.text &&
-        o.text.indexOf("Frame") == 0
+        o.text.indexOf('Frame') == 0
       ) {
-        let numbertemp = Number(o.text.replace("Frame", ""));
+        let numbertemp = Number(o.text.replace('Frame', ''));
         if (!isNaN(numbertemp)) {
           numbertemp += 1;
           if (numbertemp > number) {
@@ -304,9 +304,9 @@ export default class DrawingService {
   }
 
   drawXText(canvas: any, options?: any) {
-    canvas.hoverCursor = "default";
-    canvas.defaultCursor = "default";
-    canvas.createWidgetatCurrentLocationByType("XText", {
+    canvas.hoverCursor = 'default';
+    canvas.defaultCursor = 'default';
+    canvas.createWidgetatCurrentLocationByType('XText', {
       position: {
         left: options.x,
         top: options.y,
@@ -315,8 +315,8 @@ export default class DrawingService {
   }
 
   drawXRectNotes(canvas: any) {
-    canvas.hoverCursor = "default";
-    canvas.defaultCursor = "default";
-    canvas.createWidgetatCurrentLocationByType("XRectNotes");
+    canvas.hoverCursor = 'default';
+    canvas.defaultCursor = 'default';
+    canvas.createWidgetatCurrentLocationByType('XRectNotes');
   }
 }

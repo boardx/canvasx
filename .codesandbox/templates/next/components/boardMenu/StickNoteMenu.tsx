@@ -143,13 +143,13 @@ export const handleStickyNoteDragEnd = (canvas: any) => {
   }
 
   store.dispatch(handleSetMenuFontWeight(400));
-  // WidgetService.getInstance().insertWidget(widget.getObject());
+  // WidgetService.getInstance().insertWidget(widget.toObject(widget.extendedProperties));
 
   // canvas.pushNewState([
   //   {
   //     targetId: widget.id,
   //     activeselection: true,
-  //     newState: widget.getObject(),
+  //     newState: widget.toObject(widget.extendedProperties),
   //     action: "ADDED",
   //   },
   // ]);

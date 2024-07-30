@@ -28,7 +28,7 @@ const createTextFunc = (position: any) => {
     strokeWidth: 0,
     objType: 'XTextbox',
     userid: store.getState().user.userInfo.userId,
-    whiteboardId: store.getState().board.board.id,
+    boardId: store.getState().board.board.id,
     timestamp: Date.now(),
     zIndex: Date.now() * 100,
     isPanel: false,
@@ -80,7 +80,7 @@ const useTextActions = () => {
       instance.enterEditing();
 
       // it gets the fabric object from the created text object
-      const objs = instance.getObject();
+      const objs = instance.toObject(instance.extendedProperties);
 
       // unlock the movement of the text object along x and y directions.
       objs.lockMovementX = false;

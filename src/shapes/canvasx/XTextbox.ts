@@ -97,7 +97,6 @@ export class XTextbox<
     'width', // integer, width of the object
     'height', // integer, height of the object
     'left', // integer left for position
-    'lines', // array, the arrows array [{…}]
     'locked', // boolean, lock status for the widget， this is connected to lock
     'lockMovementX', // boolean, lock the verticle movement
     'lockMovementY', // boolean, lock the horizontal movement
@@ -113,10 +112,6 @@ export class XTextbox<
     'boardId', // whiteboard id, string
     'zIndex', // the index for the object on whiteboard, integer
     'version', // version of the app, string
-    'isPanel', // is this a panel, boolean
-    'panelObj', // if this is a panel, the id of the panel, string
-    'relationship', // array, viewporttransform
-    'subObjList', // ["5H9qYfNGt4vizhcuS"] array list id for sub objects
     'fontFamily', // string, font family
     'fontSize', // integer, font size
     'fontWeight', // integer, font weight
@@ -129,7 +124,7 @@ export class XTextbox<
     'maxHeight',
     'tempTop',
     'fixedScaleChange',
-    'preTop',
+    'connectors', //the connectors of the object
   ];
 
   static getDefaults() {
@@ -142,7 +137,7 @@ export class XTextbox<
 
   constructor(text: string, options: any) {
     super(text, options);
-    // if (this.objType !== 'WBText' && this.objType !== 'WBTextbox') {
+    // if (this.objType !== 'XText' && this.objType !== 'XTextbox') {
     // this.addControls();
     // }
     // this.InitializeEvent();
@@ -550,7 +545,7 @@ export class XTextbox<
     const newText = super._splitTextIntoLines(text);
     if (!this.fromCopy) {
       if (
-        (this.objType === 'WBText' || this.objType === 'WBTextbox') &&
+        (this.objType === 'XText' || this.objType === 'XTextbox') &&
         this.textLines &&
         this.textLines.length > 1 &&
         this.isEditing
@@ -563,7 +558,7 @@ export class XTextbox<
       this.oneLine = false;
     }
     if (
-      (this.objType === 'WBText' || this.objType === 'WBTextbox') &&
+      (this.objType === 'XText' || this.objType === 'XTextbox') &&
       newText &&
       newText.lines &&
       this.oneLine &&
@@ -705,7 +700,7 @@ export class XTextbox<
       // if it is in draw widget mode, then skip update
       // if (canvas.drawTempWidget) return;
 
-      // if (self.text === '' && self.objType === WidgetType.WBText) {
+      // if (self.text === '' && self.objType === WidgetType.XText) {
       //   canvas.removeWidget(self);
 
       //   return;
@@ -845,7 +840,7 @@ export class XTextbox<
 
     target.set('dirty', true);
 
-    if (target.objType === 'WBTextbox' || target.objType === 'WBText') {
+    if (target.objType === 'XTextbox' || target.objType === 'XText') {
       target.set('fixedScaleChange', false);
     }
 
@@ -857,14 +852,14 @@ export class XTextbox<
     const textAlign = self.textAlign;
 
     if (
-      self.objType === 'WBText' &&
+      self.objType === 'XText' &&
       (textAlign === 'left' || textAlign === 'center')
     ) {
       self.setControlVisible('ml', false);
       self.setControlVisible('mr', true);
     }
 
-    if (self.objType === 'WBText' && textAlign === 'right') {
+    if (self.objType === 'XText' && textAlign === 'right') {
       self.setControlVisible('ml', true);
       self.setControlVisible('mr', false);
     }

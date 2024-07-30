@@ -46,7 +46,7 @@ export class XURL extends FabricObject implements XObjectInterface {
   previewImage: string;
   _previewImage: HTMLImageElement | null = null;
 
-  public extendPropeties = [
+  public extendedProperties = [
     'id',
     'objType',
     'fileName',
@@ -109,7 +109,6 @@ export class XURL extends FabricObject implements XObjectInterface {
     this.height = 248;
     this.loadPreviewImage(previewImage, options.fileName!);
   }
-  extendedProperties: string[];
 
   getContextMenuList() {
     let menuList;
@@ -150,7 +149,7 @@ export class XURL extends FabricObject implements XObjectInterface {
   //   };
   // }
   toObject(propertiesToInclude: Array<any>): any {
-    return super.toObject([...this.extendPropeties, ...propertiesToInclude]);
+    return super.toObject([...this.extendedProperties, ...propertiesToInclude]);
   }
   onDoubleClick() {
     getFabricWindow().open(this.fileSrc, '_blank');

@@ -114,7 +114,7 @@ const getPath = (
 
 class XConnector extends Path {
   static type = 'XConnector';
-  objType = 'Xconnector';
+  objType = 'XConnector';
 
   fromPoint: XY | null;
   toPoint: XY | null;
@@ -130,6 +130,26 @@ class XConnector extends Path {
   toObjectId: string;
   pathType: 'curvePath' | 'straightPath' = 'curvePath';
   pathArrowTip: 'none' | 'start' | 'end' | 'both' = 'both';
+
+  public extendedProperties = [
+    'objType',
+    'boardId',
+    'userId',
+    'timestamp',
+    'zIndex',
+    'locked',
+    'id',
+    'zIndex',
+    'fromPoint',
+    'toPoint',
+    'control1',
+    'control2',
+    'style',
+    'pathType',
+    'pathArrowTip',
+    'fromId',
+    'toId',
+  ];
 
   constructor(
     fromPoint: XY,
@@ -155,6 +175,11 @@ class XConnector extends Path {
     this.pathArrowTip = options.pathArrowTip || 'both';
     this.fromId = options.fromId;
     this.toId = options.toId;
+    this.boardId = options.boardId;
+    this.zIndex = options.zIndex;
+    this.userId = options.userId;
+
+    this.locked = options.locked;
 
     const localFromPoint = TransformPointFromCanvasToObject(
       this,

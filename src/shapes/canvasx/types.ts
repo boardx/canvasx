@@ -164,7 +164,7 @@ export enum TextAlign {
 }
 export enum WidgetType {
   XActiveSelection = 'activeSelection',
-  XConnector = 'XArrow',
+  XConnector = 'XConnector',
   XCircleNotes = 'XCircleNotes',
   XFile = 'XFile',
   XGroup = 'XGroup',
@@ -180,7 +180,7 @@ export enum WidgetType {
   XRectPanel = 'XRectPanel',
   XShape = 'XShape',
   XShapeNotes = 'XShapeNotes',
-  XTriangle = 'WBTriangle',
+  XTriangle = 'XTriangle',
   XURL = 'XURL',
   XText = 'XText',
   XTextbox = 'XTextbox',

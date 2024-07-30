@@ -89,7 +89,7 @@ export default function AudioToTextAI({ canvas }: { canvas: any }) {
       left: currentFile.left + currentFile.width + 210,
       top: currentFile.top,
       userId: store.getState().user.userInfo.userId,
-      boardId: currentFile.whiteboardId,
+      boardId: currentFile.boardId,
       timestamp: Date.now(),
       text: "",
     };

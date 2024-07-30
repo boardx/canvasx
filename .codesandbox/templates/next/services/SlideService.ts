@@ -125,7 +125,7 @@ export default class SlideService {
       strokeWidth: 0,
       fill: 'rgba(0,0,255,0.3)',
       top: newTop,
-      whiteboardId: store.getState().board.boardId,
+      boardId: store.getState().board.boardId,
       width: newWidth,
       zIndex: Date.now() * 100,
     });

@@ -10,7 +10,7 @@ import {
 } from '../../constants';
 import type { ObjectEvents } from '../../EventTypeDefs';
 import { AnimatableObject } from './AnimatableObject';
-import { Point } from '../../Point';
+import { Point, XY } from '../../Point';
 import { Shadow } from '../../Shadow';
 import type {
   TDegree,
@@ -26,7 +26,11 @@ import { runningAnimations } from '../../util/animation/AnimationRegistry';
 import { cloneDeep } from '../../util/internals/cloneDeep';
 import { capValue } from '../../util/misc/capValue';
 import { createCanvasElement, toDataURL } from '../../util/misc/dom';
-import { invertTransform, qrDecompose } from '../../util/misc/matrix';
+import {
+  invertTransform,
+  multiplyTransformMatrices,
+  qrDecompose,
+} from '../../util/misc/matrix';
 import { enlivenObjectEnlivables } from '../../util/misc/objectEnlive';
 import {
   resetObjectTransform,
@@ -1642,6 +1646,36 @@ export class FabricObject<
 
   saveData(type: string, fields: string[]): boolean {
     return true;
+  }
+  transformPointToCanvas(point: XY) {
+    const self = this;
+    const toTransformPoint = new Point(point);
+    const transformedPoint = toTransformPoint.transform(
+      self.calcTransformMatrix()
+    );
+    return transformedPoint;
+  }
+  transformPointFromCanvas(point: XY) {
+    const self = this;
+    const toTransformPoint = new Point(point);
+    const transformedPoint = toTransformPoint.transform(
+      invertTransform(self.calcTransformMatrix())
+    );
+    return transformedPoint;
+  }
+
+  transformPointToViewport(point: XY) {
+    const self = this;
+    const toTransformPoint = new Point(point);
+
+    const mCanvas = self.canvas?.viewportTransform;
+    const mObject = self.calcTransformMatrix();
+    const matrix = mCanvas
+      ? multiplyTransformMatrices(mCanvas, mObject)
+      : mObject;
+
+    const transformedPoint = toTransformPoint.transform(matrix);
+    return transformedPoint;
   }
 }
 

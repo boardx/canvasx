@@ -27,9 +27,9 @@
 //  */
 // // Util['getType'] = function (objType) {
 // //   let text = '';
-// //   if (objType === 'WBRectNotes') text = '便利贴';
+// //   if (objType === 'XRectNotes') text = '便利贴';
 // //   else if (objType === 'XCircleNotes') text = '便利贴';
-// //   else if (objType === 'WBText') text = '文本';
+// //   else if (objType === 'XText') text = '文本';
 // //   else if (objType === 'WBImage') text = '图片';
 // //   else if (objType === 'WBUrlImage') text = '网址';
 // //   else if (objType === 'XPath') text = '绘画';
@@ -498,10 +498,10 @@
 //   store.dispatch(handleSetFileSelected(true));
 //   if (!objType) return;
 //   switch (objType) {
-//     case 'WBRectNotes':
+//     case 'XRectNotes':
 //       store.dispatch(handleSetNoteSelected(true));
 //       break;
-//     case 'WBText':
+//     case 'XText':
 //       store.dispatch(handleSetTextSelected(true));
 //       break;
 //     case 'XPath':
@@ -510,7 +510,7 @@
 //     case 'XConnector':
 //       store.dispatch(handleSetArrowSelected(true));
 //       break;
-//     case 'WBShapeNotes':
+//     case 'XShapeNotes':
 //       store.dispatch(handleSetShapeSelected(true));
 //       break;
 //     case 'WBImage':
@@ -521,15 +521,15 @@
 
 // Util.getMenuBarSelected = (objType) => {
 //   switch (objType) {
-//     case 'WBRectNotes':
+//     case 'XRectNotes':
 //       return store.getState().widgets.noteSelected;
-//     case 'WBText':
+//     case 'XText':
 //       return store.getState().widgets.textSelected;
 //     case 'XPath':
 //       return store.getState().widgets.pathSelected;
 //     case 'XConnector':
 //       return store.getState().widgets.arrowSelected;
-//     case 'WBShapeNotes':
+//     case 'XShapeNotes':
 //       return store.getState().widgets.shapeSelected;
 //     case 'WBImage':
 //       return store.getState().widgets.fileSelected;

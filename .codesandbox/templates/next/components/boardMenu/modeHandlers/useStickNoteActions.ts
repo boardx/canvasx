@@ -93,7 +93,9 @@ const useStickNoteActions = () => {
     store.dispatch(handleSetMenuFontWeight('400'));
 
     // inserting widget into the database
-    WidgetService.getInstance().insertWidget(widget.getObject());
+    WidgetService.getInstance().insertWidget(
+      widget.toObject(widget.extendedProperties)
+    );
 
     // // pushing a new state to the canvas
     // canvas.pushNewState([

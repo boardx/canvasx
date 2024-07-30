@@ -121,9 +121,7 @@ const ContextMenu = () => {
         .set('top', (-point0.y + point3.y) / scaley)
         .setCoords();
 
-      if (objas.isPanel || objas.obj_type === 'WBRectPanel') {
-        objas.setLockedShadow(false);
-      }
+
 
     }
 
@@ -186,9 +184,7 @@ const ContextMenu = () => {
             .set('lockRotation', true)
             // .set('selectable', false)
             .set('editable', false);
-          if (objas.isPanel || objas.obj_type === 'WBRectPanel') {
-            objas.setLockedShadow(true);
-          }
+
         } else {
           objas
             .set('lockMovementX', false)
@@ -201,9 +197,7 @@ const ContextMenu = () => {
             .set('lockRotation', false)
             // .set('selectable', true)
             .set('editable', true);
-          if (objas.isPanel || objas.obj_type === 'WBRectPanel') {
-            objas.setLockedShadow(false);
-          }
+
         }
       }
 
@@ -239,37 +233,21 @@ const ContextMenu = () => {
         // .set('selectable', false)
         .set('editable', false);
       obj.hoverCursor = `url("${cursorLock}") 0 0, auto`;
-      if (obj.isPanel || obj.obj_type === 'WBRectPanel') {
-        obj.setLockedShadow(true);
-        obj.saveData('MODIFIED', [
-          'locked',
-          'lockMovementX',
-          'lockMovementY',
-          'selectable',
-          'activeSelection',
-          'editable',
-          'lockScalingX',
-          'lockScalingY',
-          'lockSkewingX',
-          'lockSkewingY',
-          'lockRotation',
-          'shadow'
-        ]);
-      } else {
-        obj.saveData('MODIFIED', [
-          'locked',
-          'lockMovementX',
-          'lockMovementY',
-          'selectable',
-          'activeSelection',
-          'editable',
-          'lockScalingX',
-          'lockScalingY',
-          'lockSkewingX',
-          'lockSkewingY',
-          'lockRotation'
-        ]);
-      }
+
+      obj.saveData('MODIFIED', [
+        'locked',
+        'lockMovementX',
+        'lockMovementY',
+        'selectable',
+        'activeSelection',
+        'editable',
+        'lockScalingX',
+        'lockScalingY',
+        'lockSkewingX',
+        'lockSkewingY',
+        'lockRotation'
+      ]);
+
     } else {
       obj
         .set('lockMovementX', false)
@@ -283,37 +261,21 @@ const ContextMenu = () => {
         // .set('selectable', true)
         .set('editable', true);
       obj.hoverCursor = 'default';
-      if (obj.isPanel || obj.obj_type === 'WBRectPanel') {
-        obj.setLockedShadow(false);
-        obj.saveData('MODIFIED', [
-          'locked',
-          'lockMovementX',
-          'lockMovementY',
-          'selectable',
-          'activeSelection',
-          'editable',
-          'lockScalingX',
-          'lockScalingY',
-          'lockSkewingX',
-          'lockSkewingY',
-          'lockRotation',
-          'shadow'
-        ]);
-      } else {
-        obj.saveData('MODIFIED', [
-          'locked',
-          'lockMovementX',
-          'lockMovementY',
-          'selectable',
-          'activeSelection',
-          'editable',
-          'lockScalingX',
-          'lockScalingY',
-          'lockSkewingX',
-          'lockSkewingY',
-          'lockRotation'
-        ]);
-      }
+
+      obj.saveData('MODIFIED', [
+        'locked',
+        'lockMovementX',
+        'lockMovementY',
+        'selectable',
+        'activeSelection',
+        'editable',
+        'lockScalingX',
+        'lockScalingY',
+        'lockSkewingX',
+        'lockSkewingY',
+        'lockRotation'
+      ]);
+
     }
     canvas.requestRenderAll();
   };
@@ -364,10 +326,10 @@ const ContextMenu = () => {
     const sortedObjects = activeObjects
       .filter(
         object =>
-          object.obj_type === 'WBRectNotes' ||
-          object.obj_type === 'WBCircleNotes' ||
-          object.obj_type === 'WBShapeNotes' ||
-          object.obj_type === 'WBText'
+          object.objType === 'XRectNotes' ||
+          object.objType === 'XCircleNotes' ||
+          object.objType === 'XShapeNotes' ||
+          object.objType === 'XText'
       )
       .sort((a, b) => {
         if (a.top < b.top) return -1;
