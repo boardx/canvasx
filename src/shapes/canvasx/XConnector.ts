@@ -75,6 +75,12 @@ class XConnector extends Path {
     };
     this.on('modifyPath', function (this: XConnector, evtOpt) {
       this.calcStartEndPath();
+      const { commandIndex, pointIndex } = evtOpt;
+      // commandIndex === 0 is always start,
+      // all the commandIndex === 1 are control points apart the 5
+      if (commandIndex === 1 && pointIndex !== 5) {
+        return;
+      }
       this.dragActionEventHandler(evtOpt.commandIndex, evtOpt.pointIndex);
     });
   }
@@ -263,6 +269,8 @@ class XConnector extends Path {
     // Andrea, followup: currentDockingObject.hoveringControl relies on a mousemove event that gets added
     // and removed when we start the connector drag.
     // this logic should be resolved inside the connector.
+
+    // early return if we are dragging a control point
 
     if (
       currentDockingObject &&
