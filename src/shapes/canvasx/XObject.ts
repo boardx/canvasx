@@ -32,7 +32,7 @@ export class FabricObject2 {
   // activeSelectWithoutArrow: any[] = [];
   // activeSelectionWithArrow: any[] = [];
 
-  transformPointToCanvas(point: XY) {
+  transformPointToCanvas(point: XY): Point {
     const self = this;
     const toTransformPoint = new Point(point);
     const transformedPoint = toTransformPoint.transform(
@@ -40,7 +40,8 @@ export class FabricObject2 {
     );
     return transformedPoint;
   }
-  transformPointFromCanvas(point: XY) {
+
+  transformPointFromCanvas(point: XY): Point {
     const self = this;
     const toTransformPoint = new Point(point);
     const transformedPoint = toTransformPoint.transform(
