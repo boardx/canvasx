@@ -160,11 +160,11 @@ export class XRectNotes extends Textbox implements XObjectInterface {
       if (!connectorObj) return;
       console.log('connectorObj', connectorObj);
 
-      if (this.id === connectorObj.fromId) {
+      if (this.id === connectorObj.fromObjectId) {
         this.updateConnector(transformedPoint, connectorObj, 'from');
       }
 
-      if (this.id === connectorObj.toId) {
+      if (this.id === connectorObj.toObjectId) {
         this.updateConnector(transformedPoint, connectorObj, 'to');
       }
     });

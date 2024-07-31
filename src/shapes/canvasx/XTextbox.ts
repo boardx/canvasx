@@ -606,11 +606,11 @@ export class XTextbox<
 
       if (!connectorObj) return;
 
-      if (this.id === connectorObj.fromId) {
+      if (this.id === connectorObj.fromObjectId) {
         this.updateConnector(transformedPoint, connectorObj, 'from');
       }
 
-      if (this.id === connectorObj.toId) {
+      if (this.id === connectorObj.toObjectId) {
         this.updateConnector(transformedPoint, connectorObj, 'to');
       }
     });

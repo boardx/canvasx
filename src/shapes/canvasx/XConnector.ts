@@ -5,6 +5,7 @@ import { Transform } from '../../EventTypeDefs';
 import { classRegistry } from '../../ClassRegistry';
 import { iMatrix } from '../../constants';
 import { createPathControls } from '../../controls/pathControl';
+import { XCanvas } from '../../canvas/canvasx/bx-canvas';
 
 const getPath = (
   fromPoint: XY,
@@ -28,6 +29,10 @@ class XConnector extends Path {
   declare toObjectId: string;
   declare pathType: 'curvePath' | 'straightPath';
   declare pathArrowTip: 'none' | 'start' | 'end' | 'both';
+  declare fromPoint: XY;
+  declare toPoint: XY;
+  declare control1: XY;
+  declare control2: XY;
 
   /**
    * Contains the path to draw the arrow tip start
@@ -48,15 +53,19 @@ class XConnector extends Path {
     'locked',
     'id',
     'zIndex',
-    'fromPoint',
-    'toPoint',
+    'fromObjectId',
+    'toObjectId',
     'control1',
     'control2',
     'style',
     'pathType',
     'pathArrowTip',
-    'fromId',
-    'toId',
+    'fromPoint',
+    'toPoint',
+    'left',
+    'top',
+    'width',
+    'height',
   ];
 
   constructor(
@@ -77,8 +86,12 @@ class XConnector extends Path {
     this.objectCaching = false;
     this.pathType = options.pathType || 'curvePath';
     this.pathArrowTip = options.pathArrowTip || 'both';
-    this.fromId = options.fromId;
-    this.toId = options.toId;
+    this.fromObjectId = options.fromObjectId;
+    this.toObjectId = options.toObjectId;
+    this.fromPoint = fromPoint;
+    this.toPoint = toPoint;
+    this.control1 = control1;
+    this.control2 = control2;
     this.style = style;
     this.calcStartEndPath();
     this.controls = {
@@ -190,6 +203,7 @@ class XConnector extends Path {
         this,
         new Point(finalCommand[1]!, finalCommand[2]!)
       );
+      this.control1 = control1;
     }
 
     if (!control2) {
@@ -197,6 +211,7 @@ class XConnector extends Path {
         this,
         new Point(finalCommand[3]!, finalCommand[4]!)
       );
+      this.control2 = control2;
     }
 
     if (!fromPoint) {
@@ -204,6 +219,7 @@ class XConnector extends Path {
         this,
         new Point(this.path[0][1]!, this.path[0][2]!)
       );
+      this.fromPoint = fromPoint;
     }
 
     if (!toPoint) {
@@ -214,6 +230,7 @@ class XConnector extends Path {
           : new Point(finalCommand[5]!, finalCommand[6]!)
       );
       finalCommand[0] === 'L' ? 1 : 5;
+      this.toPoint = toPoint;
     }
 
     if (style) {
@@ -221,6 +238,7 @@ class XConnector extends Path {
     }
 
     const path = getPath(fromPoint, toPoint, control1, control2, this.pathType);
+
     const { path: newPath } = new Path(path);
     this.path = newPath;
     this.setBoundingBox(true);
@@ -237,7 +255,7 @@ class XConnector extends Path {
   ) {
     const target = transform.target;
     target.objectCaching = false;
-    transform.target.canvas?.initializeConnectorMode();
+    (transform.target.canvas as XCanvas).initializeConnectorMode();
   }
 
   /**
@@ -256,8 +274,8 @@ class XConnector extends Path {
     if (!target.canvas) {
       return;
     }
-    target.canvas?.exitConnectorMode();
-    target.canvas.dockingWidget = null;
+    (target.canvas as XCanvas).exitConnectorMode();
+    (target.canvas as XCanvas).dockingWidget = null;
     target.dirty = true;
     target.setCoords();
     transform.target.canvas?.requestRenderAll();
@@ -303,11 +321,13 @@ class XConnector extends Path {
       const targetX = hoverPoint.x;
       const targetY = hoverPoint.y;
 
-      const property = commandIndex === 0 ? 'fromId' : 'toId';
+      const property = commandIndex === 0 ? 'fromObjectId' : 'toObjectId';
       const existingConnectionId = target[property];
 
       if (existingConnectionId) {
-        const connectedObject = target.canvas?.findById(existingConnectionId);
+        const connectedObject = (target.canvas as XCanvas).findById(
+          existingConnectionId
+        ) as any;
         if (connectedObject) {
           connectedObject.connectors = connectedObject.connectors?.filter(
             (connector: any) => connector.connectorId !== target.id
@@ -315,7 +335,8 @@ class XConnector extends Path {
         }
       }
 
-      target[commandIndex === 0 ? 'fromId' : 'toId'] = currentDockingObject.id;
+      target[commandIndex === 0 ? 'fromObjectId' : 'toObjectId'] =
+        currentDockingObject.id;
 
       if (!currentDockingObject.connectors) {
         currentDockingObject.connectors = [];

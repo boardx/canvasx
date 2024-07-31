@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { Point } from '../Point';
 import { Control } from './Control';
 import type { TMat2D } from '../typedefs';
