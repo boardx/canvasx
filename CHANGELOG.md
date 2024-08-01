@@ -2,6 +2,7 @@
 
 ## [next]
 
+- Proposal(): Remove from XConnectors properties that are duplicate of other state [#7](https://github.com/fabricjs/fabric.js/pull/7)
 - perf(): Remove redundant matrix multiplication in multiplayTransformMatrixArray [#9893](https://github.com/fabricjs/fabric.js/pull/9893)
 - test(): Convert Animation tests to jest [#9892](https://github.com/fabricjs/fabric.js/pull/9892)
 - perf(ObjectGeometry): replace cache key string with array [#9887](https://github.com/fabricjs/fabric.js/pull/9887)
