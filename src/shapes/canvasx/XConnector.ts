@@ -52,12 +52,12 @@ class XConnector<
   /**
    * References the ID of the object where the connector starts
    */
-  private declare fromObjectId: string;
+  declare fromObjectId: string;
 
   /**
    * References the ID of the object where the connector ends
    */
-  private declare toObjectId: string;
+  declare toObjectId: string;
 
   declare pathType: 'curvePath' | 'straightPath';
 
