@@ -6,7 +6,7 @@ import { classRegistry } from '../../ClassRegistry';
 import { iMatrix } from '../../constants';
 import { createPathControls } from '../../controls/pathControl';
 import { XCanvas } from '../../canvas/canvasx/bx-canvas';
-import { TClassProperties, TOptions } from '../../typedefs';
+import { TClassProperties } from '../../typedefs';
 
 const getPath = (
   fromPoint: XY,
@@ -25,12 +25,15 @@ const getPath = (
 interface UniqueXConnectorProps {
   fromObjectId?: string;
   toObjectId?: string;
+  pathType: 'curvePath' | 'straightPath';
+  pathArrowTip: 'none' | 'start' | 'end' | 'both';
+}
+
+interface UniqueXConnectorSerializedProps {
   fromPoint: XY;
   toPoint: XY;
   control1: XY;
   control2: XY;
-  pathType: 'curvePath' | 'straightPath';
-  pathArrowTip: 'none' | 'start' | 'end' | 'both';
   style: any;
 }
 
@@ -38,10 +41,10 @@ export interface XConnectorProps extends PathProps, UniqueXConnectorProps {}
 
 export interface XConnectorSerializedProps
   extends SerializedPathProps,
-    UniqueXConnectorProps {}
+    UniqueXConnectorSerializedProps {}
 
 class XConnector<
-  Props extends TOptions<XConnectorProps> = Partial<XConnectorProps>,
+  Props extends Partial<XConnectorProps> = Partial<XConnectorProps>,
   SProps extends XConnectorSerializedProps = XConnectorSerializedProps,
   EventSpec extends ObjectEvents = ObjectEvents
 > extends Path<Props, SProps, EventSpec> {
@@ -99,7 +102,7 @@ class XConnector<
     control1: XY,
     control2: XY,
     style: any = {},
-    options: any = {}
+    options: Omit<Props, keyof UniqueXConnectorSerializedProps>
   ) {
     const path = getPath(fromPoint, toPoint, control1, control2);
     super(path);
@@ -417,3 +420,15 @@ export const TransformPointFromPathToCanvas = (
   );
 
 classRegistry.setClass(XConnector);
+
+const b = new XConnector(
+  new Point(),
+  new Point(),
+  new Point(),
+  new Point(),
+  {},
+  {
+    toObjectId: 'x',
+    toPoint: new Point(),
+  }
+);
