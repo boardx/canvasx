@@ -387,31 +387,31 @@ export class XFile extends FabricObject implements XObjectInterface {
     switch (fileName.substring(fileName.lastIndexOf('.') + 1)) {
       case 'doc':
       case 'docx':
-        fileIconURL = '/boardxstatic/fileIcons/word.png';
+        fileIconURL = './fileIcons/word.png';
         break;
       case 'xls':
       case 'xlsx':
-        fileIconURL = '/boardxstatic/fileIcons/excel.png';
+        fileIconURL = './fileIcons/excel.png';
         break;
       case 'ppt':
       case 'pptx':
-        fileIconURL = '/boardxstatic/fileIcons/ppt.png';
+        fileIconURL = './fileIcons/ppt.png';
         break;
       case 'pdf':
-        fileIconURL = '/boardxstatic/fileIcons/pdf.svg';
+        fileIconURL = './fileIcons/pdf.svg';
         break;
       case 'zip':
-        fileIconURL = '/boardxstatic/fileIcons/zip.png';
+        fileIconURL = './fileIcons/zip.png';
         break;
       case 'mp4':
-        fileIconURL = '/boardxstatic/fileIcons/mp4.png';
+        fileIconURL = './fileIcons/mp4.png';
         break;
 
       case 'webm':
-        fileIconURL = '/boardxstatic/fileIcons/mp4.png';
+        fileIconURL = './fileIcons/mp4.png';
         break;
       default:
-        fileIconURL = '/boardxstatic/fileIcons/file.png';
+        fileIconURL = './fileIcons/file.png';
         break;
     }
     return fileIconURL;
