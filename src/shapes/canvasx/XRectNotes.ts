@@ -53,6 +53,7 @@ export class XRectNotes extends Textbox implements XObjectInterface {
   declare maxHeight: number;
   declare connectors: object[];
   declare id: string;
+  declare boardId: string;
 
   public extendedProperties = [
     'objType',
