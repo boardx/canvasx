@@ -1,11 +1,12 @@
-import { Path } from '../Path';
+import { Path, PathProps, SerializedPathProps } from '../Path';
 import { sendPointToPlane, TSimpleParsedCommand } from '../../util';
 import { Point, XY } from '../../Point';
-import { Transform } from '../../EventTypeDefs';
+import { ObjectEvents, Transform } from '../../EventTypeDefs';
 import { classRegistry } from '../../ClassRegistry';
 import { iMatrix } from '../../constants';
 import { createPathControls } from '../../controls/pathControl';
 import { XCanvas } from '../../canvas/canvasx/bx-canvas';
+import { TClassProperties } from '../../typedefs';
 
 const getPath = (
   fromPoint: XY,
@@ -21,18 +22,49 @@ const getPath = (
   }
 };
 
-class XConnector extends Path {
-  static type = 'XConnector';
-  objType = 'XConnector';
+interface UniqueXConnectorProps {
+  fromObjectId?: string;
+  toObjectId?: string;
+  pathType: 'curvePath' | 'straightPath';
+  pathArrowTip: 'none' | 'start' | 'end' | 'both';
+}
+
+interface UniqueXConnectorSerializedProps {
+  fromPoint: XY;
+  toPoint: XY;
+  control1: XY;
+  control2: XY;
   style: any;
+}
+
+export interface XConnectorProps extends PathProps, UniqueXConnectorProps {}
+
+export interface XConnectorSerializedProps
+  extends SerializedPathProps,
+    UniqueXConnectorSerializedProps {}
+
+class XConnector<
+  Props extends Partial<XConnectorProps> = Partial<XConnectorProps>,
+  SProps extends XConnectorSerializedProps = XConnectorSerializedProps,
+  EventSpec extends ObjectEvents = ObjectEvents
+> extends Path<Props, SProps, EventSpec> {
+  static type = 'XConnector';
+  declare objType: string;
+  declare style: any;
+
+  /**
+   * References the ID of the object where the connector starts
+   */
   declare fromObjectId: string;
+
+  /**
+   * References the ID of the object where the connector ends
+   */
   declare toObjectId: string;
+
   declare pathType: 'curvePath' | 'straightPath';
+
   declare pathArrowTip: 'none' | 'start' | 'end' | 'both';
-  declare fromPoint: XY;
-  declare toPoint: XY;
-  declare control1: XY;
-  declare control2: XY;
 
   /**
    * Contains the path to draw the arrow tip start
@@ -55,18 +87,14 @@ class XConnector extends Path {
     'zIndex',
     'fromObjectId',
     'toObjectId',
-    'control1',
-    'control2',
     'style',
     'pathType',
     'pathArrowTip',
-    'fromPoint',
-    'toPoint',
     'left',
     'top',
     'width',
     'height',
-  ];
+  ] as const as (keyof SProps)[];
 
   constructor(
     fromPoint: XY,
@@ -74,28 +102,25 @@ class XConnector extends Path {
     control1: XY,
     control2: XY,
     style: any = {},
-    options: any = {}
+    options: Omit<Props, keyof UniqueXConnectorSerializedProps>
   ) {
     const path = getPath(fromPoint, toPoint, control1, control2);
-    super(path, options);
+    super(path);
     this.cornerColor = 'white';
     this.cornerStyle = 'circle';
     this.transparentCorners = false;
     this.cornerStrokeColor = 'gray';
+    this.setOptions(options);
+    // this shouldn't work
     this.type = 'XConnector';
+    this.objType = 'XConnector';
     this.objectCaching = false;
     this.pathType = options.pathType || 'curvePath';
     this.pathArrowTip = options.pathArrowTip || 'both';
-    this.fromObjectId = options.fromObjectId;
-    this.toObjectId = options.toObjectId;
-    this.fromPoint = fromPoint;
-    this.toPoint = toPoint;
-    this.control1 = control1;
-    this.control2 = control2;
     this.style = style;
     this.calcStartEndPath();
     this.controls = {
-      ...createPathControls(this, {
+      ...createPathControls(this as Path, {
         mouseDownHandler: this._mouseDownControl.bind(this),
         mouseUpHandler: this._mouseUpControl.bind(this),
         cursorStyle: 'crosshair',
@@ -215,7 +240,6 @@ class XConnector extends Path {
         this,
         new Point(finalCommand[1]!, finalCommand[2]!)
       );
-      this.control1 = control1;
     }
 
     if (!control2) {
@@ -223,7 +247,6 @@ class XConnector extends Path {
         this,
         new Point(finalCommand[3]!, finalCommand[4]!)
       );
-      this.control2 = control2;
     }
 
     if (!fromPoint) {
@@ -231,7 +254,6 @@ class XConnector extends Path {
         this,
         new Point(this.path[0][1]!, this.path[0][2]!)
       );
-      this.fromPoint = fromPoint;
     }
 
     if (!toPoint) {
@@ -242,7 +264,6 @@ class XConnector extends Path {
           : new Point(finalCommand[5]!, finalCommand[6]!)
       );
       finalCommand[0] === 'L' ? 1 : 5;
-      this.toPoint = toPoint;
     }
 
     if (style) {
@@ -361,12 +382,45 @@ class XConnector extends Path {
       });
     }
   }
+
+  /**
+   * Returns object representation of an instance
+   * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+   * @return {Object} object representation of an instance
+   */
+  toObject<
+    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
+    K extends keyof T = never
+  >(this: XConnector, propertiesToInclude: K[] = []): Pick<T, K> & SProps {
+    return {
+      ...super.toObject<T, K>([
+        ...propertiesToInclude,
+        ...(this.extendedProperties as K[]),
+      ]),
+      fromPoint: TransformPointFromPathToCanvas(
+        this,
+        new Point(this.path[0][1]!, this.path[0][2]!)
+      ),
+      control1: TransformPointFromPathToCanvas(
+        this,
+        new Point(this.path[1][1]!, this.path[1][2]!)
+      ),
+      control2: TransformPointFromPathToCanvas(
+        this,
+        new Point(this.path[1][3]!, this.path[1][4]!)
+      ),
+      toPoint: TransformPointFromPathToCanvas(
+        this,
+        new Point(this.path[1][5]!, this.path[1][6]!)
+      ),
+    };
+  }
 }
 
 export { XConnector };
 
 export const TransformPointFromPathToCanvas = (
-  object: XConnector,
+  object: XConnector<any, any>,
   point: Point
 ) =>
   sendPointToPlane(
@@ -376,3 +430,15 @@ export const TransformPointFromPathToCanvas = (
   );
 
 classRegistry.setClass(XConnector);
+
+const b = new XConnector(
+  new Point(),
+  new Point(),
+  new Point(),
+  new Point(),
+  {},
+  {
+    toObjectId: 'x',
+    toPoint: new Point(),
+  }
+);
