@@ -85,7 +85,7 @@ export function MenuBar() {
         break;
       case "line":
         console.log("!@startMouseListener---line", modeType);
-        canvas?.initializeConnectorMode();
+        // canvas?.initializeConnectorMode();
         handleLineBefore();
         break;
       case "text":
@@ -97,7 +97,7 @@ export function MenuBar() {
       case "stickNote":
         handleStickNoteBefore();
       case "default":
-        canvas?.exitConnectorMode();
+        // canvas?.exitConnectorMode();
         break;
     }
 

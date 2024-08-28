@@ -176,7 +176,6 @@ export {
   XCircleNotes,
   XTextbox,
   XShapeNotes,
-  alignmentGuideLines,
   XImage,
   XConnector,
   XFile,

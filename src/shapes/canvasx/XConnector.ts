@@ -76,8 +76,8 @@ class XConnector extends Path {
     style: any = {},
     options: any = {}
   ) {
-    const path = getPath(fromPoint, toPoint, control1, control2);
-    super(path, options);
+    const newPath = getPath(fromPoint, toPoint, control1, control2);
+    super(newPath, options);
     this.cornerColor = 'white';
     this.cornerStyle = 'circle';
     this.transparentCorners = false;
@@ -116,6 +116,18 @@ class XConnector extends Path {
       }
       this.dragActionEventHandler(evtOpt.commandIndex, evtOpt.pointIndex);
     });
+  }
+
+  getFromPoint() {
+    const command = this.path[0];
+    return new Point(command[1]!, command[2]!);
+  }
+
+  getToPoint() {
+    const lastCommand = this.path[this.path.length - 1];
+    return lastCommand[0] === 'L'
+      ? new Point(lastCommand[1]!, lastCommand[2]!)
+      : new Point(lastCommand[5]!, lastCommand[6]!);
   }
 
   /**
@@ -255,7 +267,6 @@ class XConnector extends Path {
   ) {
     const target = transform.target;
     target.objectCaching = false;
-    (transform.target.canvas as XCanvas).initializeConnectorMode();
   }
 
   /**
@@ -274,7 +285,6 @@ class XConnector extends Path {
     if (!target.canvas) {
       return;
     }
-    (target.canvas as XCanvas).exitConnectorMode();
     (target.canvas as XCanvas).dockingWidget = null;
     target.dirty = true;
     target.setCoords();

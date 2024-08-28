@@ -61,7 +61,7 @@ export class XTextbox<
   declare tempTop: number;
 
   declare hasNoText: boolean;
-  declare hoveringControl: string;
+
   /**
    * Minimum calculated width of a textbox, in pixels.
    * fixed to 2 so that an empty textbox cannot go to 0
@@ -613,6 +613,7 @@ export class XTextbox<
       if (this.id === connectorObj.toObjectId) {
         this.updateConnector(transformedPoint, connectorObj, 'to');
       }
+      this.canvas?.requestRenderAll();
     });
   }
 
@@ -750,7 +751,7 @@ export class XTextbox<
     super.drawObject(ctx);
     // console.log('!@@ drawObject', this.canvas?.dockingWidget, this);
     //@ts-ignore
-    if (this == this.canvas?.dockingWidget) {
+    if (this == this.canvas.dockingWidget) {
       this.renderDockingControls(ctx);
     }
   }
@@ -760,6 +761,7 @@ export class XTextbox<
     const self = this;
     const canvas = self.canvas;
     const controls = self.controls;
+
     let cornerColor = 'white';
 
     if (!canvas) return;
@@ -776,13 +778,17 @@ export class XTextbox<
       )
         continue;
 
-      if (this.hoveringControl && this.hoveringControl === controlKey) {
+      if (
+        //@ts-ignore
+        this.canvas!.hoveringControl &&
+        //@ts-ignore
+        this.canvas!.hoveringControl === controlKey
+      ) {
         cornerColor = '#F21D6B';
       } else {
         cornerColor = 'white';
       }
 
-      console.log('!!@', this.hoveringControl);
       //render 4 controls, mbaStart, mlaStart, mraStart, mtaStart
 
       this._renderControl(

@@ -1,7 +1,5 @@
 import './XActiveSelection';
 
-export { alignmentGuideLines } from '../../canvas/canvasx/WBAlignmentGuidelines';
-
 export { XCircleNotes } from './XCircleNotes';
 export { XRectNotes } from './XRectNotes';
 export { XShapeNotes } from './XShapeNotes';

@@ -178,6 +178,7 @@ export const createObjectConnectorControls = function (targetObject: any) {
       }),
       mouseDownHandler: (eventData, transformData) => {
         // this.controlMousedownProcess(transformData, 0.0, -0.5);
+
         return true;
       },
       name: 'mtaStart',

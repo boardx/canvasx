@@ -143,7 +143,6 @@ export const createObjectConnectorControls = () => {
   function renderCustomControl(ctx, left, top, fabricObject) {
     const styleOverride1 = {
       cornerSize: 10,
-
       lineWidth: 2,
     };
     renderCircleControl.call(
