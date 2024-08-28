@@ -76,8 +76,8 @@ class XConnector extends Path {
     style: any = {},
     options: any = {}
   ) {
-    const newPath = getPath(fromPoint, toPoint, control1, control2);
-    super(newPath, options);
+    const path = getPath(fromPoint, toPoint, control1, control2);
+    super(path, options);
     this.cornerColor = 'white';
     this.cornerStyle = 'circle';
     this.transparentCorners = false;
