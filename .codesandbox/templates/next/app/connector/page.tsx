@@ -90,8 +90,8 @@ const IndexPage: NextPage = () => {
                     let cp1 = { x: 0, y: 0 }, cp2 = { x: 0, y: 0 };
 
 
-                    cp1 = rectNoteA.calculateControlPoint(rectNoteA.getBoundingRect(), point1);
-                    cp2 = rectNoteB.calculateControlPoint(rectNoteB.getBoundingRect(), point2);
+                    cp1 = rectNoteA.calculateControlPoint(point1);
+                    cp2 = rectNoteB.calculateControlPoint(point2);
 
 
 

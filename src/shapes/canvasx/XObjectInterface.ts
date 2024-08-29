@@ -9,8 +9,4 @@ export interface XObjectInterface {
   locked: boolean;
 
   extendedProperties: string[];
-
-  getWidgetMenuList(): string[];
-  getWidgetMenuLength(): number;
-  getContextMenuList(): string[];
 }

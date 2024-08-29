@@ -100,8 +100,8 @@ const IndexPage: NextPage = () => {
             let cp1 = { x: 0, y: 0 }, cp2 = { x: 0, y: 0 };
 
 
-            cp1 = rectNote1.calculateControlPoint(rectNote1.getBoundingRect(), point1);
-            cp2 = rectNote2.calculateControlPoint(rectNote2.getBoundingRect(), point2);
+            cp1 = rectNote1.calculateControlPoint(point1);
+            cp2 = rectNote2.calculateControlPoint(point2);
             const curve = new fabric.XConnector(point1, point2, cp1, cp2, style, {
                 stroke: 'black',
                 strokeWidth: 2,

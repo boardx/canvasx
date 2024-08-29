@@ -7,7 +7,6 @@ import { ImageProps } from '../../Image';
 import { FabricObject } from '../../Object/FabricObject';
 import { Rect } from '../../Rect';
 
-import { WidgetMenuList } from '../MenuType';
 import { XObjectInterface } from '../XObjectInterface';
 
 export type XURLProps = ImageProps & {
@@ -153,23 +152,6 @@ export class XURL extends FabricObject implements XObjectInterface {
   }
   onDoubleClick() {
     getFabricWindow().open(this.fileSrc, '_blank');
-  }
-  getWidgetMenuList(): WidgetMenuList {
-    const menuList: WidgetMenuList = [];
-    if (this.locked) {
-      menuList.push('objectLock');
-    } else {
-      menuList.push('more');
-      menuList.push('objectLock');
-      menuList.push('delete');
-      menuList.push('fileName');
-      menuList.push('borderLineIcon');
-    }
-    return menuList;
-  }
-  getWidgetMenuLength() {
-    if (this.locked) return 50;
-    return 60;
   }
 
   drawObject(ctx: CanvasRenderingContext2D) {

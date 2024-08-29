@@ -113,7 +113,6 @@ export class XRectNotes extends Textbox implements XObjectInterface {
 
   updateConnector(point: any, connector: XConnector, type: string) {
     const controlPoint = this.calculateControlPoint(
-      this.getBoundingRect(),
       new Point(point.x, point.y)
     );
 

@@ -124,7 +124,6 @@ const useLineActions = () => {
         startPoint = hoverPoint;
 
         control1 = currentDockingObject.calculateControlPoint(
-          currentDockingObject.getBoundingRect(),
           new Point(hoverPoint.x, hoverPoint.y)
         );
       }
@@ -146,8 +145,8 @@ const useLineActions = () => {
             hasBorders: false,
             hasControls: true,
             selectable: true,
-            fromId: currentDockingObject?.id,
-            toId: null,
+            fromObjectId: currentDockingObject?.id,
+            toObjectId: null,
             perPixelTargetFind: true,
             id: Math.random().toString(36).substr(2, 9),
           }
@@ -234,7 +233,6 @@ const useLineActions = () => {
 
     if (targetObject) {
       controlPoint = targetObject.calculateControlPoint(
-        targetObject.getBoundingRect(),
         new Point(point.x, point.y)
       );
 
@@ -305,7 +303,7 @@ const useLineActions = () => {
           control2: controlPoint2,
         });
       }
-      if (type === 'to' && !connector.fromId) {
+      if (type === 'to' && !connector.fromObjectId) {
         connector.update({
           toPoint: point,
           control1: controlPoint1,
@@ -343,16 +341,15 @@ const useLineActions = () => {
         endPoint = hoverPoint;
 
         control2 = currentDockingObject.calculateControlPoint(
-          currentDockingObject.getBoundingRect(),
           new Point(hoverPoint.x, hoverPoint.y)
         );
       }
 
-      instance && (instance.toId = currentDockingObject?.id);
+      instance && (instance.toObjectId = currentDockingObject?.id);
 
-      //update fromObject and toObject according to fromId and toId
-      if (instance?.fromId) {
-        const fromObject = canvas.findById(instance.fromId);
+      //update fromObject and toObject according to fromObjectId and toObjectId
+      if (instance?.fromObjectId) {
+        const fromObject = canvas.findById(instance.fromObjectId);
 
         // instance.fromObject = fromObject;
         if (!fromObject.connectors) {
@@ -370,8 +367,8 @@ const useLineActions = () => {
 
         fromObject && (fromObject.hoveringControl = '');
       }
-      if (instance?.toId) {
-        const toObject = canvas.findById(instance.toId);
+      if (instance?.toObjectId) {
+        const toObject = canvas.findById(instance.toObjectId);
 
         if (toObject && !toObject.connectors) {
           toObject.connectors = [];

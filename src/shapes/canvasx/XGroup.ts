@@ -1,8 +1,7 @@
 import { classRegistry } from '../../ClassRegistry';
 import { Group } from '../Group';
-import { XObjectInterface } from './XObjectInterface';
 
-export class XGroup extends Group implements XObjectInterface {
+export class XGroup extends Group {
   static type = 'XGroup';
   static objType = 'XGroup';
 
@@ -24,17 +23,6 @@ export class XGroup extends Group implements XObjectInterface {
     'userNo',
   ];
 
-  getWidgetMenuList() {
-    if (this.locked) {
-      return ['objectLock'];
-    }
-    return ['objectLock', 'delete', 'aiassist'];
-  }
-
-  getWidgetMenuLength() {
-    return 60;
-  }
-
   //  override the default behavior of `getText` to return a concatenated string of all text objects\
   // canvasX custoom method
   getText(): any {
@@ -44,37 +32,6 @@ export class XGroup extends Group implements XObjectInterface {
     } else {
       return '';
     }
-  }
-
-  getContextMenuList() {
-    let menuList;
-    if (this.locked) {
-      menuList = [
-        'Bring forward',
-        'Bring to front',
-        'Send backward',
-        'Send to back',
-      ];
-    } else {
-      menuList = [
-        'Ungroup',
-        'Bring forward',
-        'Bring to front',
-        'Send backward',
-        'Send to back',
-        'Duplicate',
-        'Copy',
-        'Paste',
-        'Cut',
-        'Delete',
-      ];
-    }
-    if (this.locked) {
-      menuList.push('Unlock');
-    } else {
-      menuList.push('Lock');
-    }
-    return menuList;
   }
 }
 classRegistry.setClass(XGroup);

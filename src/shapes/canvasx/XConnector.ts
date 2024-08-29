@@ -1,11 +1,11 @@
 import { Path } from '../Path';
 import { sendPointToPlane, TSimpleParsedCommand } from '../../util';
 import { Point, XY } from '../../Point';
-import { Transform } from '../../EventTypeDefs';
 import { classRegistry } from '../../ClassRegistry';
 import { iMatrix } from '../../constants';
 import { createPathControls } from '../../controls/pathControl';
 import { XCanvas } from '../../canvas/canvasx/bx-canvas';
+import { Transform } from '../../EventTypeDefs';
 
 const getPath = (
   fromPoint: XY,
@@ -82,6 +82,7 @@ class XConnector extends Path {
     this.cornerStyle = 'circle';
     this.transparentCorners = false;
     this.cornerStrokeColor = 'gray';
+    this.hasBorders = false;
     this.type = 'XConnector';
     this.objectCaching = false;
     this.pathType = options.pathType || 'curvePath';
@@ -149,7 +150,7 @@ class XConnector extends Path {
 
     /* Calculate Path START */
     if (pathArrowTip === 'start' || pathArrowTip === 'both') {
-      const startArrowSize = 10; // Adjust the size of the start arrow tip
+      const startArrowSize = 20 + this.strokeWidth; // Adjust the size of the start arrow tip
 
       const startAngle =
         pathType === 'straightPath'
@@ -177,7 +178,7 @@ class XConnector extends Path {
     }
     /* Calculate Path End */
     if (pathArrowTip === 'end' || pathArrowTip === 'both') {
-      const endArrowSize = 10; // Adjust the size of the end arrow tip
+      const endArrowSize = 20 + this.strokeWidth; // Adjust the size of the end arrow tip
       const endAngle =
         pathType === 'straightPath'
           ? Math.atan2(toPoint.y - fromPoint.y, toPoint.x - fromPoint.x)
@@ -203,28 +204,37 @@ class XConnector extends Path {
     }
   }
 
+  calculateControlPoint(controlPointType: 'from' | 'to', point: any) {
+    let controlPoint;
+    if (controlPointType === 'from') {
+      //@ts-ignore
+      const fromObject = this.canvas?.findById(this.fromObjectId);
+      if (fromObject && fromObject.calculateControlPoint) {
+        controlPoint = fromObject.calculateControlPoint(point);
+      }
+    }
+
+    if (controlPointType === 'to') {
+      //@ts-ignore
+      const toObject = this.canvas?.findById(this.toObjectId);
+      if (toObject && toObject.calculateControlPoint) {
+        controlPoint = toObject.calculateControlPoint(point);
+      }
+    }
+
+    if (controlPoint) {
+      return controlPoint;
+    } else {
+      return point;
+    }
+  }
+
   /**
    * Given the points in scene coordinates, updates the path
    * This function is called by other objects that are moving or changing properties
    */
   update({ fromPoint, toPoint, control1, control2, style }: any = {}) {
     const finalCommand = this.path[this.path.length - 1];
-
-    if (!control1) {
-      control1 = TransformPointFromPathToCanvas(
-        this,
-        new Point(finalCommand[1]!, finalCommand[2]!)
-      );
-      this.control1 = control1;
-    }
-
-    if (!control2) {
-      control2 = TransformPointFromPathToCanvas(
-        this,
-        new Point(finalCommand[3]!, finalCommand[4]!)
-      );
-      this.control2 = control2;
-    }
 
     if (!fromPoint) {
       fromPoint = TransformPointFromPathToCanvas(
@@ -243,6 +253,30 @@ class XConnector extends Path {
       );
       finalCommand[0] === 'L' ? 1 : 5;
       this.toPoint = toPoint;
+    }
+    let controlPoint1: Point, controlPoint2: Point;
+    if (finalCommand[0] === 'L') {
+      controlPoint1 = this.calculateControlPoint('from', fromPoint);
+      controlPoint2 = this.calculateControlPoint('to', toPoint);
+    }
+    if (!control1) {
+      control1 = TransformPointFromPathToCanvas(
+        this,
+        finalCommand[0] === 'L'
+          ? controlPoint1!
+          : new Point(finalCommand[1]!, finalCommand[2]!)
+      );
+      this.control1 = control1;
+    }
+
+    if (!control2) {
+      control2 = TransformPointFromPathToCanvas(
+        this,
+        finalCommand[0] === 'L'
+          ? controlPoint2!
+          : new Point(finalCommand[3]!, finalCommand[4]!)
+      );
+      this.control2 = control2;
     }
 
     if (style) {
@@ -267,8 +301,16 @@ class XConnector extends Path {
   ) {
     const target = transform.target;
     target.objectCaching = false;
+    this.mouseDownHandler(eventData, transform, x, y);
   }
 
+  mouseDownHandler(eventData: any, transform: Transform, x: number, y: number) {
+    //reserve for subclass
+  }
+
+  mouseUpHandler(eventData: any, transform: Transform, x: number, y: number) {
+    //reserve for subclass
+  }
   /**
    * Compared to Path, it will render the official Path + the arrow tips.
    * @param ctx
@@ -289,6 +331,7 @@ class XConnector extends Path {
     target.dirty = true;
     target.setCoords();
     transform.target.canvas?.requestRenderAll();
+    this.mouseUpHandler(eventData, transform, x, y);
   }
 
   getControlPointOnCanvas(obj: any, controlName: string) {
@@ -320,12 +363,14 @@ class XConnector extends Path {
 
     if (
       currentDockingObject &&
-      currentDockingObject.controls[currentDockingObject.hoveringControl] &&
+      currentDockingObject.controls[
+        currentDockingObject.canvas.hoveringControl
+      ] &&
       currentDockingObject.calculateControlPoint
     ) {
       const hoverPoint = this.getControlPointOnCanvas(
         currentDockingObject,
-        currentDockingObject.hoveringControl
+        currentDockingObject.canvas.hoveringControl
       );
 
       const targetX = hoverPoint.x;
@@ -342,6 +387,21 @@ class XConnector extends Path {
           connectedObject.connectors = connectedObject.connectors?.filter(
             (connector: any) => connector.connectorId !== target.id
           );
+          if (connectedObject.calculateControlPoint) {
+            const controlPoint =
+              connectedObject.calculateControlPoint(hoverPoint);
+            if (commandIndex === 0) {
+              this.update({
+                fromPoint: { x: targetX, y: targetY },
+                control1: controlPoint,
+              });
+            } else {
+              this.update({
+                toPoint: { x: targetX, y: targetY },
+                control2: controlPoint,
+              });
+            }
+          }
         }
       }
 

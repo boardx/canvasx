@@ -1,10 +1,4 @@
-import {
-  TBBox,
-  TClassProperties,
-  TOptions,
-  TOriginX,
-  TOriginY,
-} from '../../typedefs';
+import { TClassProperties, TOptions, TOriginX, TOriginY } from '../../typedefs';
 import { IText } from '../IText/IText';
 import { classRegistry } from '../../ClassRegistry';
 import { createTextboxDefaultControls } from '../../controls/X_commonControls';
@@ -187,7 +181,8 @@ export class XTextbox<
     return menuList;
   }
 
-  calculateControlPoint(boundingBox: TBBox, connectingPoint: Point): Point {
+  calculateControlPoint(connectingPoint: Point): Point {
+    const boundingBox = this.getBoundingRect();
     const left = boundingBox.left;
     const top = boundingBox.top;
     const width = boundingBox.width;
@@ -619,7 +614,6 @@ export class XTextbox<
 
   updateConnector(point: any, connector: XConnector, type: string) {
     const controlPoint = this.calculateControlPoint(
-      this.getBoundingRect(),
       new Point(point.x, point.y)
     );
 
@@ -870,35 +864,6 @@ export class XTextbox<
       self.setControlVisible('mr', false);
     }
     if (self.canvas) self.canvas.requestRenderAll();
-  }
-
-  /* boardx extend function */
-  getWidgetMenuList() {
-    if (this.locked) {
-      return ['objectLock'];
-    }
-    return [
-      'drawNote',
-      'more',
-      'textToMultipleStickyNotes',
-      'switchNoteType',
-      'fontSize',
-      'changeFont',
-      'fontWeight',
-      'textBullet',
-      'borderLineIcon',
-      'textAlign',
-      'backgroundColor',
-      'fontColor',
-      'applyFormat',
-      'objectLock',
-      'delete',
-      'aiassist',
-    ];
-  }
-  getWidgetMenuLength() {
-    if (this.locked) return 50;
-    return 520;
   }
 }
 

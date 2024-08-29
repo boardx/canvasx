@@ -634,66 +634,6 @@ export class XCircleNotes extends XTextbox {
   // }
   /**boardx custom function */
 
-  getWidgetMenuList() {
-    // if (this.isDraw) {
-    //   return [
-    //     'textNote',
-    //     'borderLineIcon',
-    //     'backgroundColor',
-    //     'resetDraw',
-    //     'switchNoteType',
-    //     'drawOption',
-    //     'lineWidth',
-    //     'noteDrawColor', // strokeColor
-    //     'emojiMenu',
-    //     'more',
-    //     'objectLock',
-    //     'aiassist',
-    //   ];
-    // }
-    if (this.locked) {
-      return ['objectLock'];
-    }
-    return [
-      'drawNote',
-      'more',
-      'borderLineIcon',
-      'switchNoteType',
-      'fontSize',
-      'textAlign',
-      'backgroundColor',
-      'emojiMenu',
-      'fontWeight',
-      'textBullet',
-      'objectLock',
-      'delete',
-      'aiassist',
-    ];
-  }
-  getWidgetMenuTouchList() {
-    // if (this.isDraw) {
-    //   return ['emojiMenu', 'objectLock'];
-    // }
-    if (this.locked) {
-      return ['objectLock'];
-    }
-    return [
-      'objectDelete',
-      'moreMenuStickyNote',
-      'backgroundColor',
-      'fontColor',
-      'emojiMenu',
-      'objectLock',
-      'aiassist',
-    ];
-  }
-  getWidgetMenuLength(): any {
-    if (this.locked) return 50;
-    // if (this.isDraw) {
-    //   return 308;
-    // }
-    return 420;
-  }
   /* caculate cusor positon in the middle of the textbox */
   getCenteredTop(rectHeight: any) {
     const textHeight = this.height;
