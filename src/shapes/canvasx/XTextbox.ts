@@ -153,17 +153,6 @@ export class XTextbox<
       new Point(point.x, point.y)
     );
 
-    // console.log(
-    //   'updateConnector: point:',
-    //   point,
-    //   'control point:',
-    //   controlPoint,
-    //   connector,
-    //   type
-    // );
-    //if the connector is from the object, then the startpoint should be updated
-    //if the connector is to the object, then the endpoint should be updated
-
     //recalculate the startpoint or endpoint of the connector, and also the ControlPoint
     if (type === 'from') {
       connector.update({
@@ -200,26 +189,23 @@ export class XTextbox<
         this.id === connectorObj.fromObjectId &&
         connector.connectorType === 'from'
       ) {
-        if (!this.group) {
-          this.updateConnector(transformedPoint, connectorObj, 'from');
-        }
+        this.updateConnector(transformedPoint, connectorObj, 'from');
       }
 
       if (
         this.id === connectorObj.toObjectId &&
         connector.connectorType === 'to'
       ) {
-        if (!this.group) {
-          this.updateConnector(transformedPoint, connectorObj, 'to');
-        }
+        this.updateConnector(transformedPoint, connectorObj, 'to');
       }
     });
   }
 
   calculateControlPoint(connectingPoint: Point): Point {
     const boundingBox = this.getBoundingRect();
-    const left = boundingBox.left;
-    const top = boundingBox.top;
+    let left = boundingBox.left;
+    let top = boundingBox.top;
+
     const width = boundingBox.width;
     const height = boundingBox.height;
 
@@ -246,20 +232,20 @@ export class XTextbox<
 
     switch (nearestBorder.side) {
       case 'left':
-        controlX = left - 220;
+        controlX = left - 220 * this.scaleX;
         controlY = connectingY;
         break;
       case 'right':
-        controlX = right + 220;
+        controlX = right + 220 * this.scaleX;
         controlY = connectingY;
         break;
       case 'top':
         controlX = connectingX;
-        controlY = top - 220;
+        controlY = top - 220 * this.scaleY;
         break;
       case 'bottom':
         controlX = connectingX;
-        controlY = bottom + 220;
+        controlY = bottom + 220 * this.scaleY;
         break;
     }
 

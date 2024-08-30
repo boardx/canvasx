@@ -106,7 +106,7 @@ class XConnector extends Path {
           controlStroke: 'gray',
         },
         controlPointStyle: {
-          controlFill: 'blue',
+          controlFill: 'white',
           connectionDashArray: [5, 5],
           controlStroke: 'gray',
         },
@@ -439,10 +439,10 @@ class XConnector extends Path {
       currentDockingObject.connectors.push({
         connectorId: target.id,
         connectorType: connectorType,
-        point: {
-          x: targetX - currentDockingObject.left,
-          y: targetY - currentDockingObject.top,
-        },
+        point: currentDockingObject.transformPointFromCanvas({
+          x: targetX,
+          y: targetY,
+        }),
       });
     }
 
