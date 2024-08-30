@@ -94,12 +94,17 @@ class XConnector extends Path {
     this.control1 = control1;
     this.control2 = control2;
     this.style = style;
+    this._setMovementLock();
     this.calcStartEndPath();
     this.controls = {
       ...createPathControls(this, {
         mouseDownHandler: this._mouseDownControl.bind(this),
         mouseUpHandler: this._mouseUpControl.bind(this),
         cursorStyle: 'crosshair',
+        pointStyle: {
+          controlFill: 'white',
+          controlStroke: 'gray',
+        },
         controlPointStyle: {
           controlFill: 'blue',
           connectionDashArray: [5, 5],
@@ -301,6 +306,7 @@ class XConnector extends Path {
   ) {
     const target = transform.target;
     target.objectCaching = false;
+
     this.mouseDownHandler(eventData, transform, x, y);
   }
 
@@ -332,6 +338,17 @@ class XConnector extends Path {
     target.setCoords();
     transform.target.canvas?.requestRenderAll();
     this.mouseUpHandler(eventData, transform, x, y);
+    this._setMovementLock();
+  }
+
+  _setMovementLock() {
+    if (this.fromObjectId || this.toObjectId) {
+      this.lockMovementX = true;
+      this.lockMovementY = true;
+    } else {
+      this.lockMovementX = false;
+      this.lockMovementY = false;
+    }
   }
 
   getControlPointOnCanvas(obj: any, controlName: string) {
@@ -357,10 +374,19 @@ class XConnector extends Path {
     //@ts-ignore
     const currentDockingObject = target.canvas?.dockingWidget;
 
+    const property = commandIndex === 0 ? 'fromObjectId' : 'toObjectId';
+    const existingConnectionId = target[property];
+    let connectedObject: any = null;
+    if (existingConnectionId) {
+      connectedObject = (target.canvas as XCanvas).findById(
+        existingConnectionId
+      ) as any;
+    }
+
     // Andrea, followup: currentDockingObject.hoveringControl relies on a mousemove event that gets added
     // and removed when we start the connector drag.
     // this logic should be resolved inside the connector.
-
+    const connectorType = commandIndex === 0 ? 'from' : 'to';
     if (
       currentDockingObject &&
       currentDockingObject.controls[
@@ -376,16 +402,14 @@ class XConnector extends Path {
       const targetX = hoverPoint.x;
       const targetY = hoverPoint.y;
 
-      const property = commandIndex === 0 ? 'fromObjectId' : 'toObjectId';
-      const existingConnectionId = target[property];
-
       if (existingConnectionId) {
-        const connectedObject = (target.canvas as XCanvas).findById(
-          existingConnectionId
-        ) as any;
         if (connectedObject) {
           connectedObject.connectors = connectedObject.connectors?.filter(
-            (connector: any) => connector.connectorId !== target.id
+            (connector: any) =>
+              !(
+                connector.connectorId === target.id &&
+                connector.connectorType === connectorType
+              )
           );
           if (connectedObject.calculateControlPoint) {
             const controlPoint =
@@ -414,11 +438,24 @@ class XConnector extends Path {
 
       currentDockingObject.connectors.push({
         connectorId: target.id,
+        connectorType: connectorType,
         point: {
           x: targetX - currentDockingObject.left,
           y: targetY - currentDockingObject.top,
         },
       });
+    }
+
+    if (!currentDockingObject && connectedObject) {
+      //if it is not attached to object, remove the connector from the existing connected object and clear the from/to object id
+      target[property] = '';
+      connectedObject.connectors = connectedObject.connectors?.filter(
+        (connector: any) =>
+          !(
+            connector.connectorId === target.id &&
+            connector.connectorType === connectorType
+          )
+      );
     }
   }
 }

@@ -1,8 +1,6 @@
 import { classRegistry } from '../../ClassRegistry';
 import { XTextbox as Textbox } from './XTextbox';
 import type { TClassProperties, TOriginX, TOriginY } from '../../typedefs';
-import { Point } from '../../Point';
-import { XConnector } from './XConnector';
 import { createRectNotesDefaultControls } from '../../controls/X_commonControls';
 
 import { XObjectInterface } from './XObjectInterface';
@@ -51,7 +49,7 @@ export class XRectNotes extends Textbox implements XObjectInterface {
   declare zIndex: number;
   declare height: number;
   declare maxHeight: number;
-  declare connectors: object[];
+
   declare id: string;
   declare boardId: string;
 
@@ -108,76 +106,7 @@ export class XRectNotes extends Textbox implements XObjectInterface {
         // mr: { /* add your desired value here */ },
       },
     });
-    this.initializeEvent();
-  }
-
-  updateConnector(point: any, connector: XConnector, type: string) {
-    const controlPoint = this.calculateControlPoint(
-      new Point(point.x, point.y)
-    );
-
-    // console.log(
-    //   'updateConnector: point:',
-    //   point,
-    //   'control point:',
-    //   controlPoint,
-    //   connector,
-    //   type
-    // );
-    //if the connector is from the object, then the startpoint should be updated
-    //if the connector is to the object, then the endpoint should be updated
-
-    //recalculate the startpoint or endpoint of the connector, and also the ControlPoint
-    if (type === 'from') {
-      connector.update({
-        fromPoint: point,
-        control1: controlPoint,
-      });
-    }
-    if (type === 'to') {
-      connector.update({
-        toPoint: point,
-        control2: controlPoint,
-      });
-    }
-  }
-
-  moveOrScaleHandler(e: any) {
-    //if there is a connector, move the connector
-    if (this.connectors?.length === 0) return;
-    this.connectors?.forEach((connector: any) => {
-      const pointConnector = connector.point;
-
-      //get canvas point of the connector point
-      const point = new Point(pointConnector.x, pointConnector.y);
-      //@ts-ignore
-      const transformedPoint = this.transformPointToCanvas(point);
-
-      //use the connectorId to find the connector and then update the connector
-      //@ts-ignore
-      const connectorObj = this.canvas?.findById(connector.connectorId);
-
-      if (!connectorObj) return;
-      console.log('connectorObj', connectorObj);
-
-      if (this.id === connectorObj.fromObjectId) {
-        this.updateConnector(transformedPoint, connectorObj, 'from');
-      }
-
-      if (this.id === connectorObj.toObjectId) {
-        this.updateConnector(transformedPoint, connectorObj, 'to');
-      }
-    });
-  }
-
-  initializeEvent() {
-    this.on('moving', (e) => {
-      this.moveOrScaleHandler(e);
-    });
-
-    this.on('scaling', (e) => {
-      this.moveOrScaleHandler(e);
-    });
+    // this.initializeEvent();
   }
 
   /**
