@@ -172,7 +172,7 @@ export class XURL extends FabricObject implements XObjectInterface {
       this.drawPreviewImage(ctx, imgWidth, imgHeight);
     }
 
-    // if (this.fileName.substring(this.fileName.lastIndexOf('.') + 1) !== FileEmum.PDF) {
+    // if (this.fileName.substring(this.fileName.lastIndexOf('.') + 1) !== FileEnum.PDF) {
     this.renderTitle(ctx, this.fileName);
     // }
     this._renderStroke(ctx);

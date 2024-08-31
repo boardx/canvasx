@@ -1,4 +1,4 @@
-export enum FileEmum {
+export enum FileEnum {
   DOC = 'doc',
   DOCX = 'docx',
   XLS = 'xls',
@@ -9,6 +9,16 @@ export enum FileEmum {
   ZIP = 'zip',
   MP4 = 'mp4',
   WEBM = 'webm',
+
+  MP3 = 'mp3',
+  M4A = 'm4a',
+  WAV = 'wav',
+  AAC = 'aac',
+  FLAC = 'flac',
+  OGG = 'ogg',
+  AIFF = 'aiff',
+  WMA = 'wma',
+  APE = 'ape',
   UNKNOWN = 'unknown',
 }
 
@@ -23,6 +33,15 @@ export enum FileDocument {
   ZIP = 'ZIP File',
   MP4 = 'Video Document',
   WEBM = 'Video Document',
+  MP3 = 'Audio Document',
+  M4A = 'Audio Document',
+  WAV = 'Audio Document',
+  AAC = 'Audio Document',
+  FLAC = 'Audio Document',
+  OGG = 'Audio Document',
+  AIFF = 'Audio Document',
+  WMA = 'Audio Document',
+  APE = 'Audio Document',
 }
 
-export type FileType = keyof typeof FileEmum;
+export type FileType = keyof typeof FileEnum;

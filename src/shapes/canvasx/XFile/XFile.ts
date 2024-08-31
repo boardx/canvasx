@@ -7,7 +7,7 @@ import { ImageProps } from '../../Image';
 import { FabricObject } from '../../Object/FabricObject';
 import { Rect } from '../../Rect';
 
-import { FileEmum } from './fileType';
+import { FileEnum } from './fileType';
 import { FileType } from './fileType';
 import { XObjectInterface } from '../XObjectInterface';
 
@@ -20,12 +20,10 @@ export type XFileProps = ImageProps & {
   fileName: string;
   previewImage: string;
   fileType: FileType;
-
   originX: string;
   originY: string;
   top: number;
   left: number;
-
   width: number;
   height: number;
   backgroundColor: string;
@@ -70,7 +68,7 @@ export class XFile extends FabricObject implements XObjectInterface {
   constructor(options: Partial<XFileProps>) {
     super(options);
 
-    const previewImage = this.getFileIconURL(options.fileName!);
+    const previewImage = this.getFileIconURL(this.objType);
 
     this.set('id', options.id || '');
     this.set('fileName', options.fileName || '');
@@ -78,7 +76,7 @@ export class XFile extends FabricObject implements XObjectInterface {
     this.set('vectorSrc', options.vectorSrc || '');
     this.set('fileSrc', options.fileSrc || '');
     this.set('previewImage', options.previewImage || '');
-    this.set('fileType', this.getFileType(options.fileName));
+    this.set('fileType', XFile.getFileTypeName(options.fileName));
     this.objType = 'XFile';
     (this.cornerColor = 'white'),
       (this.cornerStrokeColor = 'gray'),
@@ -162,19 +160,6 @@ export class XFile extends FabricObject implements XObjectInterface {
     ctx.moveTo(-this.width / 2, -this.height / 2);
     ctx.stroke();
 
-    // if (this.isMoving === false && this.resizeFilter && this._needsResize()) {
-    //   // this._lastScaleX = this.scaleX;
-    //   // this._lastScaleY = this.scaleY;
-    //   // elementToDraw = this.applyFilters(
-    //   //   null,
-    //   //   this.resizeFilter,
-    //   //   this._filteredEl || this._originalElement,
-    //   //   true
-    //   // );
-    // } else {
-    //   elementToDraw = this._element;
-    // }
-
     const imgWidth = 230;
     const imgHeight = 160;
 
@@ -188,39 +173,97 @@ export class XFile extends FabricObject implements XObjectInterface {
       );
     }
 
-    // if (this.fileName.substring(this.fileName.lastIndexOf('.') + 1) !== FileEmum.PDF) {
+    // if (this.fileName.substring(this.fileName.lastIndexOf('.') + 1) !== FileEnum.PDF) {
     this.renderTitle(ctx, this.fileName);
     // }
     this._renderStroke(ctx);
   }
 
-  getFileType(fileName = '') {
+  static getFileTypeName(fileName = '') {
     let fileType = '';
     switch (fileName.substring(fileName.lastIndexOf('.') + 1)) {
-      case FileEmum.DOC:
-      case FileEmum.DOCX:
+      case FileEnum.DOC:
+      case FileEnum.DOCX:
         fileType = 'Word Document';
         break;
-      case FileEmum.XLS:
-      case FileEmum.XLSX:
+      case FileEnum.XLS:
+      case FileEnum.XLSX:
         fileType = 'Excel Document';
         break;
-      case FileEmum.PPT:
-      case FileEmum.PPTX:
+      case FileEnum.PPT:
+      case FileEnum.PPTX:
         fileType = 'PPT Document';
         break;
-      case FileEmum.PDF:
+      case FileEnum.PDF:
         fileType = 'PDF Document';
         break;
-      case FileEmum.ZIP:
+      case FileEnum.ZIP:
         fileType = 'ZIP File';
         break;
-      case FileEmum.MP4:
-      case FileEmum.WEBM:
+      case FileEnum.MP4:
+      case FileEnum.WEBM:
         fileType = 'Video Document';
         break;
+      case FileEnum.MP3:
+      case FileEnum.WEBM:
+      case FileEnum.M4A:
+      case FileEnum.WAV:
+      case FileEnum.AAC:
+      case FileEnum.FLAC:
+      case FileEnum.OGG:
+      case FileEnum.AIFF:
+      case FileEnum.WMA:
+      case FileEnum.APE:
+        fileType = 'Audio Document';
+        break;
+
       default:
         fileType = 'Other Document';
+        break;
+    }
+    return fileType;
+  }
+
+  static getFileType(fileName = '') {
+    let fileType = '';
+    switch (fileName.substring(fileName.lastIndexOf('.') + 1)) {
+      case FileEnum.DOC:
+      case FileEnum.DOCX:
+        fileType = 'XFileWord';
+        break;
+      case FileEnum.XLS:
+      case FileEnum.XLSX:
+        fileType = 'XFileExcel';
+        break;
+      case FileEnum.PPT:
+      case FileEnum.PPTX:
+        fileType = 'XFilePPT';
+        break;
+      case FileEnum.PDF:
+        fileType = 'XFilePDF';
+        break;
+      case FileEnum.ZIP:
+        fileType = 'XFileZip';
+        break;
+      case FileEnum.MP4:
+      case FileEnum.WEBM:
+        fileType = 'XFileVideo';
+        break;
+      case FileEnum.MP3:
+      case FileEnum.WEBM:
+      case FileEnum.M4A:
+      case FileEnum.WAV:
+      case FileEnum.AAC:
+      case FileEnum.FLAC:
+      case FileEnum.OGG:
+      case FileEnum.AIFF:
+      case FileEnum.WMA:
+      case FileEnum.APE:
+        fileType = 'XFileAudio';
+        break;
+
+      default:
+        fileType = 'XFile';
         break;
     }
     return fileType;
@@ -230,9 +273,9 @@ export class XFile extends FabricObject implements XObjectInterface {
     if (!fileName) return false;
 
     switch (fileName.substr(fileName.lastIndexOf('.') + 1)) {
-      case FileEmum.MP4:
+      case FileEnum.MP4:
         return true;
-      case FileEmum.WEBM:
+      case FileEnum.WEBM:
         return true;
       default:
         return false;
@@ -348,33 +391,29 @@ export class XFile extends FabricObject implements XObjectInterface {
     }
     if (lineCount < 3) context.fillText(line, x, _y);
   }
-  getFileIconURL(fileName: string) {
+  getFileIconURL(objType: string) {
     let fileIconURL = '';
-    switch (fileName.substring(fileName.lastIndexOf('.') + 1)) {
-      case 'doc':
-      case 'docx':
+    switch (objType) {
+      case 'XFileWord':
         fileIconURL = '/boardxstatic/fileIcons/word.png';
         break;
-      case 'xls':
-      case 'xlsx':
+      case 'XFileExcel':
         fileIconURL = '/boardxstatic/fileIcons/excel.png';
         break;
-      case 'ppt':
-      case 'pptx':
+      case 'XFilePPT':
         fileIconURL = '/boardxstatic/fileIcons/ppt.png';
         break;
-      case 'pdf':
+      case 'XFilePDF':
         fileIconURL = '/boardxstatic/fileIcons/pdf.svg';
         break;
-      case 'zip':
+      case 'XFileZip':
         fileIconURL = '/boardxstatic/fileIcons/zip.png';
         break;
-      case 'mp4':
+      case 'XFileVideo':
         fileIconURL = '/boardxstatic/fileIcons/mp4.png';
         break;
-
-      case 'webm':
-        fileIconURL = '/boardxstatic/fileIcons/mp4.png';
+      case 'XFileAudio':
+        fileIconURL = '/boardxstatic/fileIcons/audio.png';
         break;
       default:
         fileIconURL = '/boardxstatic/fileIcons/file.png';
@@ -383,7 +422,7 @@ export class XFile extends FabricObject implements XObjectInterface {
     return fileIconURL;
   }
   async loadPreviewImage(previewImage: string, fileName: string) {
-    const url = previewImage ? previewImage : this.getFileIconURL(fileName!);
+    const url = previewImage ? previewImage : this.getFileIconURL(this.objType);
 
     const loadedImg = await loadImage(url, {
       crossOrigin: 'anonymous',

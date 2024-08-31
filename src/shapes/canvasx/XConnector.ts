@@ -82,6 +82,8 @@ class XConnector extends Path {
     this.cornerStyle = 'circle';
     this.transparentCorners = false;
     this.cornerStrokeColor = 'gray';
+    this.originX = 'left';
+    this.originY = 'top';
     this.hasBorders = false;
     this.type = 'XConnector';
     this.objectCaching = false;

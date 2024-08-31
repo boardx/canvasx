@@ -171,20 +171,6 @@ export * as controlsUtils from './src/controls';
 
 export * from './src/filters';
 
-export {
-  XRectNotes,
-  XCircleNotes,
-  XTextbox,
-  XShapeNotes,
-  XImage,
-  XConnector,
-  XFile,
-  XGroup,
-  XURL,
-  XMarkdown,
-  XChart,
-  XFrame,
-  XPath,
-} from './src/shapes/canvasx';
+export * from './src/shapes/canvasx';
 
 export { XCanvas } from './src/canvas/canvasx/bx-canvas';

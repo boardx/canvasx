@@ -20,7 +20,7 @@ const IndexPage: NextPage = () => {
                 height: document.documentElement.clientHeight
                     - 60,
             });
-            enum FileEmum {
+            enum FileEnum {
                 DOC = 'doc',
                 DOCX = 'docx',
                 XLS = 'xls',
@@ -34,18 +34,18 @@ const IndexPage: NextPage = () => {
                 UNKNOWN = 'unknown',
             }
 
-            const files: FileEmum[] = [
-                FileEmum.DOC,
-                FileEmum.DOCX,
-                FileEmum.XLS,
-                FileEmum.XLSX,
-                FileEmum.PPT,
-                FileEmum.PPTX,
-                FileEmum.PDF,
-                FileEmum.ZIP,
-                FileEmum.MP4,
-                FileEmum.WEBM,
-                FileEmum.UNKNOWN,
+            const files: FileEnum[] = [
+                FileEnum.DOC,
+                FileEnum.DOCX,
+                FileEnum.XLS,
+                FileEnum.XLSX,
+                FileEnum.PPT,
+                FileEnum.PPTX,
+                FileEnum.PDF,
+                FileEnum.ZIP,
+                FileEnum.MP4,
+                FileEnum.WEBM,
+                FileEnum.UNKNOWN,
             ];
 
             const columnCount = 4;
