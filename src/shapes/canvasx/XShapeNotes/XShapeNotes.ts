@@ -1,5 +1,4 @@
 import { classRegistry } from '../../../ClassRegistry';
-import { createRectNotesDefaultControls } from '../../../controls/X_commonControls';
 import { getFabricDocument } from '../../../env';
 import { TClassProperties, TFiller } from '../../../typedefs';
 import { XTextbox } from '../XTextbox';
@@ -8,6 +7,7 @@ import { shapeList } from './types';
 import { shapeType } from './types';
 
 import { XObjectInterface } from '../XObjectInterface';
+import { createShapeNotesDefaultControls } from '../../../controls/X_commonControls';
 
 export type shapeInfo = {
   name: shapeType;
@@ -95,7 +95,7 @@ export class XShapeNotes extends XTextbox implements XObjectInterface {
 
     this.resetSplitByGrapheme();
     Object.assign(this, {
-      controls: { ...createRectNotesDefaultControls(this) },
+      controls: { ...createShapeNotesDefaultControls(this) },
     });
 
     this.on('scaling', this.handleScaling);

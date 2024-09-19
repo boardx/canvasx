@@ -707,7 +707,7 @@ export class XTextbox<
     super.drawObject(ctx);
     // console.log('!@@ drawObject', this.canvas?.dockingWidget, this);
     //@ts-ignore
-    if (this == this.canvas.dockingWidget) {
+    if (this == this.canvas?.dockingWidget) {
       this.renderDockingControls(ctx);
     }
   }
