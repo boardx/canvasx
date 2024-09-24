@@ -3,6 +3,8 @@ import { FabricObject } from '../Object/FabricObject';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { classRegistry } from '../../ClassRegistry';
 import { createCanvasElement } from '../../util/misc/dom';
+import { WidgetChartInterface, EntityKeys } from './type/widget.entity.chart';
+import { WidgetType } from './type/widget.type';
 
 Chart.register(...registerables);
 
@@ -12,14 +14,14 @@ interface ChartObjectOptions extends ObjectProps {
   height: number;
 }
 
-class XChart extends FabricObject {
+class XChart extends FabricObject implements WidgetChartInterface {
   private chartConfig: ChartConfiguration;
   private chartInstance: Chart | null = null;
   private canvasElement: HTMLCanvasElement | null = null;
   private needsUpdate: boolean = true; // Flag to track if update is needed
 
-  static type = 'XChart';
-  static objType = 'XChart';
+  static type: WidgetType = 'XChart';
+  static objType: WidgetType = 'XChart';
 
   constructor(options: Partial<ChartObjectOptions>) {
     super(options);
@@ -29,6 +31,16 @@ class XChart extends FabricObject {
     this.createCanvasElement();
     this.addDoubleClickEventListener();
   }
+  chartOptions: any;
+  boardId: string;
+  objType: WidgetType;
+  userId: string;
+  zIndex: number;
+  version: string;
+  updatedAt: number;
+  lastEditedBy: string;
+  createdAt: number;
+  createdBy: string;
 
   private createCanvasElement() {
     if (!this.canvasElement) {
@@ -77,6 +89,19 @@ class XChart extends FabricObject {
       });
     });
   }
+  getObject() {
+    const entityKeys: string[] = EntityKeys;
+    const result: Record<string, any> = {};
+
+    entityKeys.forEach((key) => {
+      if (key in this) {
+        result[key] = (this as any)[key];
+      }
+    });
+
+    return result;
+  }
+
 
   async _render(ctx: CanvasRenderingContext2D) {
     if (this.needsUpdate) {
@@ -126,10 +151,10 @@ class XChart extends FabricObject {
     modal.innerHTML = `
       <h2>Edit Chart Data</h2>
       <textarea id="chartDataInput" rows="10" cols="40">${JSON.stringify(
-        this.chartConfig.data,
-        null,
-        2
-      )}</textarea>
+      this.chartConfig.data,
+      null,
+      2
+    )}</textarea>
       <br />
       <button id="saveChartData">Save</button>
       <button id="cancelEdit">Cancel</button>

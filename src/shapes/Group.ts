@@ -43,7 +43,7 @@ import type { FitContentLayout } from '../LayoutManager';
  */
 class NoopLayoutManager extends LayoutManager {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  performLayout() {}
+  performLayout() { }
 }
 
 export interface GroupEvents extends ObjectEvents, CollectionEvents {
@@ -58,14 +58,13 @@ export interface GroupOwnProps {
 
 export interface SerializedGroupProps
   extends SerializedObjectProps,
-    GroupOwnProps {
+  GroupOwnProps {
   objects: SerializedObjectProps[];
   layoutManager: SerializedLayoutManager;
 }
 
 export interface GroupProps extends FabricObjectProps, GroupOwnProps {
   layoutManager: LayoutManager;
-  zIndex: number;
 }
 
 export const groupDefaultValues: Partial<TClassProperties<Group>> = {
@@ -84,8 +83,7 @@ export class Group
   extends createCollectionMixin(
     FabricObject<GroupProps, SerializedGroupProps, GroupEvents>
   )
-  implements GroupProps
-{
+  implements GroupProps {
   /**
    * Used to optimize performance
    * set to `false` if you don't need contained objects to be targets of events
@@ -632,9 +630,9 @@ export class Group
    */
   getSvgStyles(): string {
     const opacity =
-        typeof this.opacity !== 'undefined' && this.opacity !== 1
-          ? `opacity: ${this.opacity};`
-          : '',
+      typeof this.opacity !== 'undefined' && this.opacity !== 1
+        ? `opacity: ${this.opacity};`
+        : '',
       visibility = this.visible ? '' : ' visibility: hidden;';
     return [opacity, this.getSvgFilter(), visibility].join('');
   }

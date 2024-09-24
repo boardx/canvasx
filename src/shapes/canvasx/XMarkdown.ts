@@ -8,7 +8,8 @@ import hljs from 'highlight.js'; // https://highlightjs.org
 import markdownit from 'markdown-it';
 //@ts-ignore
 import javascript from 'highlight.js/lib/languages/javascript';
-import { XObjectInterface } from './XObjectInterface';
+import { WidgetMarkdownInterface, EntityKeys } from './type/widget.entity.markdown';
+import { WidgetType } from './type/widget.type';
 
 hljs.registerLanguage('javascript', javascript);
 
@@ -20,14 +21,14 @@ interface MarkdownTextOptions {
   markdownText?: string;
 }
 
-class XMarkdown extends XTextbox implements XObjectInterface {
+class XMarkdown extends XTextbox implements WidgetMarkdownInterface {
   public markdownText: string;
   isEditing: boolean = false;
   private renderedImage: FabricImage | null = null;
   private md: any;
 
-  static type = 'XMarkdown';
-  static objType = 'XMarkdown';
+  static type: WidgetType = 'XMarkdown';
+  static objType: WidgetType = 'XMarkdown';
   constructor(text: string, options?: MarkdownTextOptions) {
     super(text, options);
     this.markdownText = options?.markdownText || text;
@@ -69,7 +70,7 @@ class XMarkdown extends XTextbox implements XObjectInterface {
         if (lang && hljs.getLanguage(lang)) {
           try {
             return hljs.highlight(str, { language: lang }).value;
-          } catch (__) {}
+          } catch (__) { }
         }
 
         return ''; // use external default escaping
@@ -114,6 +115,20 @@ class XMarkdown extends XTextbox implements XObjectInterface {
       this.dirty = true;
       this.canvas?.renderAll();
     });
+  }
+
+
+  getObject() {
+    const entityKeys: string[] = EntityKeys;
+    const result: Record<string, any> = {};
+
+    entityKeys.forEach((key) => {
+      if (key in this) {
+        result[key] = (this as any)[key];
+      }
+    });
+
+    return result;
   }
 
   private parseHtmlToImage(html: string): Promise<FabricImage> {

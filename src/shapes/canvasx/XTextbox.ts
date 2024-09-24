@@ -1,16 +1,17 @@
-import { TClassProperties, TOptions, TOriginX, TOriginY } from '../../typedefs';
+import { TClassProperties, TOriginX, TOriginY } from '../../typedefs';
 import { IText } from '../IText/IText';
 import { classRegistry } from '../../ClassRegistry';
 import { createTextboxDefaultControls } from '../../controls/X_commonControls';
-import { EventName, TextAlign, WidgetType, Origin } from './types';
-import { SerializedTextboxProps, Textbox, TextboxProps } from '../Textbox';
+import { EventName, TextAlign, Origin } from './types';
+import { Textbox } from '../Textbox';
+
+import { WidgetType } from './type/widget.type';
+import { WidgetTextboxInterface, EntityKeys } from './type/widget.entity.textbox';
 
 import { isTransformCentered, getLocalPoint } from '../../controls/util';
 import { Point } from '../../Point';
 import { XConnector } from './XConnector';
 import { FabricObject } from '../Object/Object';
-import { XObjectInterface } from './XObjectInterface';
-import { ITextEvents } from '../IText/ITextBehavior';
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
 // regexes, list of properties that are not suppose to change by instances, magic consts.
 // this will be a separated effort
@@ -18,8 +19,7 @@ export const textboxDefaultValues: Partial<TClassProperties<XTextbox>> = {
   minWidth: 20,
   dynamicMinWidth: 2,
   // _wordJoiners: /[ \t\r]/,
-  splitByGrapheme: true,
-  objType: 'XTextbox',
+  splitByGrapheme: false,
   cornerColor: 'white',
   cornerSize: 10,
   cornerStyle: 'circle',
@@ -42,16 +42,11 @@ export const XTextboxProps: Partial<TClassProperties<XTextbox>> = {};
  * user can only change width. Height is adjusted automatically based on the
  * wrapping of lines.
  */
-export class XTextbox<
-    Props extends TOptions<TextboxProps> = Partial<TextboxProps>,
-    SProps extends SerializedTextboxProps = SerializedTextboxProps,
-    EventSpec extends ITextEvents = ITextEvents
-  >
+export class XTextbox
   extends Textbox
-  implements XObjectInterface
-{
-  static type = 'XTextbox';
-  static objType = 'XTextbox';
+  implements WidgetTextboxInterface {
+  static type: WidgetType = 'XTextbox';
+  static objType: WidgetType = 'XTextbox';
   /**
    * Minimum width of textbox, in pixels.
    * @type Number
@@ -90,43 +85,7 @@ export class XTextbox<
 
   static ownDefaults: Record<string, any> = textboxDefaultValues;
 
-  extendedProperties = [
-    'id', // string, the id of the object
-    'angle', //  integer, angle for recording rotating
-    'backgroundColor', // string,  background color, works when the image is transparent
-    'fill', // the font color
-    'width', // integer, width of the object
-    'height', // integer, height of the object
-    'left', // integer left for position
-    'locked', // boolean, lock status for the widget， this is connected to lock
-    'lockMovementX', // boolean, lock the verticle movement
-    'lockMovementY', // boolean, lock the horizontal movement
-    'lockScalingFlip', // boolean,  make it can not be inverted by pulling the width to the negative side
-    'objType', // object type
-    'originX', // string, Horizontal origin of transformation of an object (one of "left", "right", "center") See http://jsfiddle.net/1ow02gea/244/ on how originX/originY affect objects in groups
-    'originY', // string, Vertical origin of transformation of an object (one of "top", "bottom", "center") See http://jsfiddle.net/1ow02gea/244/ on how originX/originY affect objects in groups
-    'scaleX', // nunber, Object scale factor (horizontal)
-    'scaleY', // number, Object scale factor (vertical)
-    'selectable', // boolean, When set to `false`, an object can not be selected for modification (using either point-click-based or group-based selection). But events still fire on it.
-    'top', // integer, Top position of an object. Note that by default it's relative to object top. You can change this by setting originY={top/center/bottom}
-    'userId', // string, user identity
-    'boardId', // whiteboard id, string
-    'zIndex', // the index for the object on whiteboard, integer
-    'version', // version of the app, string
-    'fontFamily', // string, font family
-    'fontSize', // integer, font size
-    'fontWeight', // integer, font weight
-    'lineHeight', // integer, font height
-    'text', // string, text
-    'textAlign', // string, alignment
-    'editable',
-    'shapeScaleX',
-    'shapeScaleY',
-    'maxHeight',
-    'tempTop',
-    'fixedScaleChange',
-    'connectors', //the connectors of the object
-  ];
+
 
   static getDefaults() {
     return {
@@ -135,6 +94,8 @@ export class XTextbox<
       ...XTextbox.ownDefaults,
     };
   }
+
+
 
   constructor(text: string, options: any) {
     super(text, options);
@@ -146,6 +107,17 @@ export class XTextbox<
 
     // this.resetResizeControls();
   }
+  maxHeight: number;
+  fixedScaleChange: boolean;
+  boardId: string;
+  objType: WidgetType;
+  userId: string;
+  zIndex: number;
+  version: string;
+  updatedAt: number;
+  lastEditedBy: string;
+  createdAt: number;
+  createdBy: string;
   /* boardx extend function */
 
   updateConnector(point: any, connector: XConnector, type: string) {
@@ -605,13 +577,27 @@ export class XTextbox<
     return;
   }
 
+  getObject() {
+    const entityKeys: string[] = EntityKeys;
+    const result: Record<string, any> = {};
+
+    entityKeys.forEach((key) => {
+      if (key in this) {
+        result[key] = (this as any)[key];
+      }
+    });
+
+    return result;
+  }
+
+
   // toObject(propertiesToInclude: Array<any>): object {
   //   return super.toObject(
   //     ['minWidth', 'splitByGrapheme'].concat(propertiesToInclude)
   //   );
   // }
   /**extend function for fronted */
-  checkTextboxChange() {}
+  checkTextboxChange() { }
   initializeEvent() {
     const self = this;
     const canvas = this.canvas;
@@ -630,7 +616,7 @@ export class XTextbox<
         self.left += (self.width * self.scaleX) / 2;
       }
 
-      if (self.objType === WidgetType.XText) {
+      if (self.objType === 'XTextbox') {
         self.originY = 'top';
 
         self.top -= (self.height * self.scaleY) / 2;
@@ -675,7 +661,7 @@ export class XTextbox<
         self.left -= (self.width * self.scaleX) / 2;
       }
 
-      if (self.objType === WidgetType.XText) {
+      if (self.objType === 'XTextbox') {
         self.top = self.tempTop + (self.height * self.scaleY) / 2;
         self.tempTop = self.top;
       }
@@ -814,7 +800,7 @@ export class XTextbox<
     const textAlign = self.textAlign;
 
     if (
-      self.objType === 'XText' &&
+      self.objType === 'XTextbox' &&
       (textAlign === 'left' || textAlign === 'center')
     ) {
       self.setControlVisible('ml', false);

@@ -9,7 +9,11 @@ import type { FabricObjectProps, SerializedObjectProps } from '../Object/types';
 import type { ObjectEvents } from '../../EventTypeDefs';
 // @todo Would be nice to have filtering code not imported directly.
 
+import { WidgetImageInterface, EntityKeys } from './type/widget.entity.image';
 import { FabricImage } from '../Image';
+import { WidgetType } from './type/widget.type';
+import { FileObject } from './type/file';
+
 
 export type ImageSource =
   | HTMLImageElement
@@ -49,7 +53,7 @@ export interface SerializedImageProps extends SerializedObjectProps {
   cropY: number;
 }
 
-export interface ImageProps extends FabricObjectProps, UniqueImageProps {}
+export interface ImageProps extends FabricObjectProps, UniqueImageProps { }
 
 const IMAGE_PROPS = ['cropX', 'cropY'] as const;
 
@@ -60,9 +64,19 @@ export class XImage<
   Props extends TOptions<ImageProps> = Partial<ImageProps>,
   SProps extends SerializedImageProps = SerializedImageProps,
   EventSpec extends ObjectEvents = ObjectEvents
-> extends FabricImage {
+> extends FabricImage implements WidgetImageInterface {
+  markdownText: string;
+  cropWidth: number;
+  cropHeight: number;
+  previewImage: FileObject;
+  imageSrc: FileObject;
+  version: string;
+  updatedAt: number;
+  lastEditedBy: string;
+  createdAt: number;
+  createdBy: string;
   /* boardx cusotm function */
-  declare objType: string;
+  declare objType: WidgetType;
 
   declare locked: boolean;
 
@@ -87,55 +101,25 @@ export class XImage<
   declare oHeight: number;
 
   declare strokeWidth: number;
-  static type = 'XImage';
-  static objType = 'XImage';
+  static type: WidgetType = 'XImage';
+  static objType: WidgetType = 'XImage';
 
-  public extendedProperties = [
-    'id',
-    'angle',
-    'backgroundColor',
-    'fill',
-    'width',
-    'height',
-    'left',
-    'locked',
-    'lockScalingX',
-    'lockScalingY',
-    'lockMovementX',
-    'lockMovementY',
-    'lockScalingFlip',
-    'objType',
-    'originX',
-    'originY',
-    'scaleX',
-    'scaleY',
-    'selectable',
-    'top',
-    'userNo',
-    'userId',
-    'boardId',
-    'zIndex',
-    'version',
-    'isPanel',
-    'panelObj',
-    'relationship',
-    'flipX',
-    'flipY',
-    'stroke',
-    'strokeWidth',
-    'lines',
-    'src',
-    'name',
-    'progressBar',
-    'isUploading',
-    'initedProgressBar',
-    'hoverCursor',
-    'lockUniScaling',
-    'cornerStyle',
-    'lightbox',
-    'cropSelectionRect',
-    'url',
-  ];
+
+
+
+  getObject() {
+    const entityKeys: string[] = EntityKeys;
+    const result: Record<string, any> = {};
+
+    entityKeys.forEach((key) => {
+      if (key in this) {
+        result[key] = (this as any)[key];
+      }
+    });
+
+    return result;
+  }
+
 
   /**
    * @private
@@ -201,8 +185,8 @@ export class XImage<
    */
   parsePreserveAspectRatioAttribute() {
     const pAR = parsePreserveAspectRatioAttribute(
-        this.preserveAspectRatio || ''
-      ),
+      this.preserveAspectRatio || ''
+    ),
       pWidth = this.width,
       pHeight = this.height,
       parsedAttributes = { width: pWidth, height: pHeight };

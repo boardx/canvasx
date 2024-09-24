@@ -7,6 +7,9 @@ import { createPathControls } from '../../controls/pathControl';
 import { XCanvas } from '../../canvas/canvasx/bx-canvas';
 import { Transform } from '../../EventTypeDefs';
 
+import { EntityKeys, WidgetConnectorInterface } from './type/widget.entity.connector';
+import { WidgetType } from './type/widget.type';
+
 const getPath = (
   fromPoint: XY,
   toPoint: XY,
@@ -21,9 +24,9 @@ const getPath = (
   }
 };
 
-class XConnector extends Path {
-  static type = 'XConnector';
-  objType = 'XConnector';
+class XConnector extends Path implements WidgetConnectorInterface {
+  static type: WidgetType = 'XConnector';
+  static objType: WidgetType = 'XConnector';
   style: any;
   declare fromObjectId: string;
   declare toObjectId: string;
@@ -44,29 +47,6 @@ class XConnector extends Path {
    */
   declare pathEnd: TSimpleParsedCommand[];
 
-  public extendedProperties = [
-    'objType',
-    'boardId',
-    'userId',
-    'timestamp',
-    'zIndex',
-    'locked',
-    'id',
-    'zIndex',
-    'fromObjectId',
-    'toObjectId',
-    'control1',
-    'control2',
-    'style',
-    'pathType',
-    'pathArrowTip',
-    'fromPoint',
-    'toPoint',
-    'left',
-    'top',
-    'width',
-    'height',
-  ];
 
   constructor(
     fromPoint: XY,
@@ -123,11 +103,33 @@ class XConnector extends Path {
       this.dragActionEventHandler(evtOpt.commandIndex, evtOpt.pointIndex);
     });
   }
+  boardId: string;
+  objType: WidgetType;
+  userId: string;
+  zIndex: number;
+  version: string;
+  updatedAt: number;
+  lastEditedBy: string;
+  createdAt: number;
+  createdBy: string;
 
   getFromPoint() {
     const command = this.path[0];
     return new Point(command[1]!, command[2]!);
   }
+  getObject() {
+    const entityKeys: string[] = EntityKeys;
+    const result: Record<string, any> = {};
+
+    entityKeys.forEach((key) => {
+      if (key in this) {
+        result[key] = (this as any)[key];
+      }
+    });
+
+    return result;
+  }
+
 
   getToPoint() {
     const lastCommand = this.path[this.path.length - 1];
@@ -160,11 +162,11 @@ class XConnector extends Path {
       const startAngle =
         pathType === 'straightPath'
           ? Math.atan2(fromPoint.y - toPoint.y, fromPoint.x - toPoint.x) +
-            Math.PI
+          Math.PI
           : Math.atan2(
-              lastCommand[2]! - fromPoint.y,
-              lastCommand[1]! - fromPoint.x
-            );
+            lastCommand[2]! - fromPoint.y,
+            lastCommand[1]! - fromPoint.x
+          );
 
       const startArrow1X =
         fromPoint.x + startArrowSize * Math.cos(startAngle + Math.PI / 6);
@@ -188,9 +190,9 @@ class XConnector extends Path {
         pathType === 'straightPath'
           ? Math.atan2(toPoint.y - fromPoint.y, toPoint.x - fromPoint.x)
           : Math.atan2(
-              toPoint.y - lastCommand[4]!,
-              toPoint.x - lastCommand[3]!
-            );
+            toPoint.y - lastCommand[4]!,
+            toPoint.x - lastCommand[3]!
+          );
 
       const endArrow1X =
         toPoint.x - endArrowSize * Math.cos(endAngle - Math.PI / 6);
@@ -390,7 +392,7 @@ class XConnector extends Path {
     if (
       currentDockingObject &&
       currentDockingObject.controls[
-        currentDockingObject.canvas.hoveringControl
+      currentDockingObject.canvas.hoveringControl
       ] &&
       currentDockingObject.calculateControlPoint
     ) {

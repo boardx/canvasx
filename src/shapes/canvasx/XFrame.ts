@@ -5,14 +5,17 @@ import { Group } from '../Group';
 import { LayoutManager } from '../../LayoutManager';
 import { FitContentLayout } from '../../LayoutManager/LayoutStrategies/FitContentLayout';
 import { classRegistry } from '../../ClassRegistry';
+import { EntityKeys, WidgetFrameInterface } from './type/widget.entity.frame';
+import { WidgetType } from './type/widget.type';
 
-class XFrame extends FabricObject {
+class XFrame extends FabricObject implements WidgetFrameInterface {
   title: Textbox;
+  titleText: string;
   body: Rect;
   objects: Group;
   layoutManager: LayoutManager;
-  static type = 'XFrame';
-  static objType = 'XFrame';
+  static type: WidgetType = 'XFrame';
+  static objType: WidgetType = 'XFrame';
 
   constructor(
     canvas: any,
@@ -24,6 +27,7 @@ class XFrame extends FabricObject {
   ) {
     super();
     this.canvas = canvas;
+
     this.title = new Textbox(titleText, {
       left: left,
       top: top,
@@ -32,7 +36,7 @@ class XFrame extends FabricObject {
       selectable: true,
       editable: true,
     });
-
+    this.titleText = titleText;
     this.body = new Rect({
       left: left,
       top: top + 30,
@@ -116,6 +120,15 @@ class XFrame extends FabricObject {
 
     this.canvas!.renderAll();
   }
+  boardId: string;
+  objType: WidgetType;
+  userId: string;
+  zIndex: number;
+  version: string;
+  updatedAt: number;
+  lastEditedBy: string;
+  createdAt: number;
+  createdBy: string;
 
   checkObjectInFrame(obj: any) {
     const objBound = obj.getBoundingRect();
@@ -133,6 +146,18 @@ class XFrame extends FabricObject {
     }
   }
 
+  getObject() {
+    const entityKeys: string[] = EntityKeys;
+    const result: Record<string, any> = {};
+
+    entityKeys.forEach((key) => {
+      if (key in this) {
+        result[key] = (this as any)[key];
+      }
+    });
+
+    return result;
+  }
   addObject(obj: any) {
     if (!this.objects.contains(obj)) {
       this.objects.add(obj);

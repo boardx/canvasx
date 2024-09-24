@@ -1,5 +1,4 @@
 import type { BorderProps } from './BorderProps';
-import { CanvasxProps } from './CanvasXProps';
 import type { ControlProps } from './ControlProps';
 import type { LockInteractionProps } from './LockInteractionProps';
 import type { ObjectProps } from './ObjectProps';
@@ -8,8 +7,7 @@ export interface FabricObjectProps
   extends ObjectProps,
     ControlProps,
     BorderProps,
-    LockInteractionProps,
-    CanvasxProps {
+    LockInteractionProps {
   /**
    * When `true`, cache does not get updated during scaling. The picture will get blocky if scaled
    * too much and will be redrawn with correct details at the end of scaling.

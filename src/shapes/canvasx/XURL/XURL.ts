@@ -6,8 +6,11 @@ import { loadImage } from '../../../util/misc/objectEnlive';
 import { ImageProps } from '../../Image';
 import { FabricObject } from '../../Object/FabricObject';
 import { Rect } from '../../Rect';
+import { FileObject } from '../type/file';
 
-import { XObjectInterface } from '../XObjectInterface';
+import { WidgetURLInterface, EntityKeys } from '../type/widget.entity.url';
+import { WidgetType } from '../type/widget.type';
+
 
 export type XURLProps = ImageProps & {
   id: string;
@@ -35,14 +38,11 @@ export const XURLDefaultValues: Partial<XURLProps> = {
   transparentCorners: false,
 };
 
-export class XURL extends FabricObject implements XObjectInterface {
+export class XURL extends FabricObject implements WidgetURLInterface {
   static objType = 'XURL';
   static type = 'XURL';
   transcription: string;
-  vectorSrc: string;
-  fileSrc: string;
-  fileName: string;
-  previewImage: string;
+
   _previewImage: HTMLImageElement | null = null;
 
   public extendedProperties = [
@@ -108,37 +108,33 @@ export class XURL extends FabricObject implements XObjectInterface {
     this.height = 248;
     this.loadPreviewImage(previewImage, options.fileName!);
   }
+  vectorSrc: FileObject;
+  fileSrc: FileObject;
+  fileName: string;
+  previewImage: FileObject;
+  boardId: string;
+  objType: WidgetType;
+  userId: string;
+  zIndex: number;
+  version: string;
+  updatedAt: number;
+  lastEditedBy: string;
+  createdAt: number;
+  createdBy: string;
 
-  getContextMenuList() {
-    let menuList;
-    if (this.locked) {
-      menuList = [
-        'Bring forward',
-        'Bring to front',
-        'Send backward',
-        'Send to back',
-      ];
-    } else {
-      menuList = [
-        'Bring forward',
-        'Bring to front',
-        'Send backward',
-        'Send to back',
-        'Duplicate',
-        'Copy',
-        'Paste',
-        'Cut',
-        'Delete',
-      ];
-    }
+  getObject() {
+    const entityKeys: string[] = EntityKeys;
+    const result: Record<string, any> = {};
 
-    if (this.locked) {
-      menuList.push('Unlock');
-    } else {
-      menuList.push('Lock');
-    }
-    return menuList;
+    entityKeys.forEach((key) => {
+      if (key in this) {
+        result[key] = (this as any)[key];
+      }
+    });
+
+    return result;
   }
+
 
   // static getDefaults() {
   //   return {
@@ -151,7 +147,7 @@ export class XURL extends FabricObject implements XObjectInterface {
     return super.toObject([...this.extendedProperties, ...propertiesToInclude]);
   }
   onDoubleClick() {
-    getFabricWindow().open(this.fileSrc, '_blank');
+    getFabricWindow().open(this.fileSrc.tmpPath, '_blank');
   }
 
   drawObject(ctx: CanvasRenderingContext2D) {
@@ -230,9 +226,9 @@ export class XURL extends FabricObject implements XObjectInterface {
 
     // handle the situation that the website's title is null
     if (title === null || unicodeTitle.indexOf('\\ufffd') !== -1 || !title) {
-      const firstChar = this.fileSrc.indexOf('.');
-      const lastChar = this.fileSrc.indexOf('.', firstChar + 1);
-      this.fileName = this.fileSrc.substring(firstChar + 1, lastChar);
+      const firstChar = this.fileSrc.tmpPath.indexOf('.');
+      const lastChar = this.fileSrc.tmpPath.indexOf('.', firstChar + 1);
+      this.fileName = this.fileSrc.tmpPath.substring(firstChar + 1, lastChar);
     }
 
     // title setting
@@ -240,9 +236,8 @@ export class XURL extends FabricObject implements XObjectInterface {
 
     // url setting
     const newurl = this.fileSrc
-      ? `${this.fileSrc.split('/')[0]}/${this.fileSrc.split('/')[1]}/${
-          this.fileSrc.split('/')[2]
-        }`
+      ? `${this.fileSrc.tmpPath.split('/')[0]}/${this.fileSrc.tmpPath.split('/')[1]}/${this.fileSrc.tmpPath.split('/')[2]
+      }`
       : '';
     ctx.font = '12px Inter';
     ctx.fillStyle = 'rgba(35, 41, 48, 0.65)';

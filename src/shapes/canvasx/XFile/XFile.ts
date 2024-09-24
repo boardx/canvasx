@@ -1,3 +1,4 @@
+import { TOriginX, TOriginY } from 'fabric';
 import { classRegistry } from '../../../ClassRegistry';
 import { Shadow } from '../../../Shadow';
 import { getFabricWindow } from '../../../env';
@@ -7,151 +8,174 @@ import { ImageProps } from '../../Image';
 import { FabricObject } from '../../Object/FabricObject';
 import { Rect } from '../../Rect';
 
-import { FileEnum } from './fileType';
-import { FileType } from './fileType';
-import { XObjectInterface } from '../XObjectInterface';
+import {
+  WidgetFileInterface,
+  WidgetFileClass,
+  FileObjectType,
+  FileEnum
+} from '../type/widget.entity.file';
+import { WidgetType, WidgetFileType } from '../type/widget.type';
+import { EntityKeys, } from "../type/widget.entity.file";
+import { FileObject } from "../type/file";
 
-export type XFileProps = ImageProps & {
-  id: string;
-  text: string;
-  transcription: string;
-  vectorSrc: string;
-  fileSrc: string;
-  fileName: string;
-  previewImage: string;
-  fileType: FileType;
-  originX: string;
-  originY: string;
-  top: number;
-  left: number;
-  width: number;
-  height: number;
-  backgroundColor: string;
+
+
+export type XFileProps = ImageProps & WidgetFileClass;
+
+const FILE_ICON_PATHS: Record<WidgetFileType, string> = {
+  XFileWord: '/boardxstatic/fileIcons/word.png',
+  XFileExcel: '/boardxstatic/fileIcons/excel.png',
+  XFilePPT: '/boardxstatic/fileIcons/ppt.png',
+  XFilePDF: '/boardxstatic/fileIcons/pdf.svg',
+  XFileZip: '/boardxstatic/fileIcons/zip.png',
+  XFileVideo: '/boardxstatic/fileIcons/mp4.png',
+  XFileAudio: '/boardxstatic/fileIcons/audio.png',
+  XFile: '/boardxstatic/fileIcons/file.png',
 };
 
-export const XFileDefaultValues: Partial<XFileProps> = {
-  originX: 'center',
-  originY: 'center',
-  cornerColor: 'white',
-  cornerStrokeColor: 'gray',
-  cornerSize: 10,
-  cornerStyle: 'circle',
-  transparentCorners: false,
+const FILE_TYPE_NAMES: Record<FileObjectType, string> = {
+  DOC: 'Word Document',
+  DOCX: 'Word Document',
+  XLS: 'Excel Document',
+  XLSX: 'Excel Document',
+  PPT: 'PPT Document',
+  PPTX: 'PPT Document',
+  PDF: 'PDF Document',
+  ZIP: 'ZIP File',
+  MP4: 'Video Document',
+  WEBM: 'Video Document',
+  MP3: 'Audio Document',
+  M4A: 'Audio Document',
+  WAV: 'Audio Document',
+  AAC: 'Audio Document',
+  FLAC: 'Audio Document',
+  OGG: 'Audio Document',
+  AIFF: 'Audio Document',
+  WMA: 'Audio Document',
+  APE: 'Audio Document',
+  UNKNOWN: 'Other Document',
 };
 
-export class XFile extends FabricObject implements XObjectInterface {
-  static objType = 'XFile';
-  static type = 'XFile';
-  transcription: string;
-  vectorSrc: string;
-  fileSrc: string;
-  fileName: string;
-  previewImage: string;
-  fileType: FileType;
-  _previewImage: HTMLImageElement | null = null;
+const VIDEO_FILE_EXTENSIONS = new Set([FileEnum.MP4, FileEnum.WEBM]);
 
-  public extendedProperties = [
-    'id',
-    'objType',
-    'fileName',
-    'transcription',
-    'vectorSrc',
-    'fileSrc',
-    'userId',
-    'clientId',
-    'zIndex',
-    'locked',
-    'boardId',
-    'fileType',
-    'previewImage',
-  ];
-  constructor(options: Partial<XFileProps>) {
+export class XFile extends FabricObject implements WidgetFileInterface {
+  static objType: WidgetFileType = 'XFile';
+  static type: WidgetFileType = 'XFile';
+
+  // WidgetFile properties
+  id: string = '';
+  boardId: string = '';
+  backgroundColor: string = 'rgba(0,0,0,0)';
+  fill: string = 'rgba(0,0,0,0)';
+  width: number = 230;
+  height: number = 248;
+  left: number = 0;
+  locked: boolean = false;
+  objType: WidgetType = 'XFile';
+  originX: TOriginX = 'center';
+  originY: TOriginY = 'center';
+  scaleX: number = 1;
+  scaleY: number = 1;
+  selectable: boolean = true;
+  top: number = 0;
+  userId: string = '';
+  zIndex: number = 0;
+  version: string = '';
+  updatedAt: number = Date.now();
+  lastEditedBy: string = '';
+  createdAt: number = Date.now();
+  createdBy: string = '';
+  visible: boolean = true;
+
+  // WidgetFile specific properties
+  fileName: string = '';
+  fileSrc: FileObject = { tmpPath: '', id: '', path: '' };
+  vectorSrc: FileObject = { tmpPath: '', id: '', path: '' };
+  transcription: string = '';
+
+  previewImage: FileObject = { tmpPath: '', id: '', path: '' };
+
+  private _previewImage: HTMLImageElement | null = null;
+
+
+
+  constructor(options: Partial<XFileProps> = {}) {
     super(options);
 
-    const previewImage = this.getFileIconURL(this.objType);
+    this.initializeProperties(options);
+    this.initializeVisuals();
+    this.loadPreviewImage(
+      this.getFileIconURL(XFile.objType),
+      options.fileName!
+    );
+  }
+  fileObjectType: FileObjectType;
 
-    this.set('id', options.id || '');
-    this.set('fileName', options.fileName || '');
-    this.set('transcription', options.transcription || '');
-    this.set('vectorSrc', options.vectorSrc || '');
-    this.set('fileSrc', options.fileSrc || '');
-    this.set('previewImage', options.previewImage || '');
-    this.set('fileType', XFile.getFileTypeName(options.fileName));
-    this.objType = 'XFile';
-    (this.cornerColor = 'white'),
-      (this.cornerStrokeColor = 'gray'),
-      (this.cornerSize = 15),
-      (this.cornerStyle = 'circle'),
-      (this.transparentCorners = false),
-      (this.shadow = new Shadow({
-        color: 'rgba(217, 161, 177, 0.54)',
-        offsetX: 1,
-        offsetY: 2,
-        blur: 4,
-        id: 310,
-      }));
-    const fileSuffixName = options.fileType;
+  private initializeProperties(options: Partial<XFileProps>) {
+    this.set('id', options.id || this.id);
+    this.set('fileName', options.fileName || this.fileName);
+    this.set('transcription', options.transcription || this.transcription);
+    this.set('vectorSrc', options.vectorSrc || this.vectorSrc);
+    this.set('fileSrc', options.fileSrc || this.fileSrc);
+    this.set('previewImage', options.previewImage || this.previewImage);
+    this.fileObjectType = XFile.getFileType(options.fileName || '');
+    this.fill = options.backgroundColor || this.backgroundColor;
+  }
+
+  private initializeVisuals() {
+    this.cornerColor = 'white';
+    this.cornerStrokeColor = 'gray';
+    this.cornerSize = 10;
+    this.cornerStyle = 'circle';
+    this.transparentCorners = false;
+    this.shadow = new Shadow({
+      color: 'rgba(217, 161, 177, 0.54)',
+      offsetX: 1,
+      offsetY: 2,
+      blur: 4,
+      id: 310,
+    });
+
     this.clipPath = new Rect({
       left: 0,
       top: 0,
       rx: 8,
       ry: 8,
-      width: 230,
-      height: 248,
+      width: this.width,
+      height: this.height,
       fill: '#000000',
     });
-    this.width = 230;
-    this.height = 248;
-    this.loadPreviewImage(previewImage, options.fileName!);
   }
 
-  getContextMenuList() {
-    let menuList;
-    if (this.locked) {
-      menuList = [
-        'Bring forward',
-        'Bring to front',
-        'Send backward',
-        'Send to back',
-      ];
-    } else {
-      menuList = [
-        'Bring forward',
-        'Bring to front',
-        'Send backward',
-        'Send to back',
-        'Duplicate',
-        'Copy',
-        'Paste',
-        'Cut',
-        'Delete',
-      ];
-    }
-    if (this.locked) {
-      menuList.push('Unlock');
-    } else {
-      menuList.push('Lock');
-    }
-
-    return menuList;
-  }
-  // static getDefaults() {
-  //   return {
-  //     ...super.getDefaults(),
-  //     ...XFile.ownDefaults,
-  //     ...XFileDefaultValues,
-  //   };
-  // }
-  toObject(propertiesToInclude: Array<any>): any {
-    return super.toObject([...this.extendedProperties, ...propertiesToInclude]);
-  }
-  onDoubleClick() {
-    getFabricWindow().open(this.fileSrc, '_blank');
+  toObject(propertiesToInclude: string[] = []): any {
+    return super.toObject([...EntityKeys, ...propertiesToInclude]);
   }
 
-  drawObject(ctx: CanvasRenderingContext2D) {
-    let elementToDraw = null;
-    // draw border
+  getObject() {
+    const entityKeys: string[] = EntityKeys;
+    const result: Record<string, any> = {};
+
+    entityKeys.forEach((key) => {
+      if (key in this) {
+        result[key] = (this as any)[key];
+      }
+    });
+
+    return result;
+  }
+
+  onDoubleClick(): void {
+    getFabricWindow().open(this.fileSrc.tmpPath, '_blank');
+  }
+
+  drawObject(ctx: CanvasRenderingContext2D): void {
+    this.drawBorder(ctx);
+    this.drawPreviewImage(ctx);
+    this.renderTitle(ctx, this.fileName);
+    this._renderStroke(ctx);
+  }
+
+  private drawBorder(ctx: CanvasRenderingContext2D): void {
     ctx.beginPath();
     ctx.fillStyle = 'rgba(255,255,255,0)';
     ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
@@ -159,7 +183,9 @@ export class XFile extends FabricObject implements XObjectInterface {
     ctx.strokeStyle = '#ffffff';
     ctx.moveTo(-this.width / 2, -this.height / 2);
     ctx.stroke();
+  }
 
+  private drawPreviewImage(ctx: CanvasRenderingContext2D): void {
     const imgWidth = 230;
     const imgHeight = 160;
 
@@ -172,264 +198,125 @@ export class XFile extends FabricObject implements XObjectInterface {
         imgHeight
       );
     }
-
-    // if (this.fileName.substring(this.fileName.lastIndexOf('.') + 1) !== FileEnum.PDF) {
-    this.renderTitle(ctx, this.fileName);
-    // }
-    this._renderStroke(ctx);
   }
 
-  static getFileTypeName(fileName = '') {
-    let fileType = '';
-    switch (fileName.substring(fileName.lastIndexOf('.') + 1)) {
-      case FileEnum.DOC:
-      case FileEnum.DOCX:
-        fileType = 'Word Document';
-        break;
-      case FileEnum.XLS:
-      case FileEnum.XLSX:
-        fileType = 'Excel Document';
-        break;
-      case FileEnum.PPT:
-      case FileEnum.PPTX:
-        fileType = 'PPT Document';
-        break;
-      case FileEnum.PDF:
-        fileType = 'PDF Document';
-        break;
-      case FileEnum.ZIP:
-        fileType = 'ZIP File';
-        break;
-      case FileEnum.MP4:
-      case FileEnum.WEBM:
-        fileType = 'Video Document';
-        break;
-      case FileEnum.MP3:
-      case FileEnum.WEBM:
-      case FileEnum.M4A:
-      case FileEnum.WAV:
-      case FileEnum.AAC:
-      case FileEnum.FLAC:
-      case FileEnum.OGG:
-      case FileEnum.AIFF:
-      case FileEnum.WMA:
-      case FileEnum.APE:
-        fileType = 'Audio Document';
-        break;
-
-      default:
-        fileType = 'Other Document';
-        break;
-    }
-    return fileType;
+  static getFileTypeName(fileName: string = ''): string {
+    const extension = fileName
+      .split('.')
+      .pop()
+      ?.toUpperCase() as FileObjectType;
+    return FILE_TYPE_NAMES[extension] || 'Other Document';
   }
 
-  static getFileType(fileName = '') {
-    let fileType = '';
-    switch (fileName.substring(fileName.lastIndexOf('.') + 1)) {
-      case FileEnum.DOC:
-      case FileEnum.DOCX:
-        fileType = 'XFileWord';
-        break;
-      case FileEnum.XLS:
-      case FileEnum.XLSX:
-        fileType = 'XFileExcel';
-        break;
-      case FileEnum.PPT:
-      case FileEnum.PPTX:
-        fileType = 'XFilePPT';
-        break;
-      case FileEnum.PDF:
-        fileType = 'XFilePDF';
-        break;
-      case FileEnum.ZIP:
-        fileType = 'XFileZip';
-        break;
-      case FileEnum.MP4:
-      case FileEnum.WEBM:
-        fileType = 'XFileVideo';
-        break;
-      case FileEnum.MP3:
-      case FileEnum.WEBM:
-      case FileEnum.M4A:
-      case FileEnum.WAV:
-      case FileEnum.AAC:
-      case FileEnum.FLAC:
-      case FileEnum.OGG:
-      case FileEnum.AIFF:
-      case FileEnum.WMA:
-      case FileEnum.APE:
-        fileType = 'XFileAudio';
-        break;
+  static getFileType(fileName: string = ''): FileObjectType {
+    const extension: FileObjectType = fileName
+      .split('.')
+      .pop()
+      ?.toUpperCase() as FileObjectType;
 
-      default:
-        fileType = 'XFile';
-        break;
-    }
-    return fileType;
+    return extension;
   }
 
-  isFileVideo(fileName: string) {
-    if (!fileName) return false;
-
-    switch (fileName.substr(fileName.lastIndexOf('.') + 1)) {
-      case FileEnum.MP4:
-        return true;
-      case FileEnum.WEBM:
-        return true;
-      default:
-        return false;
-    }
+  isFileVideo(fileName: string): boolean {
+    const extension = fileName.split('.').pop()?.toUpperCase();
+    return VIDEO_FILE_EXTENSIONS.has(extension as FileEnum);
   }
 
-  renderTitle(ctx: any, title: string) {
+  renderTitle(ctx: CanvasRenderingContext2D, title: string): void {
     const maxWidth = this.width;
     const x = -this.width / 2;
     const y = this.height / 2 - 60;
 
-    ctx.font = '16px Arial';
+    ctx.font = '16px Inter';
     ctx.fillStyle = 'rgba(255, 255, 255, 1)';
-
-    // white board behind the title
     ctx.fillRect(x, y - 29, maxWidth, 90);
     ctx.fillStyle = '#190FA1';
 
-    // helper function to convert string
-    const GB2312UnicodeConverter = {
-      ToUnicode(str: string) {
-        return escape(str).toLocaleLowerCase().replace(/%u/gi, '\\u');
-      },
-      ToGB2312(str: string) {
-        return unescape(str.replace(/\\u/gi, '%u'));
-      },
-    };
-    // Handle non-unicode or non-utf8 coding string
-    const unicodeTitle = GB2312UnicodeConverter.ToUnicode(title);
+    const sanitizedTitle = this.sanitizeTitle(title);
+    this.wrapText(ctx, sanitizedTitle, x + 15, y - 5, maxWidth - 20, 23);
 
-    // handle the situation that the website's title is null
-    if (title === null || unicodeTitle.indexOf('\\ufffd') !== -1 || !title) {
-      const firstChar = this.fileSrc.indexOf('.');
-      const lastChar = this.fileSrc.indexOf('.', firstChar + 1);
-      this.fileName = this.fileSrc.substring(firstChar + 1, lastChar);
-    }
-
-    // title setting
-    this.wrapText(ctx, title, x + 15, y - 5, maxWidth - 20, 23);
-
-    // url setting
-    const newurl = this.fileSrc
-      ? `${this.fileSrc.split('/')[0]}/${this.fileSrc.split('/')[1]}/${
-          this.fileSrc.split('/')[2]
-        }`
-      : '';
+    const newUrl = this.getShortenedUrl();
     ctx.font = '12px Inter';
     ctx.fillStyle = 'rgba(35, 41, 48, 0.65)';
-    // gray square in front of website
-    this.wrapText(ctx, newurl, x + 15, y + 45, maxWidth - 20, 25);
+    this.wrapText(ctx, newUrl, x + 15, y + 45, maxWidth - 20, 25);
   }
 
-  // changeFileImgUrl(targetSrc: string) {
-  //   this.setSrc(targetSrc, { crossOrigin: 'anonymous' });
-  // }
+  private sanitizeTitle(title: string): string {
+    const unicodeTitle = this.toUnicode(title);
+    if (!title || unicodeTitle.includes('\\ufffd')) {
+      const parts = this.fileSrc.tmpPath.split('.');
+      return parts.length > 2 ? parts[1] : 'Untitled';
+    }
+    return title;
+  }
 
-  wrapText(
-    context: any,
+  private toUnicode(str: string): string {
+    return escape(str).toLowerCase().replace(/%u/gi, '\\u');
+  }
+
+  private getShortenedUrl(): string {
+    if (!this.fileSrc.tmpPath) return '';
+    const parts = this.fileSrc.tmpPath.split('/');
+    return parts.length >= 3
+      ? `${parts[0]}/${parts[1]}/${parts[2]}`
+      : this.fileSrc.tmpPath;
+  }
+
+  private wrapText(
+    ctx: CanvasRenderingContext2D,
     text: string,
     x: number,
     y: number,
     maxWidth: number,
     lineHeight: number
-  ) {
-    let words: any = [];
-    if (text) words = text.split(' ');
-
+  ): void {
+    const words = text.includes(' ') ? text.split(' ') : text.split('');
     let line = '';
     let lineCount = 1;
     let tempLine = '';
-    let _y = y;
+    let currentY = y;
 
-    // handle non-English char
-    if (escape(text).indexOf('%u') < 0) {
-      // only the English char
-      for (let n = 0; n < words.length; n++) {
-        if (lineCount === 3) return;
-        if (n !== 0) tempLine = `${line.slice(0, -3)}...`;
-        const testLine = `${line + words[n]} `;
-        const metrics = context.measureText(testLine);
-        const testWidth = metrics.width;
-        if (testWidth > maxWidth && n > 0) {
-          if (lineCount === 2) {
-            line = tempLine;
-          }
-          context.fillText(line, x, _y);
-          line = `${words[n]} `;
-          _y += lineHeight;
-          lineCount++;
-        } else {
-          line = testLine;
+    for (let n = 0; n < words.length; n++) {
+      if (lineCount === 3) return;
+
+      const testLine = line + (words[n] + (words.length > 1 ? ' ' : ''));
+      const metrics = ctx.measureText(testLine);
+      const testWidth = metrics.width;
+
+      if (testWidth > maxWidth && n > 0) {
+        if (lineCount === 2) {
+          line = `${line.slice(0, -3)}...`;
         }
-      }
-    } else {
-      for (let n = 0; n < text.length; n++) {
-        if (lineCount === 3) return;
-        if (n !== 0) tempLine = `${line.slice(0, -2)}...`;
-        const testLine = `${line + text[n]}`;
-        const metrics = context.measureText(testLine);
-        const testWidth = metrics.width;
-        if (testWidth > maxWidth && n > 0) {
-          if (lineCount === 2) {
-            line = tempLine;
-          }
-          context.fillText(line, x, _y);
-          line = `${text[n]}`;
-          _y += lineHeight;
-          lineCount++;
-        } else {
-          line = testLine;
-        }
+        ctx.fillText(line, x, currentY);
+        line = words[n] + ' ';
+        currentY += lineHeight;
+        lineCount++;
+      } else {
+        line = testLine;
       }
     }
-    if (lineCount < 3) context.fillText(line, x, _y);
-  }
-  getFileIconURL(objType: string) {
-    let fileIconURL = '';
-    switch (objType) {
-      case 'XFileWord':
-        fileIconURL = '/boardxstatic/fileIcons/word.png';
-        break;
-      case 'XFileExcel':
-        fileIconURL = '/boardxstatic/fileIcons/excel.png';
-        break;
-      case 'XFilePPT':
-        fileIconURL = '/boardxstatic/fileIcons/ppt.png';
-        break;
-      case 'XFilePDF':
-        fileIconURL = '/boardxstatic/fileIcons/pdf.svg';
-        break;
-      case 'XFileZip':
-        fileIconURL = '/boardxstatic/fileIcons/zip.png';
-        break;
-      case 'XFileVideo':
-        fileIconURL = '/boardxstatic/fileIcons/mp4.png';
-        break;
-      case 'XFileAudio':
-        fileIconURL = '/boardxstatic/fileIcons/audio.png';
-        break;
-      default:
-        fileIconURL = '/boardxstatic/fileIcons/file.png';
-        break;
-    }
-    return fileIconURL;
-  }
-  async loadPreviewImage(previewImage: string, fileName: string) {
-    const url = previewImage ? previewImage : this.getFileIconURL(this.objType);
 
-    const loadedImg = await loadImage(url, {
-      crossOrigin: 'anonymous',
-    });
-    this._previewImage = loadedImg;
-    this.dirty = true;
-    this.canvas?.requestRenderAll();
+    if (lineCount < 3) {
+      ctx.fillText(line, x, currentY);
+    }
+  }
+
+  getFileIconURL(objType: WidgetFileType): string {
+    return FILE_ICON_PATHS[objType] || FILE_ICON_PATHS['XFile'];
+  }
+
+  async loadPreviewImage(
+    previewImage: string,
+    fileName: string
+  ): Promise<void> {
+    const url = previewImage || this.getFileIconURL(XFile.objType);
+    try {
+      this._previewImage = await loadImage(url, { crossOrigin: 'anonymous' });
+      this.dirty = true;
+      this.canvas?.requestRenderAll();
+    } catch (error) {
+      console.error('Failed to load preview image:', error);
+    }
   }
 }
 

@@ -6,8 +6,11 @@ import { XTextbox } from '../XTextbox';
 import { shapeList } from './types';
 import { shapeType } from './types';
 
-import { XObjectInterface } from '../XObjectInterface';
+import { WidgetShapeNotesInterface, EntityKeys } from '../type/widget.entity.shapenote';
 import { createShapeNotesDefaultControls } from '../../../controls/X_commonControls';
+import { WidgetType } from '../type/widget.type';
+
+
 
 export type shapeInfo = {
   name: shapeType;
@@ -22,7 +25,7 @@ export type shapeInfo = {
 
 function getShapeInfo(shape: string): shapeInfo | null {
   const shapeObj = shapeList.find((item) => item.name === shape);
-  console.log('### shapeObj:', shapeObj);
+
   if (!shapeObj) {
     return shapeList[0] as shapeInfo;
   } else {
@@ -31,57 +34,35 @@ function getShapeInfo(shape: string): shapeInfo | null {
 }
 
 export const XShapeNotesDefaultValues: Partial<TClassProperties<XShapeNotes>> =
-  {
-    minWidth: 20,
-    minHeight: 20,
-    dynamicMinWidth: 2,
-    lockScalingFlip: true,
-    noScaleCache: false,
-    _wordJoiners: /[ \t\r]/,
-    splitByGrapheme: true,
-    objType: 'XShapeNotes',
-    textAlign: 'center',
-    centeredScaling: false,
-    cornerColor: 'white',
-    cornerStrokeColor: 'gray',
-    cornerSize: 10,
-    cornerStyle: 'circle',
-    transparentCorners: false,
-  };
+{
+  minWidth: 20,
+  minHeight: 20,
+  dynamicMinWidth: 2,
+  lockScalingFlip: true,
+  noScaleCache: false,
+  _wordJoiners: /[ \t\r]/,
+  splitByGrapheme: true,
+  objType: 'XShapeNotes',
+  textAlign: 'center',
+  centeredScaling: false,
+  cornerColor: 'white',
+  cornerStrokeColor: 'gray',
+  cornerSize: 10,
+  cornerStyle: 'circle',
+  transparentCorners: false,
+};
 
-interface XShapeNotesProps {
-  shapeName: string;
-  id: string;
-  originX: string;
-  originY: string;
-  top: number;
-  left: number;
-  textAlign: string;
-  width: number;
-  height: number;
-  backgroundColor: string;
-  scaleX: number;
-  scaleY: number;
-  stroke: string;
-  strokeWidth: number;
-  zIndex: number;
-  locked: boolean;
-  boardId: string;
-  userId: string;
-  clientId: number;
-  timestamp: number;
-}
 
-export class XShapeNotes extends XTextbox implements XObjectInterface {
+export class XShapeNotes extends XTextbox implements WidgetShapeNotesInterface {
   bgShape: shapeInfo | null;
   verticalAlign = 'middle';
   maxHeight: number = 138;
   minHeight: number = 20;
 
-  static type = 'XShapeNotes';
-  objType = 'XShapeNotes';
+  static type: WidgetType = 'XShapeNotes';
+  static objType: WidgetType = 'XShapeNotes';
 
-  constructor(text: string, options: Partial<XShapeNotesProps>) {
+  constructor(text: string, options: Partial<WidgetShapeNotesInterface>) {
     super(text, options);
 
     this.bgShape = options.shapeName ? getShapeInfo(options.shapeName) : null;
@@ -102,17 +83,22 @@ export class XShapeNotes extends XTextbox implements XObjectInterface {
     this.on('modified', this.handleModified);
     this.on('changed', this.handleModified);
   }
-  extendedProperties = [
-    'shapeName',
-    'id',
-    'objType',
-    'zIndex',
-    'locked',
-    'boardId',
-    'userId',
-    'clientId',
-    'timestamp',
-  ];
+  shapeName: shapeType;
+
+
+  getObject() {
+    const entityKeys: string[] = EntityKeys;
+    const result: Record<string, any> = {};
+
+    entityKeys.forEach((key) => {
+      if (key in this) {
+        result[key] = (this as any)[key];
+      }
+    });
+
+    return result;
+  }
+
 
   handleModified() {
     this.canvas!.uniformScaling = false;
@@ -218,7 +204,7 @@ export class XShapeNotes extends XTextbox implements XObjectInterface {
     const offsets = this._applyPatternGradientTransform(
       ctx,
       ((method === 'fillText' ? this.fill : this.stroke) as TFiller) ||
-        this.fill!
+      this.fill!
     );
 
     for (let i = 0, len = this._textLines.length; i < len; i++) {

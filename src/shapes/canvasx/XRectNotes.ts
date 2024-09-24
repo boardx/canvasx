@@ -3,7 +3,8 @@ import { XTextbox as Textbox } from './XTextbox';
 import type { TClassProperties, TOriginX, TOriginY } from '../../typedefs';
 import { createRectNotesDefaultControls } from '../../controls/X_commonControls';
 
-import { XObjectInterface } from './XObjectInterface';
+
+import { WidgetRectNotesInterface, EntityKeys } from './type/widget.entity.rectnote';
 // this will be a separated effort
 export const rectNotesDefaultValues: Partial<TClassProperties<XRectNotes>> = {
   minWidth: 20,
@@ -27,7 +28,7 @@ export const rectNotesDefaultValues: Partial<TClassProperties<XRectNotes>> = {
  * wrapping of lines.
  */
 ///@ts-ignore
-export class XRectNotes extends Textbox implements XObjectInterface {
+export class XRectNotes extends Textbox implements WidgetRectNotesInterface {
   /**selectable
    * Minimum width of textbox, in pixels.
    * @type Number
@@ -35,7 +36,7 @@ export class XRectNotes extends Textbox implements XObjectInterface {
    */
   declare minWidth: number;
   static type = 'XRectNotes';
-  objType: string = 'XRectNotes';
+  static objType = 'XRectNotes';
   declare locked: boolean;
 
   declare verticalAlign: string;
@@ -53,20 +54,7 @@ export class XRectNotes extends Textbox implements XObjectInterface {
   declare id: string;
   declare boardId: string;
 
-  public extendedProperties = [
-    'objType',
-    'boardId',
-    'userId',
-    'timestamp',
-    'zIndex',
-    'locked',
-    'verticalAlign',
-    'id',
-    'zIndex',
-    'emoj',
-    'userEmoji',
-    'connectors', //the connectors of the object
-  ];
+
   /**
    * Minimum calculated width of a textbox, in pixels.
    * fixed to 2 so that an empty textbox cannot go to 0
@@ -190,6 +178,23 @@ export class XRectNotes extends Textbox implements XObjectInterface {
 
     return map;
   }
+
+
+  getObject() {
+    const entityKeys: string[] = EntityKeys;
+    const result: Record<string, any> = {};
+
+    entityKeys.forEach((key) => {
+      if (key in this) {
+        result[key] = (this as any)[key];
+      }
+    });
+
+    return result;
+  }
+
+
+
 
   /**
    * Returns true if object has a style property or has it on a specified line

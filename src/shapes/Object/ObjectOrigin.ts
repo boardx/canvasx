@@ -30,10 +30,6 @@ export class ObjectOrigin<EventSpec>
   declare strokeWidth: number;
   declare strokeUniform: boolean;
 
-  //canvasx specific
-  declare objType: string;
-  declare zIndex: number;
-
   /**
    * Object containing this object.
    * can influence its size and position

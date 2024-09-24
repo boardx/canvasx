@@ -22,6 +22,8 @@ import type { ObjectEvents } from '../../EventTypeDefs';
 import { TBBox, TClassProperties, TSVGReviver } from '../../typedefs';
 import { cloneDeep } from '../../util/internals/cloneDeep';
 import { createPathDefaultControls } from '../../controls/commonControls';
+import { WidgetPathInterface, EntityKeys } from './type/widget.entity.path';
+import { WidgetType } from './type/widget.type';
 
 interface UniquePathProps {
   sourcePath?: string;
@@ -31,7 +33,7 @@ interface UniquePathProps {
 
 export interface SerializedPathProps
   extends SerializedObjectProps,
-    UniquePathProps {}
+  UniquePathProps { }
 
 export interface PathProps extends FabricObjectProps {
   objType: 'XPath';
@@ -47,7 +49,7 @@ export class XPath<
   Props extends TOptions<PathProps> = Partial<PathProps>,
   SProps extends SerializedPathProps = SerializedPathProps,
   EventSpec extends ObjectEvents = ObjectEvents
-> extends FabricObject<Props, SProps, EventSpec> {
+> extends FabricObject<Props, SProps, EventSpec> implements WidgetPathInterface {
   /**
    * Array of path points
    * @type Array
@@ -82,12 +84,6 @@ export class XPath<
   declare userNo: string;
 
   declare version: string;
-
-  declare isPanel: boolean;
-
-  declare panelObj: any;
-
-  declare subObjList: any;
 
   declare lineWidth: any;
 
@@ -127,6 +123,11 @@ export class XPath<
     typeof left === 'number' && this.set('left', left);
     typeof top === 'number' && this.set('top', top);
   }
+  objType: WidgetType;
+  updatedAt: number;
+  lastEditedBy: string;
+  createdAt: number;
+  createdBy: string;
 
   static getDefaults() {
     return {
@@ -175,7 +176,7 @@ export class XPath<
 
     for (const command of this.path) {
       switch (
-        command[0] // first letter
+      command[0] // first letter
       ) {
         case 'L': // lineto, absolute
           x = command[1];
@@ -242,10 +243,24 @@ export class XPath<
    * @return {string} string representation of an instance
    */
   toString() {
-    return `#<Path (${this.complexity()}): { "top": ${this.top}, "left": ${
-      this.left
-    } }>`;
+    return `#<Path (${this.complexity()}): { "top": ${this.top}, "left": ${this.left
+      } }>`;
   }
+
+
+  getObject() {
+    const entityKeys: string[] = EntityKeys;
+    const result: Record<string, any> = {};
+
+    entityKeys.forEach((key) => {
+      if (key in this) {
+        result[key] = (this as any)[key];
+      }
+    });
+
+    return result;
+  }
+
 
   /**
    * Returns object representation of an instance
@@ -364,7 +379,7 @@ export class XPath<
     for (const command of this.path) {
       // current instruction
       switch (
-        command[0] // first letter
+      command[0] // first letter
       ) {
         case 'L': // lineto, absolute
           x = command[1];

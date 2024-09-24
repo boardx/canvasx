@@ -1,9 +1,13 @@
 import { classRegistry } from '../../ClassRegistry';
 import { Group } from '../Group';
 
+import { WidgetType } from './type/widget.type';
+import { EntityKeys } from './type/widget.entity.group';
+
+
 export class XGroup extends Group {
   static type = 'XGroup';
-  static objType = 'XGroup';
+  static objType: WidgetType = 'XGroup';
   declare id: string;
   declare boardId: string;
   declare userId: string;
@@ -17,7 +21,7 @@ export class XGroup extends Group {
   constructor(objects: any, options: any) {
     super(objects, options);
     this.id = options.id || '';
-    this.objType = 'XGroup';
+
     this.boardId = options.boardId || '';
     this.userId = options.userId || '';
     this.timestamp = options.timestamp || Date.now();
@@ -29,18 +33,19 @@ export class XGroup extends Group {
     this.objectArr = options.objectArr || [];
   }
 
-  extendedProperties = [
-    'subTargetCheck',
-    'objType',
-    'boardId',
-    'userId',
-    'timestamp',
-    'zIndex',
-    'locked',
-    'id',
-    'selectable',
-    'objectArr',
-  ];
+
+  getObject() {
+    const entityKeys: string[] = EntityKeys;
+    const result: Record<string, any> = {};
+
+    entityKeys.forEach((key) => {
+      if (key in this) {
+        result[key] = (this as any)[key];
+      }
+    });
+
+    return result;
+  }
 
   //  override the default behavior of `getText` to return a concatenated string of all text objects\
   // canvasX custoom method
