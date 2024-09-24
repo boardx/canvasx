@@ -87,9 +87,41 @@ export class XRectNotes extends XTextbox implements WidgetRectNotesInterface {
     text: string,
     options: Partial<TClassProperties<XRectNotes>> = {}
   ) {
-
-
+    options.lastEditedByName = options.lastEditedByName ?? '';
+    options.createdByName = options.createdByName ?? '';
+    options.fontFamily = options.fontFamily ?? 'Inter';
+    options.fontSize = options.fontSize ?? 12;
+    options.fontWeight = options.fontWeight ?? "400";
+    options.lineHeight = options.lineHeight ?? 1.5;
+    options.text = options.text ?? '';
+    options.textAlign = options.textAlign ?? 'center';
+    options.editable = options.editable ?? true;
+    options.fixedScaleChange = options.fixedScaleChange ?? false;
+    options.connectors = options.connectors ?? [];
+    options.id = options.id ?? '';
+    options.boardId = options.boardId ?? '';
+    options.backgroundColor = options.backgroundColor ?? '#FCEC8A';
+    options.width = 230;
+    options.height = 138;
+    options.left = options.left ?? 0;
+    options.locked = options.locked ?? false;
+    options.objType = options.objType ?? 'XRectNotes';
+    options.originX = options.originX ?? 'center';
+    options.originY = options.originY ?? 'center';
+    options.scaleX = options.scaleX ?? 1;
+    options.scaleY = options.scaleY ?? 1;
+    options.selectable = options.selectable ?? true;
+    options.top = options.top ?? 0;
+    options.userId = options.userId ?? '';
+    options.zIndex = options.zIndex ?? Date.now() * 100;
+    options.version = options.version ?? '1.0';
+    options.updatedAt = options.updatedAt ?? Date.now();
+    options.lastEditedBy = options.lastEditedBy ?? '';
+    options.createdAt = options.createdAt ?? Date.now();
+    options.createdBy = options.createdBy ?? '';
+    options.visible = options.visible ?? true;
     super(text, options);
+    this.maxHeight = 138;
     Object.assign(this, {
       controls: {
         ...createRectNotesDefaultControls(this),
@@ -97,6 +129,8 @@ export class XRectNotes extends XTextbox implements WidgetRectNotesInterface {
       },
     });
     Object.assign(this, options);
+
+
     this.objType = 'XRectNotes';
     // this.initializeEvent();
   }

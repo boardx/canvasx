@@ -86,14 +86,15 @@ export class XImage<
 
   constructor(image: any, options: any) {
 
+    options.objType = 'XImage';
+    options.cornerColor = 'white';
+    options.cornerSize = 10;
+    options.cornerStyle = 'circle';
+    options.transparentCorners = false;
+    options.cornerStrokeColor = 'gray';
     super(image, options);
     Object.assign(this, options);
-    this.objType = 'XImage';
-    this.cornerColor = 'white';
-    this.cornerSize = 10;
-    this.cornerStyle = 'circle';
-    this.transparentCorners = false;
-    this.cornerStrokeColor = 'gray';
+
   }
   markdownText: string;
   lastEditedByName: string;

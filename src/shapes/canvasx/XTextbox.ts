@@ -99,27 +99,29 @@ export class XTextbox
 
   constructor(text: string, options: any) {
 
+    options.oneLine = options.oneLine || true;
+    options.connectors = options.connectors || [];
+    options.originX = options.originX || 'center';
+    options.originY = options.originY || 'center';
+    options.minWidth = options.minWidth || 20;
+    options.dynamicMinWidth = options.dynamicMinWidth || 2;
+    options.splitByGrapheme = options.splitByGrapheme || false;
+    options.fixedScaleChange = options.fixedScaleChange || false;
+    options.boardId = options.boardId || '';
+
+    options.userId = options.userId || '';
+    options.zIndex = options.zIndex || 0;
+    options.version = options.version || '';
+    options.updatedAt = options.updatedAt || Date.now();
+    options.lastEditedByName = options.lastEditedByName || '';
+    options.createdByName = options.createdByName || '';
+    options.objType = 'XTextbox';
+
     super(text, options);
     this.initializeEvent();
     Object.assign(this, options);
 
-    this.oneLine = true;
-    this.connectors = options.connectors || [];
-    this.originX = options.originX || 'center';
-    this.originY = options.originY || 'center';
-    this.minWidth = options.minWidth || 20;
-    this.dynamicMinWidth = options.dynamicMinWidth || 2;
-    this.splitByGrapheme = options.splitByGrapheme || false;
-    this.fixedScaleChange = options.fixedScaleChange || false;
-    this.boardId = options.boardId || '';
-    this.objType = options.objType || 'XTextbox';
-    this.userId = options.userId || '';
-    this.zIndex = options.zIndex || 0;
-    this.version = options.version || '';
-    this.updatedAt = options.updatedAt || Date.now();
-    this.lastEditedByName = options.lastEditedByName || '';
-    this.createdByName = options.createdByName || '';
-    this.objType = 'XTextbox';
+
     // this.resetResizeControls();
   }
   lastEditedByName: string;
