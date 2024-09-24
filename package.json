@@ -2,7 +2,7 @@
   "name": "@boardxus/canvasx",
   "description": "CanvasX is the core component for boardx - the open source digital whiteboard for the future of work.",
   "homepage": "http://www.boardx.us/",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "author": "boardx",
   "contributors": [],
   "keywords": [
@@ -75,6 +75,7 @@
     "auto-changelog": "^2.3.0",
     "axios": "^0.27.2",
     "babel-plugin-import-json-value": "^0.1.2",
+
     "babel-plugin-transform-imports": "git+https://git@github.com/ShaMan123/babel-plugin-transform-imports.git",
     "busboy": "^1.6.0",
     "chalk": "^2.4.1",
@@ -148,7 +149,7 @@
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@mdit/plugin-katex": "^0.12.0",
-    "@rollup/rollup-darwin-arm64": "^4.22.4",
+
     "chart.js": "^4.4.3",
     "highlight.js": "^11.9.0",
     "html2canvas": "^1.4.1",
