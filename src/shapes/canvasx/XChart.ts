@@ -23,7 +23,8 @@ class XChart extends FabricObject implements WidgetChartInterface {
   static type: WidgetType = 'XChart';
   static objType: WidgetType = 'XChart';
 
-  constructor(options: Partial<ChartObjectOptions>) {
+  constructor(options: any) {
+
     super(options);
     this.chartConfig = options.chartConfig!;
     this.width = options.width!;
@@ -31,6 +32,7 @@ class XChart extends FabricObject implements WidgetChartInterface {
     this.createCanvasElement();
     this.addDoubleClickEventListener();
     Object.assign(this, options);
+    this.objType = 'XChart';
   }
   lastEditedByName: string;
   createdByName: string;

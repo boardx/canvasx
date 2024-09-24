@@ -23,10 +23,11 @@ class XMarkdown extends XTextbox implements WidgetMarkdownInterface {
 
   static type: WidgetType = 'XMarkdown';
   static objType: WidgetType = 'XMarkdown';
-  constructor(text: string, options?: WidgetMarkdownInterface) {
+  constructor(text: string, options: WidgetMarkdownInterface) {
+
     super(text, options);
     this.markdownText = options?.markdownText || text;
-
+    this.objType = 'XMarkdown';
     // full options list (defaults)
     this.md = markdownit({
       // Enable HTML tags in source

@@ -1,12 +1,12 @@
-import   { WidgetBaseInterface,TOriginX, TOriginY } from './widget.entity.base';
-import {  WidgetType } from './widget.type';
- 
+import { WidgetBaseInterface, TOriginX, TOriginY } from './widget.entity.base';
+import { WidgetType } from './widget.type';
+
 export type pathType = 'curvePath' | 'straightPath';
 export type pathArrowTip = 'none' | 'start' | 'end' | 'both';
 export type xy = { x: number; y: number };
 
-export   interface WidgetConnectorInterface extends WidgetBaseInterface {
-  
+export interface WidgetConnectorInterface extends WidgetBaseInterface {
+  path: any[];
   fromObjectId: string;
   toObjectId: string;
   pathType: pathType;
@@ -16,11 +16,31 @@ export   interface WidgetConnectorInterface extends WidgetBaseInterface {
   control1: xy;
   control2: xy;
   style: any;
+
+  fill: string | null | any;
+  stroke: string | null | any;
+  strokeWidth: number;
+  strokeLineCap: string;
+  strokeDashOffset: number;
+  strokeLineJoin: string;
+  strokeUniform: boolean;
+  strokeMiterLimit: number;
+  fillRule: string;
 }
 
 export class WidgetConnectorClass implements WidgetConnectorInterface {
-  lastEditedByName: string="";
-  createdByName: string="";
+  path: any[] = [''];
+  fill: any = 'transparent';
+  stroke: any = '#000000';
+  strokeWidth: number = 1;
+  strokeLineCap: string = 'butt';
+  strokeDashOffset: number = 0;
+  strokeLineJoin: string = 'miter';
+  strokeUniform: boolean = false;
+  strokeMiterLimit: number = 10;
+  fillRule: string = 'nonzero';
+  lastEditedByName: string = "";
+  createdByName: string = "";
   fromObjectId: string = '';
   toObjectId: string = '';
   pathType: pathType = 'straightPath';

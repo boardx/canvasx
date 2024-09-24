@@ -101,15 +101,16 @@ export class XPath<
    */
   constructor(
     path: TComplexPathData | string,
-    { path: _, left, top, ...options }: Partial<Props> = {}
+    { path: _, left, top, ...options }: Partial<any> = {}
   ) {
+
     super(options as Props);
     this._setPath(path || [], true);
     typeof left === 'number' && this.set('left', left);
     typeof top === 'number' && this.set('top', top);
 
     Object.assign(this, options);
-
+    this.objType = 'XPath';
   }
   lastEditedByName: string;
   createdByName: string;

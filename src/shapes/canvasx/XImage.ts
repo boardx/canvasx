@@ -85,9 +85,15 @@ export class XImage<
   static objType: WidgetType = 'XImage';
 
   constructor(image: any, options: any) {
+
     super(image, options);
     Object.assign(this, options);
-
+    this.objType = 'XImage';
+    this.cornerColor = 'white';
+    this.cornerSize = 10;
+    this.cornerStyle = 'circle';
+    this.transparentCorners = false;
+    this.cornerStrokeColor = 'gray';
   }
   markdownText: string;
   lastEditedByName: string;

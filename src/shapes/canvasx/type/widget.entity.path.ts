@@ -18,7 +18,7 @@ export class WidgetPathClass implements WidgetPathInterface {
   fill: string = 'transparent';
   lastEditedByName: string = "";
   createdByName: string = "";
-  path: any[] = [];
+  path: any[] = [''];
   stroke: string = '#000000';
   strokeWidth: number = 1;
   strokeLineCap: string = 'butt';
@@ -51,4 +51,4 @@ export class WidgetPathClass implements WidgetPathInterface {
   visible: boolean = true;
 }
 
-export const EntityKeys = Object.keys(new WidgetPathClass()) as (keyof WidgetPathInterface)[];
+export const EntityKeys = Object.keys(new WidgetPathClass()) as string[];

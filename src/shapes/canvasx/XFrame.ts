@@ -18,7 +18,8 @@ class XFrame extends FabricObject implements WidgetFrameInterface {
   static objType: WidgetType = 'XFrame';
 
   constructor(options: Partial<WidgetFrameInterface> = {}) {
-    super();
+
+    super(options);
     Object.assign(this, options);
     this.titleText = 'Frame Title',
       this.left = 100,
@@ -34,6 +35,7 @@ class XFrame extends FabricObject implements WidgetFrameInterface {
       editable: true,
     });
     this.titleText = this.titleText;
+    this.objType = 'XFrame';
     this.body = new Rect({
       left: this.left,
       top: this.top + 30,

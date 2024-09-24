@@ -47,6 +47,7 @@ export class XURL extends FabricObject implements WidgetURLInterface {
     'boardId',
   ];
   constructor(options: Partial<XURLProps>) {
+
     super(options);
 
     const previewImage = options.previewImage
@@ -56,7 +57,7 @@ export class XURL extends FabricObject implements WidgetURLInterface {
     Object.assign(this, options);
 
     this.on('mousedblclick', this.onDoubleClick.bind(this));
-
+    this.objType = 'XURL';
     this.objType = 'XURL';
     (this.cornerColor = 'white'),
       (this.cornerStrokeColor = 'gray'),

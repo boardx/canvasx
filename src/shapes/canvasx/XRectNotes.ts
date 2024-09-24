@@ -1,5 +1,5 @@
 import { classRegistry } from '../../ClassRegistry';
-import { XTextbox as Textbox } from './XTextbox';
+import { XTextbox } from './XTextbox';
 import type { TClassProperties, TOriginX, TOriginY } from '../../typedefs';
 import { createRectNotesDefaultControls } from '../../controls/X_commonControls';
 
@@ -28,7 +28,7 @@ export const rectNotesDefaultValues: Partial<TClassProperties<XRectNotes>> = {
  * wrapping of lines.
  */
 ///@ts-ignore
-export class XRectNotes extends Textbox implements WidgetRectNotesInterface {
+export class XRectNotes extends XTextbox implements WidgetRectNotesInterface {
   /**selectable
    * Minimum width of textbox, in pixels.
    * @type Number
@@ -38,7 +38,7 @@ export class XRectNotes extends Textbox implements WidgetRectNotesInterface {
   static type = 'XRectNotes';
   static objType = 'XRectNotes';
   declare locked: boolean;
-
+  declare cornerStyle: any;
   declare verticalAlign: string;
   declare originX: TOriginX;
   declare originY: TOriginY;
@@ -72,7 +72,7 @@ export class XRectNotes extends Textbox implements WidgetRectNotesInterface {
    */
   declare splitByGrapheme: boolean;
 
-  static textLayoutProperties = [...Textbox.textLayoutProperties, 'width'];
+  static textLayoutProperties = [...XTextbox.textLayoutProperties, 'width'];
 
   static ownDefaults: Record<string, any> = rectNotesDefaultValues;
 
@@ -87,6 +87,8 @@ export class XRectNotes extends Textbox implements WidgetRectNotesInterface {
     text: string,
     options: Partial<TClassProperties<XRectNotes>> = {}
   ) {
+
+
     super(text, options);
     Object.assign(this, {
       controls: {
@@ -95,7 +97,7 @@ export class XRectNotes extends Textbox implements WidgetRectNotesInterface {
       },
     });
     Object.assign(this, options);
-
+    this.objType = 'XRectNotes';
     // this.initializeEvent();
   }
 

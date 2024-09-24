@@ -57,8 +57,10 @@ class XConnector extends Path implements WidgetConnectorInterface {
     options: any = {}
   ) {
     const path = getPath(fromPoint, toPoint, control1, control2);
+
+
     super(path, options);
-    Object.assign(this, options);
+    // Object.assign(this, options);
     this.cornerColor = 'white';
     this.cornerStyle = 'circle';
     this.transparentCorners = false;

@@ -108,13 +108,14 @@ export class XText
     }
 
     constructor(text: string, options: any) {
+
         super(text, options);
         // if (this.objType !== 'XText' && this.objType !== 'XTextbox') {
         // this.addControls();
         // }
         this.initializeEvent();
         Object.assign(this, options);
-
+        this.objType = 'XText';
 
         // this.resetResizeControls();
     }

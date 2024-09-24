@@ -98,9 +98,11 @@ export class XTextbox
 
 
   constructor(text: string, options: any) {
+
     super(text, options);
     this.initializeEvent();
     Object.assign(this, options);
+
     this.oneLine = true;
     this.connectors = options.connectors || [];
     this.originX = options.originX || 'center';
@@ -117,7 +119,7 @@ export class XTextbox
     this.updatedAt = options.updatedAt || Date.now();
     this.lastEditedByName = options.lastEditedByName || '';
     this.createdByName = options.createdByName || '';
-
+    this.objType = 'XTextbox';
     // this.resetResizeControls();
   }
   lastEditedByName: string;

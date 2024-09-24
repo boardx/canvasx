@@ -99,9 +99,11 @@ export class XFile extends FabricObject implements WidgetFileInterface {
 
 
 
-  constructor(options: Partial<XFileProps> = {}) {
-    super(options);
+  constructor(options: Partial<XFileProps & { type: string }> = {}) {
 
+
+    super(options);
+    this.objType = 'XFile';
     this.initializeProperties(options);
     this.initializeVisuals();
     this.loadPreviewImage(

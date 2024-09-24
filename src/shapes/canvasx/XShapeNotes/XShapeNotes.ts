@@ -50,7 +50,9 @@ export class XShapeNotes extends XTextbox implements WidgetShapeNotesInterface {
   shapeName: shapeType;
 
 
-  constructor(text: string, options: Partial<WidgetShapeNotesInterface>) {
+  constructor(text: string, options: Partial<WidgetShapeNotesInterface> & { type: string }) {
+
+
     super(text, options);
     this.bgShape = options.shapeName ? getShapeInfo(options.shapeName) : null;
     this.width = (options.width || 200) * (options.scaleX || 1);
