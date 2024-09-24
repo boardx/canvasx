@@ -4,9 +4,8 @@ import { classRegistry } from '../../ClassRegistry';
 import { createTextboxDefaultControls } from '../../controls/X_commonControls';
 import { XTextbox } from './XTextbox';
 
-import { WidgetType } from './type/widget.type';
 import { EntityKeys } from './type/widget.entity.textbox';
-
+import { WidgetType } from './type/widget.type';
 import { Point } from '../../Point';
 import { WidgetTextInterface } from './type/widget.entity.text';
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
@@ -42,8 +41,8 @@ export const XTextboxProps: Partial<TClassProperties<XTextbox>> = {};
 export class XText
     extends XTextbox
     implements WidgetTextInterface {
-    static type: WidgetType = 'XText';
-    static objType: WidgetType = 'XText';
+
+
     /**
      * Minimum width of textbox, in pixels.
      * @type Number
@@ -54,6 +53,9 @@ export class XText
     declare tempTop: number;
 
     declare hasNoText: boolean;
+
+    static objType: WidgetType = 'XText';
+    static type: WidgetType = 'XText';
 
     /**
      * Minimum calculated width of a textbox, in pixels.
@@ -111,10 +113,12 @@ export class XText
         // this.addControls();
         // }
         this.initializeEvent();
-        this.connectors = options.connectors || [];
+        Object.assign(this, options);
+
 
         // this.resetResizeControls();
     }
+
 
     /* boardx extend function */
 

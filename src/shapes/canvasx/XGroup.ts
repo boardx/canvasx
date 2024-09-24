@@ -3,35 +3,30 @@ import { Group } from '../Group';
 
 import { WidgetType } from './type/widget.type';
 import { EntityKeys } from './type/widget.entity.group';
+import { WidgetGroupInterface } from './type/widget.entity.group';
 
 
-export class XGroup extends Group {
-  static type = 'XGroup';
+export class XGroup extends Group implements WidgetGroupInterface {
+  static type: WidgetType = 'XGroup';
   static objType: WidgetType = 'XGroup';
-  declare id: string;
-  declare boardId: string;
-  declare userId: string;
-  declare timestamp: number;
-  declare zIndex: number;
-  declare locked: boolean;
-  declare verticalAlign: string;
-  declare objectArr: any[];
-  declare version: number;
+
 
   constructor(objects: any, options: any) {
     super(objects, options);
-    this.id = options.id || '';
 
-    this.boardId = options.boardId || '';
-    this.userId = options.userId || '';
-    this.timestamp = options.timestamp || Date.now();
-    this.zIndex = options.zIndex || 0;
-    this.locked = options.locked || false;
-    this.verticalAlign = options.verticalAlign || 'middle';
-
-    this.selectable = options.selectable || true;
-    this.objectArr = options.objectArr || [];
   }
+  lastEditedByName: string;
+  createdByName: string;
+  objectArr: any[];
+  boardId: string;
+  objType: WidgetType;
+  userId: string;
+  zIndex: number;
+  version: string;
+  updatedAt: number;
+  lastEditedBy: string;
+  createdAt: number;
+  createdBy: string;
 
 
   getObject() {

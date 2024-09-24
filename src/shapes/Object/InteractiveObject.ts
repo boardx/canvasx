@@ -40,13 +40,15 @@ export type TStyleOverride = ControlRenderingStyleOverride &
   >;
 
 export class InteractiveFabricObject<
-    Props extends TFabricObjectProps = Partial<FabricObjectProps>,
-    SProps extends SerializedObjectProps = SerializedObjectProps,
-    EventSpec extends ObjectEvents = ObjectEvents
-  >
+  Props extends TFabricObjectProps = Partial<FabricObjectProps>,
+  SProps extends SerializedObjectProps = SerializedObjectProps,
+  EventSpec extends ObjectEvents = ObjectEvents
+>
   extends FabricObject<Props, SProps, EventSpec>
-  implements FabricObjectProps
-{
+  implements FabricObjectProps {
+
+
+
   declare noScaleCache: boolean;
 
   declare snapAngle?: TDegree;
@@ -171,10 +173,10 @@ export class InteractiveFabricObject<
     const key = this.__corner;
     return key
       ? {
-          key,
-          control: this.controls[key],
-          coord: this.oCoords[key],
-        }
+        key,
+        control: this.controls[key],
+        coord: this.oCoords[key],
+      }
       : undefined;
   }
 
@@ -459,17 +461,17 @@ export class InteractiveFabricObject<
     let size;
     if ((styleOverride && styleOverride.forActiveSelection) || this.group) {
       const bbox = sizeAfterTransform(
-          this.width,
-          this.height,
-          calcDimensionsMatrix(options)
-        ),
+        this.width,
+        this.height,
+        calcDimensionsMatrix(options)
+      ),
         stroke = !this.isStrokeAccountedForInDimensions()
           ? (this.strokeUniform
-              ? new Point().scalarAdd(this.canvas ? this.canvas.getZoom() : 1)
-              : // this is extremely confusing. options comes from the upper function
-                // and is the qrDecompose of a matrix that takes in account zoom too
-                new Point(options.scaleX, options.scaleY)
-            ).scalarMultiply(this.strokeWidth)
+            ? new Point().scalarAdd(this.canvas ? this.canvas.getZoom() : 1)
+            : // this is extremely confusing. options comes from the upper function
+            // and is the qrDecompose of a matrix that takes in account zoom too
+            new Point(options.scaleX, options.scaleY)
+          ).scalarMultiply(this.strokeWidth)
           : ZERO;
       size = bbox
         .add(stroke)

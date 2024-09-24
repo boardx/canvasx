@@ -5,6 +5,8 @@ import { WidgetType } from './widget.type';
 export   interface WidgetCircleNotesInterface extends WidgetTextboxInterface {}
 
 export class WidgetCircleNotesClass implements WidgetCircleNotesInterface {
+    lastEditedByName: string="";
+    createdByName: string="";
     fontFamily: string = 'Inter';
     fontSize: number = 12;
     fontWeight: string = 'normal';

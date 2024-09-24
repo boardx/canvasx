@@ -3,6 +3,7 @@ import { WidgetType } from './widget.type';
 
 export interface WidgetPathInterface extends WidgetBaseInterface {
   path: any[];
+  fill: string | null | any;
   stroke: string | null | any;
   strokeWidth: number;
   strokeLineCap: string;
@@ -14,6 +15,9 @@ export interface WidgetPathInterface extends WidgetBaseInterface {
 }
 
 export class WidgetPathClass implements WidgetPathInterface {
+  fill: string = 'transparent';
+  lastEditedByName: string = "";
+  createdByName: string = "";
   path: any[] = [];
   stroke: string = '#000000';
   strokeWidth: number = 1;

@@ -1,5 +1,5 @@
 import { TOriginX, TOriginY } from './widget.entity.base';
-import { WidgetTextboxInterface, Connector } from './widget.entity.textbox';
+import   { WidgetTextboxInterface,Connector } from './widget.entity.textbox';
 import { WidgetType } from './widget.type';
 
 export   interface WidgetShapeNotesInterface extends WidgetTextboxInterface {
@@ -24,6 +24,8 @@ export type shapeType =
   | 'constellationRound';
 
 export class WidgetShapeNotesClass implements WidgetShapeNotesInterface {
+  lastEditedByName: string="";
+  createdByName: string="";
   shapeName: shapeType = 'rect';
   fontFamily: string = 'Arial';
   fontSize: number = 14;
@@ -59,4 +61,4 @@ export class WidgetShapeNotesClass implements WidgetShapeNotesInterface {
   visible: boolean = true;
 }
 
-export const EntityKeys = Object.keys(new WidgetShapeNotesClass()) as string[]; 
+export const EntityKeys = Object.keys(new WidgetShapeNotesClass()) as (keyof WidgetShapeNotesInterface)[];

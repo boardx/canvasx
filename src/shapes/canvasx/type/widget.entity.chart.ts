@@ -3,9 +3,12 @@ import { WidgetType } from './widget.type';
 
 export   interface WidgetChartInterface extends WidgetBaseInterface {
   chartOptions: any;
+  
 }
 
 class WidgetChartClass implements WidgetChartInterface {
+  lastEditedByName: string="";
+  createdByName: string="";
   id: string = '';
   boardId: string = '';
   backgroundColor: string = '';

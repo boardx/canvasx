@@ -6,6 +6,8 @@ export   interface WidgetMarkdownInterface extends WidgetBaseInterface {
 }
 
 export class WidgetMarkdownClass implements WidgetBaseInterface {
+  lastEditedByName: string="";
+  createdByName: string="";
   id: string = '';
   boardId: string = '';
   backgroundColor: string = '#FFFFFF';

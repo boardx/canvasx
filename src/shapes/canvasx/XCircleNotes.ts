@@ -114,9 +114,9 @@ export class XCircleNotes extends XTextbox implements WidgetCircleNotesInterface
     };
   }
 
-  constructor(text: string, options: Partial<CircleNotesProps>) {
+  constructor(text: string, options: any) {
     super(text, options);
-
+    Object.assign(this, options);
     Object.assign(this, {
       controls: { ...createRectNotesDefaultControls(this) },
     });

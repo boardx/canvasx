@@ -89,25 +89,10 @@ export class XPath<
 
   declare radius: any;
 
-  static objType = 'XPath';
-  static type = 'XPath';
+  static objType: WidgetType = 'XPath';
+  static type: WidgetType = 'XPath';
 
-  public extendedProperties = [
-    'objType',
-    'boardId',
-    'userId',
-    'timestamp',
-    'zIndex',
-    'locked',
-    'lines',
-    'relationship',
-    'id',
-    'clientId',
-    'version',
-    'lineWidth',
-    'radius',
-    'path',
-  ];
+
   /**
    * Constructor
    * @param {TComplexPathData} path Path data (sequence of coordinates and corresponding "command" tokens)
@@ -122,7 +107,12 @@ export class XPath<
     this._setPath(path || [], true);
     typeof left === 'number' && this.set('left', left);
     typeof top === 'number' && this.set('top', top);
+
+    Object.assign(this, options);
+
   }
+  lastEditedByName: string;
+  createdByName: string;
   objType: WidgetType;
   updatedAt: number;
   lastEditedBy: string;
@@ -272,7 +262,7 @@ export class XPath<
     K extends keyof T = never
   >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return {
-      ...super.toObject([...propertiesToInclude, ...this.extendedProperties]),
+      ...super.toObject([...propertiesToInclude]),
       path: cloneDeep(this.path),
     };
   }

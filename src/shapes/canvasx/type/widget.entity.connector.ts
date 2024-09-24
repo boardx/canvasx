@@ -6,6 +6,7 @@ export type pathArrowTip = 'none' | 'start' | 'end' | 'both';
 export type xy = { x: number; y: number };
 
 export   interface WidgetConnectorInterface extends WidgetBaseInterface {
+  
   fromObjectId: string;
   toObjectId: string;
   pathType: pathType;
@@ -18,6 +19,8 @@ export   interface WidgetConnectorInterface extends WidgetBaseInterface {
 }
 
 export class WidgetConnectorClass implements WidgetConnectorInterface {
+  lastEditedByName: string="";
+  createdByName: string="";
   fromObjectId: string = '';
   toObjectId: string = '';
   pathType: pathType = 'straightPath';

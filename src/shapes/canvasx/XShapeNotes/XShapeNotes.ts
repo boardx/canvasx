@@ -35,36 +35,23 @@ function getShapeInfo(shape: string): shapeInfo | null {
 
 export const XShapeNotesDefaultValues: Partial<TClassProperties<XShapeNotes>> =
 {
-  minWidth: 20,
-  minHeight: 20,
-  dynamicMinWidth: 2,
-  lockScalingFlip: true,
-  noScaleCache: false,
-  _wordJoiners: /[ \t\r]/,
-  splitByGrapheme: true,
-  objType: 'XShapeNotes',
-  textAlign: 'center',
-  centeredScaling: false,
-  cornerColor: 'white',
-  cornerStrokeColor: 'gray',
-  cornerSize: 10,
-  cornerStyle: 'circle',
-  transparentCorners: false,
+
 };
 
 
 export class XShapeNotes extends XTextbox implements WidgetShapeNotesInterface {
-  bgShape: shapeInfo | null;
-  verticalAlign = 'middle';
-  maxHeight: number = 138;
-  minHeight: number = 20;
-
   static type: WidgetType = 'XShapeNotes';
   static objType: WidgetType = 'XShapeNotes';
 
+  bgShape: shapeInfo | null;
+  verticalAlign: string;
+  maxHeight: number;
+  minHeight: number;
+  shapeName: shapeType;
+
+
   constructor(text: string, options: Partial<WidgetShapeNotesInterface>) {
     super(text, options);
-
     this.bgShape = options.shapeName ? getShapeInfo(options.shapeName) : null;
     this.width = (options.width || 200) * (options.scaleX || 1);
     this.height = (options.height || 200) * (options.scaleY || 1);
@@ -73,6 +60,31 @@ export class XShapeNotes extends XTextbox implements WidgetShapeNotesInterface {
     this.id = options.id || '';
     this.verticalAlign = this.bgShape?.verticalAlign || 'middle';
     this.textAlign = this.bgShape?.textAlign || 'center';
+    this.shapeName = options.shapeName || 'rect';
+    this.fontSize = options.fontSize || 14;
+    this.fontFamily = options.fontFamily || 'Inter';
+    this.fontWeight = options.fontWeight || 'normal';
+    this.lineHeight = options.lineHeight || 1.5;
+    this.text = text;
+
+    this.minWidth = 20;
+    this.minHeight = 20;
+    this.dynamicMinWidth = 2;
+    this.lockScalingFlip = true;
+    this.noScaleCache = false;
+    this._wordJoiners = /[ \t\r]/;
+    this.splitByGrapheme = true;
+    this.objType = 'XShapeNotes';
+    this.textAlign = 'center';
+    this.centeredScaling = false;
+    this.cornerColor = 'white';
+    this.cornerStrokeColor = 'gray';
+    this.cornerSize = 10;
+    this.cornerStyle = 'circle';
+    this.transparentCorners = false;
+    this.verticalAlign = 'middle';
+
+    this.maxHeight = options.maxHeight || 138;
 
     this.resetSplitByGrapheme();
     Object.assign(this, {
@@ -83,7 +95,7 @@ export class XShapeNotes extends XTextbox implements WidgetShapeNotesInterface {
     this.on('modified', this.handleModified);
     this.on('changed', this.handleModified);
   }
-  shapeName: shapeType;
+
 
 
   getObject() {
@@ -118,7 +130,6 @@ export class XShapeNotes extends XTextbox implements WidgetShapeNotesInterface {
   static getDefaults() {
     return {
       ...super.getDefaults(),
-
       ...XShapeNotes.ownDefaults,
     };
   }

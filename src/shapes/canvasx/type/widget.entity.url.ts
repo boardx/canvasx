@@ -11,6 +11,8 @@ export interface WidgetURLInterface extends WidgetBaseInterface {
 
 
 export class WidgetURLClass implements WidgetURLInterface {
+  lastEditedByName: string="";
+  createdByName: string="";
   transcription: string = '';
   vectorSrc: FileObject = { id: '', path: '', tmpPath: '' };
   fileSrc: FileObject = { id: '', path: '', tmpPath: '' };

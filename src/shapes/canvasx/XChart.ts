@@ -30,7 +30,10 @@ class XChart extends FabricObject implements WidgetChartInterface {
     this.height = options.height!;
     this.createCanvasElement();
     this.addDoubleClickEventListener();
+    Object.assign(this, options);
   }
+  lastEditedByName: string;
+  createdByName: string;
   chartOptions: any;
   boardId: string;
   objType: WidgetType;

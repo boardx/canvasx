@@ -13,13 +13,7 @@ import { WidgetType } from './type/widget.type';
 
 hljs.registerLanguage('javascript', javascript);
 
-interface MarkdownTextOptions {
-  left?: number;
-  top?: number;
-  width?: number;
-  height?: number;
-  markdownText?: string;
-}
+
 
 class XMarkdown extends XTextbox implements WidgetMarkdownInterface {
   public markdownText: string;
@@ -29,7 +23,7 @@ class XMarkdown extends XTextbox implements WidgetMarkdownInterface {
 
   static type: WidgetType = 'XMarkdown';
   static objType: WidgetType = 'XMarkdown';
-  constructor(text: string, options?: MarkdownTextOptions) {
+  constructor(text: string, options?: WidgetMarkdownInterface) {
     super(text, options);
     this.markdownText = options?.markdownText || text;
 
@@ -76,6 +70,7 @@ class XMarkdown extends XTextbox implements WidgetMarkdownInterface {
         return ''; // use external default escaping
       },
     });
+    Object.assign(this, options);
 
     this.on('editing:entered', this.onEditingEntered.bind(this));
     this.on('editing:exited', this.onEditingExited.bind(this));
@@ -83,6 +78,7 @@ class XMarkdown extends XTextbox implements WidgetMarkdownInterface {
     this.on('resizing', this.onScaled.bind(this));
     this.renderMarkdown();
   }
+
 
   private onEditingEntered() {
     this.isEditing = true;

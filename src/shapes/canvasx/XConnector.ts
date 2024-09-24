@@ -58,12 +58,14 @@ class XConnector extends Path implements WidgetConnectorInterface {
   ) {
     const path = getPath(fromPoint, toPoint, control1, control2);
     super(path, options);
+    Object.assign(this, options);
     this.cornerColor = 'white';
     this.cornerStyle = 'circle';
     this.transparentCorners = false;
     this.cornerStrokeColor = 'gray';
     this.hasBorders = false;
     this.type = 'XConnector';
+    this.objType = 'XConnector';
     this.objectCaching = false;
     this.pathType = options.pathType || 'curvePath';
     this.pathArrowTip = options.pathArrowTip || 'both';
@@ -73,6 +75,9 @@ class XConnector extends Path implements WidgetConnectorInterface {
     this.toPoint = toPoint;
     this.control1 = control1;
     this.control2 = control2;
+    this.createdByName = options.createdByName;
+    this.lastEditedByName = options.lastEditedByName;
+    this.boardId = options.boardId;
     this.style = style;
     this._setMovementLock();
     this.calcStartEndPath();
@@ -103,6 +108,8 @@ class XConnector extends Path implements WidgetConnectorInterface {
       this.dragActionEventHandler(evtOpt.commandIndex, evtOpt.pointIndex);
     });
   }
+  lastEditedByName: string;
+  createdByName: string;
   boardId: string;
   objType: WidgetType;
   userId: string;

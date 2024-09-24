@@ -6,6 +6,8 @@ export   interface WidgetTextInterface extends WidgetTextboxInterface {}
 
 
 export class WidgetTextClass implements WidgetTextInterface {
+    lastEditedByName: string="";
+    createdByName: string="";
     fontFamily: string = 'Inter';
     fontSize: number = 14;
     fontWeight: string = 'normal';

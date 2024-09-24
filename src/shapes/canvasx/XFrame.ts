@@ -17,39 +17,36 @@ class XFrame extends FabricObject implements WidgetFrameInterface {
   static type: WidgetType = 'XFrame';
   static objType: WidgetType = 'XFrame';
 
-  constructor(
-    canvas: any,
-    titleText = 'Frame Title',
-    left = 100,
-    top = 100,
-    width = 400,
-    height = 300
-  ) {
+  constructor(options: Partial<WidgetFrameInterface> = {}) {
     super();
-    this.canvas = canvas;
-
-    this.title = new Textbox(titleText, {
-      left: left,
-      top: top,
+    Object.assign(this, options);
+    this.titleText = 'Frame Title',
+      this.left = 100,
+      this.top = 100,
+      this.width = 400,
+      this.height = 300
+    this.title = new Textbox(this.titleText, {
+      left: this.left,
+      top: this.top,
       fontSize: 18,
       fontWeight: 'bold',
       selectable: true,
       editable: true,
     });
-    this.titleText = titleText;
+    this.titleText = this.titleText;
     this.body = new Rect({
-      left: left,
-      top: top + 30,
-      width: width,
-      height: height,
+      left: this.left,
+      top: this.top + 30,
+      width: this.width,
+      height: this.height,
       fill: 'rgba(0,0,0,0.1)',
       selectable: false,
       evented: false,
     });
 
     this.objects = new Group([this.body, this.title], {
-      left: left,
-      top: top,
+      left: this.left,
+      top: this.top,
       selectable: true,
     });
 
@@ -120,6 +117,8 @@ class XFrame extends FabricObject implements WidgetFrameInterface {
 
     this.canvas!.renderAll();
   }
+  lastEditedByName: string;
+  createdByName: string;
   boardId: string;
   objType: WidgetType;
   userId: string;

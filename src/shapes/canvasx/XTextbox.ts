@@ -99,14 +99,29 @@ export class XTextbox
 
   constructor(text: string, options: any) {
     super(text, options);
-    // if (this.objType !== 'XText' && this.objType !== 'XTextbox') {
-    // this.addControls();
-    // }
     this.initializeEvent();
+    Object.assign(this, options);
+    this.oneLine = true;
     this.connectors = options.connectors || [];
+    this.originX = options.originX || 'center';
+    this.originY = options.originY || 'center';
+    this.minWidth = options.minWidth || 20;
+    this.dynamicMinWidth = options.dynamicMinWidth || 2;
+    this.splitByGrapheme = options.splitByGrapheme || false;
+    this.fixedScaleChange = options.fixedScaleChange || false;
+    this.boardId = options.boardId || '';
+    this.objType = options.objType || 'XTextbox';
+    this.userId = options.userId || '';
+    this.zIndex = options.zIndex || 0;
+    this.version = options.version || '';
+    this.updatedAt = options.updatedAt || Date.now();
+    this.lastEditedByName = options.lastEditedByName || '';
+    this.createdByName = options.createdByName || '';
 
     // this.resetResizeControls();
   }
+  lastEditedByName: string;
+  createdByName: string;
   maxHeight: number;
   fixedScaleChange: boolean;
   boardId: string;

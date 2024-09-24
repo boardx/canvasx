@@ -6,6 +6,8 @@ export   interface WidgetGroupInterface extends WidgetBaseInterface {
 }
 
 export class WidgetGroupClass implements WidgetGroupInterface {
+  lastEditedByName: string="";
+  createdByName: string="";
   objectArr: any[] = [];
   id: string = '';
   boardId: string = '';

@@ -1,11 +1,13 @@
-import { WidgetBaseInterface, TOriginX, TOriginY } from './widget.entity.base';
+import   {WidgetBaseInterface, TOriginX, TOriginY } from './widget.entity.base';
 import { WidgetType } from './widget.type';
 
-export interface WidgetFrameInterface extends WidgetBaseInterface {
+export   interface WidgetFrameInterface extends WidgetBaseInterface {
   titleText: string;
 }
 
 export class WidgetFrameClass implements WidgetFrameInterface {
+  lastEditedByName: string="";
+  createdByName: string="";
   titleText: string = '';
   id: string = '';
   boardId: string = '';

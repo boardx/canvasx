@@ -11,6 +11,7 @@ import { WidgetShapeNotesInterface } from './widget.entity.shapenote';
 import { WidgetURLInterface } from './widget.entity.url';
 import { WidgetConnectorInterface } from './widget.entity.connector';
 import { WidgetMarkdownInterface } from './widget.entity.markdown';
+import { WidgetTextInterface } from './widget.entity.text';
 
 export type WidgetObjectType =
   | WidgetChartInterface
@@ -25,4 +26,5 @@ export type WidgetObjectType =
   | WidgetShapeNotesInterface
   | WidgetURLInterface
   | WidgetConnectorInterface
-  | WidgetMarkdownInterface;
+  | WidgetMarkdownInterface
+  | WidgetTextInterface;

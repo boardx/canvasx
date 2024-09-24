@@ -1,4 +1,3 @@
-
 export type WidgetType =
   | 'activeSelection'
   | 'XConnector'
@@ -32,6 +31,8 @@ export type WidgetType =
   | 'XFileZip'
   | 'XFileVideo'
   | 'XFileAudio';
+
+ 
 
 export type WidgetFileType =
   | 'XFile'

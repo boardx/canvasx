@@ -62,6 +62,8 @@ export   interface WidgetFileInterface extends WidgetBaseInterface {
 
 
 export class WidgetFileClass implements WidgetFileInterface {
+  lastEditedByName: string="";
+  createdByName: string="";
   fileName: string = '';
   fileSrc: FileObject = { path: '', id: '', tmpPath: '' };
   vectorSrc: FileObject = { path: '', id: '', tmpPath: '' };;

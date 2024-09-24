@@ -5,6 +5,8 @@ import { WidgetType } from './widget.type';
 export   interface WidgetRectNotesInterface extends WidgetTextboxInterface {}
 
 export class WidgetRectNotesClass implements WidgetRectNotesInterface {
+    lastEditedByName: string="";
+    createdByName: string="";
     fontFamily: string = 'Inter';
     fontSize: number = 12;
     fontWeight: string = 'normal';

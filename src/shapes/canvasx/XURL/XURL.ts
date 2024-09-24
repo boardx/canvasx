@@ -12,21 +12,7 @@ import { WidgetURLInterface, EntityKeys } from '../type/widget.entity.url';
 import { WidgetType } from '../type/widget.type';
 
 
-export type XURLProps = ImageProps & {
-  id: string;
-  text: string;
-  transcription: string;
-  vectorSrc: string;
-  fileSrc: string;
-  fileName: string;
-  description: string;
-  previewImage: string;
-  userId: string;
-  clientId: number;
-  zIndex: number;
-  locked: boolean;
-  boardId: string;
-};
+export type XURLProps = ImageProps & WidgetURLInterface;
 
 export const XURLDefaultValues: Partial<XURLProps> = {
   originX: 'center',
@@ -67,18 +53,7 @@ export class XURL extends FabricObject implements WidgetURLInterface {
       ? options.previewImage
       : '/fileIcons/weblink.png'; //this.getFileIconURL(options.fileName!);
 
-    this.set('id', options.id || '');
-    this.set('fileName', options.fileName || '');
-    this.set('transcription', options.transcription || '');
-    this.set('vectorSrc', options.vectorSrc || '');
-    this.set('fileSrc', options.fileSrc || '');
-    this.set('previewImage', previewImage || '');
-    this.set('description', options.description || '');
-    this.set('userId', options.userId || '');
-    this.set('clientId', options.clientId || 0);
-    this.set('zIndex', options.zIndex || 0);
-    this.set('locked', options.locked || false);
-    this.set('boardId', options.boardId || '');
+    Object.assign(this, options);
 
     this.on('mousedblclick', this.onDoubleClick.bind(this));
 
@@ -106,8 +81,10 @@ export class XURL extends FabricObject implements WidgetURLInterface {
     });
     this.width = 230;
     this.height = 248;
-    this.loadPreviewImage(previewImage, options.fileName!);
+    this.loadPreviewImage(this.previewImage.tmpPath, options.fileName!);
   }
+  lastEditedByName: string;
+  createdByName: string;
   vectorSrc: FileObject;
   fileSrc: FileObject;
   fileName: string;

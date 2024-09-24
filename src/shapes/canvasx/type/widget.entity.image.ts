@@ -13,6 +13,8 @@ export   interface WidgetImageInterface extends WidgetBaseInterface {
 }
 
 export class WidgetImageClass implements WidgetImageInterface {
+  lastEditedByName: string="";
+  createdByName: string="";
   markdownText: string = '';
   cropX: number = 0;
   cropY: number = 0;

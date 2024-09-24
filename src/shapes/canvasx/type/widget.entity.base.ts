@@ -20,8 +20,10 @@ export interface WidgetBaseInterface {
   version: string;
   updatedAt: number;
   lastEditedBy: string;
+  lastEditedByName: string;
   createdAt: number;
   createdBy: string;
+  createdByName: string;
   visible: boolean;
 }
 

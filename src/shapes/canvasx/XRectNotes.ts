@@ -94,6 +94,8 @@ export class XRectNotes extends Textbox implements WidgetRectNotesInterface {
         // mr: { /* add your desired value here */ },
       },
     });
+    Object.assign(this, options);
+
     // this.initializeEvent();
   }
 

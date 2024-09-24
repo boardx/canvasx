@@ -65,7 +65,7 @@ export class XImage<
   SProps extends SerializedImageProps = SerializedImageProps,
   EventSpec extends ObjectEvents = ObjectEvents
 > extends FabricImage implements WidgetImageInterface {
-  markdownText: string;
+
   cropWidth: number;
   cropHeight: number;
   previewImage: FileObject;
@@ -75,36 +75,23 @@ export class XImage<
   lastEditedBy: string;
   createdAt: number;
   createdBy: string;
+  boardId: string;
+  objType: WidgetType;
+  userId: string;
+  zIndex: number;
   /* boardx cusotm function */
-  declare objType: WidgetType;
 
-  declare locked: boolean;
-
-  declare boardId: string;
-
-  declare userId: string;
-
-  declare timestamp: Date;
-
-  declare verticalAlign: string;
-
-  declare zIndex: number;
-
-  declare lines: object[];
-
-  declare relationship: object[];
-
-  declare id: string;
-
-  declare oWidth: number;
-
-  declare oHeight: number;
-
-  declare strokeWidth: number;
   static type: WidgetType = 'XImage';
   static objType: WidgetType = 'XImage';
 
+  constructor(image: any, options: any) {
+    super(image, options);
+    Object.assign(this, options);
 
+  }
+  markdownText: string;
+  lastEditedByName: string;
+  createdByName: string;
 
 
   getObject() {
