@@ -34,6 +34,8 @@ class XChart extends FabricObject implements WidgetChartInterface {
     Object.assign(this, options);
     this.objType = 'XChart';
   }
+  updatedBy: string;
+  updatedByName: string;
   lastEditedByName: string;
   createdByName: string;
   chartOptions: any;

@@ -84,6 +84,8 @@ export class XURL extends FabricObject implements WidgetURLInterface {
     this.height = 248;
     this.loadPreviewImage(this.previewImage.tmpPath, options.fileName!);
   }
+  updatedBy: string;
+  updatedByName: string;
   lastEditedByName: string;
   createdByName: string;
   vectorSrc: FileObject;

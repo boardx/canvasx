@@ -111,6 +111,8 @@ export class XFile extends FabricObject implements WidgetFileInterface {
       options.fileName!
     );
   }
+  updatedBy: string;
+  updatedByName: string;
   lastEditedByName: string;
   createdByName: string;
   fileObjectType: FileObjectType;
