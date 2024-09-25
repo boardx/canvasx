@@ -5,23 +5,23 @@ import { WidgetType } from './widget.type';
 export   interface WidgetRectNotesInterface extends WidgetTextboxInterface {}
 
 export class WidgetRectNotesClass implements WidgetRectNotesInterface {
-    lastEditedByName: string="";
+    updatedBy: string = "";
+    updatedByName: string = "";
     createdByName: string="";
     fontFamily: string = 'Inter';
-    fontSize: number = 12;
-    fontWeight: string = 'normal';
+    fontSize: number = 16;
+    fontWeight: string = '400';
     lineHeight: number = 1.5;
     text: string = '';
-    textAlign: string = 'left';
+    textAlign: string = 'center';
     editable: boolean = true;
-    maxHeight: number = 200;
     fixedScaleChange: boolean = false;
     connectors: Connector[] = [];
     id: string = '';
     boardId: string = '';
-    backgroundColor: string = '#FFFFFF';
-    width: number = 100;
-    height: number = 100;
+    backgroundColor: string = 'rgba(252,236,138,1)';
+    width: number = 230;
+    height: number = 138;
     left: number = 0;
     locked: boolean = false;
     objType: WidgetType = "XRectNotes";
@@ -32,10 +32,10 @@ export class WidgetRectNotesClass implements WidgetRectNotesInterface {
     selectable: boolean = true;
     top: number = 0;
     userId: string = '';
-    zIndex: number = 1;
+    zIndex: number = Date.now()*100;
     version: string = '1.0';
     updatedAt: number = Date.now();
-    lastEditedBy: string = '';
+ 
     createdAt: number = Date.now();
     createdBy: string = '';
     visible: boolean = true;

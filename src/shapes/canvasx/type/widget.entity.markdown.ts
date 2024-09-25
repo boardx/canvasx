@@ -6,8 +6,9 @@ export   interface WidgetMarkdownInterface extends WidgetBaseInterface {
 }
 
 export class WidgetMarkdownClass implements WidgetBaseInterface {
-  lastEditedByName: string="";
-  createdByName: string="";
+  updatedBy: string = "";
+  updatedByName: string = "";
+   createdByName: string="";
   id: string = '';
   boardId: string = '';
   backgroundColor: string = '#FFFFFF';
@@ -23,11 +24,10 @@ export class WidgetMarkdownClass implements WidgetBaseInterface {
   selectable: boolean = true;
   top: number = 0;
   userId: string = '';
-  zIndex: number = 0;
+  zIndex: number = Date.now() *100;
   version: string = '1.0';
   updatedAt: number = Date.now();
-  lastEditedBy: string = '';
-  createdAt: number = Date.now();
+   createdAt: number = Date.now();
   createdBy: string = '';
   visible: boolean = true;
 }

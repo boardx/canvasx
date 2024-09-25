@@ -24,24 +24,25 @@ export type shapeType =
   | 'constellationRound';
 
 export class WidgetShapeNotesClass implements WidgetShapeNotesInterface {
-  lastEditedByName: string="";
+  updatedBy: string = "";
+  updatedByName: string = "";
   createdByName: string="";
   shapeName: shapeType = 'rect';
-  fontFamily: string = 'Arial';
-  fontSize: number = 14;
-  fontWeight: string = 'normal';
+  fontFamily: string = 'Inter';
+  fontSize: number = 16;
+  fontWeight: string = '400';
   lineHeight: number = 1.5;
   text: string = '';
-  textAlign: string = 'left';
+  textAlign: string = 'center';
   editable: boolean = true;
   maxHeight: number = 100;
   fixedScaleChange: boolean = false;
   connectors: Connector[] = [];
   id: string = '';
   boardId: string = '';
-  backgroundColor: string = '#FFFFFF';
-  width: number = 100;
-  height: number = 100;
+  backgroundColor: string = '#eeeeee';
+  width: number = 200;
+  height: number = 200;
   left: number = 0;
   locked: boolean = false;
   objType: WidgetType = 'XShapeNotes';
@@ -52,10 +53,9 @@ export class WidgetShapeNotesClass implements WidgetShapeNotesInterface {
   selectable: boolean = true;
   top: number = 0;
   userId: string = '';
-  zIndex: number = 0;
+  zIndex: number = Date.now() * 100;
   version: string = '1.0';
   updatedAt: number = Date.now();
-  lastEditedBy: string = '';
   createdAt: number = Date.now();
   createdBy: string = '';
   visible: boolean = true;

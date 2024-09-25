@@ -29,6 +29,8 @@ export interface WidgetConnectorInterface extends WidgetBaseInterface {
 }
 
 export class WidgetConnectorClass implements WidgetConnectorInterface {
+  updatedBy: string = "";
+  updatedByName: string = "";
   path: any[] = [''];
   fill: any = 'transparent';
   stroke: any = '#000000';
@@ -39,11 +41,10 @@ export class WidgetConnectorClass implements WidgetConnectorInterface {
   strokeUniform: boolean = false;
   strokeMiterLimit: number = 10;
   fillRule: string = 'nonzero';
-  lastEditedByName: string = "";
-  createdByName: string = "";
+   createdByName: string = "";
   fromObjectId: string = '';
   toObjectId: string = '';
-  pathType: pathType = 'straightPath';
+  pathType: pathType = "curvePath";
   pathArrowTip: pathArrowTip = 'none';
   fromPoint: xy = { x: 0, y: 0 };
   toPoint: xy = { x: 0, y: 0 };
@@ -52,7 +53,7 @@ export class WidgetConnectorClass implements WidgetConnectorInterface {
   style: any = {};
   id: string = '';
   boardId: string = '';
-  backgroundColor: string = '';
+  backgroundColor: string = 'transparent';
   width: number = 0;
   height: number = 0;
   left: number = 0;
@@ -65,11 +66,10 @@ export class WidgetConnectorClass implements WidgetConnectorInterface {
   selectable: boolean = true;
   top: number = 0;
   userId: string = '';
-  zIndex: number = 0;
+  zIndex: number = Date.now() * 100;
   version: string = '';
   updatedAt: number = Date.now();
-  lastEditedBy: string = '';
-  createdAt: number = Date.now();
+   createdAt: number = Date.now();
   createdBy: string = '';
   visible: boolean = true;
 }

@@ -45,7 +45,7 @@ export class XShapeNotes extends XTextbox implements WidgetShapeNotesInterface {
 
   bgShape: shapeInfo | null;
   verticalAlign: string;
-  maxHeight: number;
+
   minHeight: number;
   shapeName: shapeType;
 
@@ -68,7 +68,6 @@ export class XShapeNotes extends XTextbox implements WidgetShapeNotesInterface {
     this.fontWeight = options.fontWeight || 'normal';
     this.lineHeight = options.lineHeight || 1.5;
     this.text = text;
-
     this.minWidth = 20;
     this.minHeight = 20;
     this.dynamicMinWidth = 2;
@@ -86,7 +85,7 @@ export class XShapeNotes extends XTextbox implements WidgetShapeNotesInterface {
     this.transparentCorners = false;
     this.verticalAlign = 'middle';
 
-    this.maxHeight = options.maxHeight || 138;
+
 
     this.resetSplitByGrapheme();
     Object.assign(this, {

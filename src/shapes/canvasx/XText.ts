@@ -121,6 +121,7 @@ export class XText
     }
 
 
+
     /* boardx extend function */
 
 

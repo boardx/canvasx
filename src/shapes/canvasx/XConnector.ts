@@ -110,6 +110,8 @@ class XConnector extends Path implements WidgetConnectorInterface {
       this.dragActionEventHandler(evtOpt.commandIndex, evtOpt.pointIndex);
     });
   }
+  updatedBy: string;
+  updatedByName: string;
   lastEditedByName: string;
   createdByName: string;
   boardId: string;

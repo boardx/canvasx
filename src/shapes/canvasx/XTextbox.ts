@@ -124,6 +124,8 @@ export class XTextbox
 
     // this.resetResizeControls();
   }
+  updatedBy: string;
+  updatedByName: string;
   lastEditedByName: string;
   createdByName: string;
   maxHeight: number;

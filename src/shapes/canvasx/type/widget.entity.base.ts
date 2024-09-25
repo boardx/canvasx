@@ -7,6 +7,7 @@ export interface WidgetBaseInterface {
   width: number;
   height: number;
   left: number;
+  top: number;
   locked: boolean;
   objType: WidgetType;
   originX: TOriginX;
@@ -14,13 +15,11 @@ export interface WidgetBaseInterface {
   scaleX: number;
   scaleY: number;
   selectable: boolean;
-  top: number;
-  userId: string;
   zIndex: number;
   version: string;
   updatedAt: number;
-  lastEditedBy: string;
-  lastEditedByName: string;
+  updatedBy: string;
+  updatedByName: string;
   createdAt: number;
   createdBy: string;
   createdByName: string;

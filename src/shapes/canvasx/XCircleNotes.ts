@@ -124,6 +124,7 @@ export class XCircleNotes extends XTextbox implements WidgetCircleNotesInterface
     this.objType = 'XCircleNotes';
   }
 
+
   getObject() {
     const entityKeys: string[] = EntityKeys;
     const result: Record<string, any> = {};

@@ -96,6 +96,8 @@ export class XImage<
     Object.assign(this, options);
 
   }
+  updatedBy: string;
+  updatedByName: string;
   markdownText: string;
   lastEditedByName: string;
   createdByName: string;

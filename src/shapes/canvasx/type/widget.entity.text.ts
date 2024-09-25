@@ -6,7 +6,9 @@ export   interface WidgetTextInterface extends WidgetTextboxInterface {}
 
 
 export class WidgetTextClass implements WidgetTextInterface {
-    lastEditedByName: string="";
+    updatedBy: string = "";
+    updatedByName: string = "";
+ 
     createdByName: string="";
     fontFamily: string = 'Inter';
     fontSize: number = 14;
@@ -15,7 +17,6 @@ export class WidgetTextClass implements WidgetTextInterface {
     text: string = '';
     textAlign: string = 'left';
     editable: boolean = true;
-    maxHeight: number = 200;
     fixedScaleChange: boolean = false;
     connectors: Connector[] = [];
     id: string = '';
@@ -33,10 +34,10 @@ export class WidgetTextClass implements WidgetTextInterface {
     selectable: boolean = true;
     top: number = 0;
     userId: string = '';
-    zIndex: number = 0;
+    zIndex: number = Date.now()*100;
     version: string = '1.0';
     updatedAt: number = Date.now();
-    lastEditedBy: string = '';
+ 
     createdAt: number = Date.now();
     createdBy: string = '';
     visible: boolean = true;

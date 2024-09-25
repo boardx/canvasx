@@ -6,6 +6,7 @@ import { WidgetTextboxInterface } from './widget.entity.textbox';
 import { WidgetFileInterface } from './widget.entity.file';
 import { WidgetImageInterface } from './widget.entity.image';
 import { WidgetFrameInterface } from './widget.entity.frame';
+
 import { WidgetPathInterface } from './widget.entity.path';
 import { WidgetShapeNotesInterface } from './widget.entity.shapenote';
 import { WidgetURLInterface } from './widget.entity.url';

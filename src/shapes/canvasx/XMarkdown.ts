@@ -81,6 +81,7 @@ class XMarkdown extends XTextbox implements WidgetMarkdownInterface {
   }
 
 
+
   private onEditingEntered() {
     this.isEditing = true;
     this.text = this.markdownText;

@@ -19,13 +19,14 @@ export   interface WidgetTextboxInterface extends WidgetBaseInterface {
   text: string;
   textAlign: string;
   editable: boolean;
-  maxHeight: number;
   fixedScaleChange: boolean;
   connectors: Connector[]; // You can replace 'any' with the appropriate type for connectors
 }
 
 export class WidgetTextboxClass implements WidgetTextboxInterface {
-  lastEditedByName: string="";
+  updatedBy: string = "";
+  updatedByName: string = "";
+ 
   createdByName: string="";
   fontFamily: string = 'Inter';
   fontSize: number = 16;
@@ -55,7 +56,7 @@ export class WidgetTextboxClass implements WidgetTextboxInterface {
   zIndex: number = 0;
   version: string = '1.0';
   updatedAt: number = Date.now();
-  lastEditedBy: string = '';
+ 
   createdAt: number = Date.now();
   createdBy: string = '';
   visible: boolean = true;

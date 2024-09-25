@@ -119,6 +119,8 @@ class XFrame extends FabricObject implements WidgetFrameInterface {
 
     this.canvas!.renderAll();
   }
+  updatedBy: string;
+  updatedByName: string;
   lastEditedByName: string;
   createdByName: string;
   boardId: string;

@@ -112,6 +112,8 @@ export class XPath<
     Object.assign(this, options);
     this.objType = 'XPath';
   }
+  updatedBy: string;
+  updatedByName: string;
   lastEditedByName: string;
   createdByName: string;
   objType: WidgetType;

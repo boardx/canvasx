@@ -62,8 +62,9 @@ export   interface WidgetFileInterface extends WidgetBaseInterface {
 
 
 export class WidgetFileClass implements WidgetFileInterface {
-  lastEditedByName: string="";
-  createdByName: string="";
+  updatedBy: string = "";
+  updatedByName: string = "";
+   createdByName: string="";
   fileName: string = '';
   fileSrc: FileObject = { path: '', id: '', tmpPath: '' };
   vectorSrc: FileObject = { path: '', id: '', tmpPath: '' };;
@@ -72,9 +73,9 @@ export class WidgetFileClass implements WidgetFileInterface {
   previewImage: FileObject ={ path: '', id: '', tmpPath: '' };;
   id: string = '';
   boardId: string = '';
-  backgroundColor: string = '';
-  width: number = 0;
-  height: number = 0;
+  backgroundColor: string = 'transparent';
+  width: number = 300;
+  height: number = 400;
   left: number = 0;
   locked: boolean = false;
   objType: WidgetType = "XFile";
@@ -85,11 +86,10 @@ export class WidgetFileClass implements WidgetFileInterface {
   selectable: boolean = true;
   top: number = 0;
   userId: string = '';
-  zIndex: number = 0;
+  zIndex: number = Date.now() * 100;
   version: string = '';
   updatedAt: number = Date.now();
-  lastEditedBy: string = '';
-  createdAt: number = Date.now();
+   createdAt: number = Date.now();
   createdBy: string = '';
   visible: boolean = true;
 }

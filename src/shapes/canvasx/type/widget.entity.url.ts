@@ -11,7 +11,8 @@ export interface WidgetURLInterface extends WidgetBaseInterface {
 
 
 export class WidgetURLClass implements WidgetURLInterface {
-  lastEditedByName: string="";
+  updatedBy: string = "";
+  updatedByName: string = "";
   createdByName: string="";
   transcription: string = '';
   vectorSrc: FileObject = { id: '', path: '', tmpPath: '' };
@@ -33,10 +34,9 @@ export class WidgetURLClass implements WidgetURLInterface {
   selectable: boolean = true;
   top: number = 0;
   userId: string = '';
-  zIndex: number = 0;
+  zIndex: number = Date.now() *100;
   version: string = '1.0';
   updatedAt: number = Date.now();
-  lastEditedBy: string = '';
   createdAt: number = Date.now();
   createdBy: string = '';
   visible: boolean = true;

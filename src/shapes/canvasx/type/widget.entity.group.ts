@@ -6,12 +6,13 @@ export   interface WidgetGroupInterface extends WidgetBaseInterface {
 }
 
 export class WidgetGroupClass implements WidgetGroupInterface {
-  lastEditedByName: string="";
-  createdByName: string="";
+  updatedBy: string = "";
+  updatedByName: string = "";
+   createdByName: string="";
   objectArr: any[] = [];
   id: string = '';
   boardId: string = '';
-  backgroundColor: string = '';
+  backgroundColor: string = 'transparent';
   width: number = 0;
   height: number = 0;
   left: number = 0;
@@ -23,12 +24,10 @@ export class WidgetGroupClass implements WidgetGroupInterface {
   scaleY: number = 1;
   selectable: boolean = true;
   top: number = 0;
-  userId: string = '';
-  zIndex: number = 0;
+  zIndex: number = Date.now() *100;
   version: string = '1.0';
   updatedAt: number = Date.now();
-  lastEditedBy: string = '';
-  createdAt: number = Date.now();
+   createdAt: number = Date.now();
   createdBy: string = '';
   visible: boolean = true;
 }

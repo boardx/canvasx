@@ -15,8 +15,10 @@ export interface WidgetPathInterface extends WidgetBaseInterface {
 }
 
 export class WidgetPathClass implements WidgetPathInterface {
+  updatedBy: string = "";
+  updatedByName: string = "";
   fill: string = 'transparent';
-  lastEditedByName: string = "";
+ 
   createdByName: string = "";
   path: any[] = [''];
   stroke: string = '#000000';
@@ -41,11 +43,9 @@ export class WidgetPathClass implements WidgetPathInterface {
   scaleY: number = 1;
   selectable: boolean = true;
   top: number = 0;
-  userId: string = '';
-  zIndex: number = 0;
+  zIndex: number = Date.now() * 100;
   version: string = '1.0';
   updatedAt: number = Date.now();
-  lastEditedBy: string = '';
   createdAt: number = Date.now();
   createdBy: string = '';
   visible: boolean = true;

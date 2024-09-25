@@ -1,19 +1,20 @@
-import {  WidgetBaseInterface,TOriginX, TOriginY } from './widget.entity.base';
+import { WidgetBaseInterface, TOriginX, TOriginY } from './widget.entity.base';
 import { WidgetType } from './widget.type';
 
-export   interface WidgetChartInterface extends WidgetBaseInterface {
+export interface WidgetChartInterface extends WidgetBaseInterface {
   chartOptions: any;
-  
+
 }
 
 class WidgetChartClass implements WidgetChartInterface {
-  lastEditedByName: string="";
-  createdByName: string="";
+  updatedBy: string = "";
+  updatedByName: string = "";
+  createdByName: string = "";
   id: string = '';
   boardId: string = '';
   backgroundColor: string = '';
-  width: number = 0;
-  height: number = 0;
+  width: number = 400;
+  height: number =500;
   left: number = 0;
   locked: boolean = false;
   objType: WidgetType = "XChart"; // Replace with an appropriate default value
@@ -24,10 +25,9 @@ class WidgetChartClass implements WidgetChartInterface {
   selectable: boolean = true;
   top: number = 0;
   userId: string = '';
-  zIndex: number = 0;
+  zIndex: number = Date.now() *100;
   version: string = '';
   updatedAt: number = Date.now();
-  lastEditedBy: string = '';
   createdAt: number = Date.now();
   createdBy: string = '';
   visible: boolean = true;

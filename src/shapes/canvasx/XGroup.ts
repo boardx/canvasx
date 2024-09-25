@@ -17,6 +17,8 @@ export class XGroup extends Group implements WidgetGroupInterface {
     Object.assign(this, options);
     this.objType = 'XGroup';
   }
+  updatedBy: string;
+  updatedByName: string;
   lastEditedByName: string;
   createdByName: string;
   objectArr: any[];
