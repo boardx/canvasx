@@ -31,7 +31,7 @@ export class WidgetShapeNotesClass implements WidgetShapeNotesInterface {
   fontFamily: string = 'Inter';
   fontSize: number = 16;
   fontWeight: string = '400';
-  lineHeight: number = 1.5;
+  lineHeight: number = 1.2;
   text: string = '';
   textAlign: string = 'center';
   editable: boolean = true;

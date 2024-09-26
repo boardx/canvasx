@@ -12,8 +12,8 @@ export class WidgetTextClass implements WidgetTextInterface {
     createdByName: string="";
     fontFamily: string = 'Inter';
     fontSize: number = 14;
-    fontWeight: string = 'normal';
-    lineHeight: number = 1.5;
+    fontWeight: string = '400';
+    lineHeight: number = 1.2;
     text: string = '';
     textAlign: string = 'left';
     editable: boolean = true;

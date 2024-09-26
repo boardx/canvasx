@@ -7,8 +7,8 @@ export   interface WidgetImageInterface extends WidgetBaseInterface {
   cropY: number;
   cropWidth: number;
   cropHeight: number;
-  previewImage: FileObject;
-  imageSrc: FileObject;
+  previewImage: FileObject|null;
+  imageSrc: FileObject|null;
 }
 
 export class WidgetImageClass implements WidgetImageInterface {
@@ -20,8 +20,8 @@ export class WidgetImageClass implements WidgetImageInterface {
   cropY: number = 0;
   cropWidth: number = 0;
   cropHeight: number = 0;
-  previewImage: FileObject = { id: '',   path:'', tmpPath:'' };
-  imageSrc: FileObject = { id: '',   path:'', tmpPath:'' };
+  previewImage: FileObject |null =null;
+  imageSrc: FileObject  |null =null;
   id: string = '';
   boardId: string = '';
   backgroundColor: string = 'transparent';

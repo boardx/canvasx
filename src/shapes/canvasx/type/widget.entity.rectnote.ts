@@ -11,7 +11,7 @@ export class WidgetRectNotesClass implements WidgetRectNotesInterface {
     fontFamily: string = 'Inter';
     fontSize: number = 16;
     fontWeight: string = '400';
-    lineHeight: number = 1.5;
+    lineHeight: number = 1.2;
     text: string = '';
     textAlign: string = 'center';
     editable: boolean = true;
@@ -35,7 +35,7 @@ export class WidgetRectNotesClass implements WidgetRectNotesInterface {
     zIndex: number = Date.now()*100;
     version: string = '1.0';
     updatedAt: number = Date.now();
- 
+    fill: string = 'rgba(33,33,33,1)';
     createdAt: number = Date.now();
     createdBy: string = '';
     visible: boolean = true;

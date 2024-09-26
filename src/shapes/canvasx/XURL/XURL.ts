@@ -46,19 +46,19 @@ export class XURL extends FabricObject implements WidgetURLInterface {
     'locked',
     'boardId',
   ];
-  constructor(options: Partial<XURLProps>) {
+  constructor(url: any, options: Partial<XURLProps>) {
 
     super(options);
 
-    const previewImage = options.previewImage
-      ? options.previewImage
+    const previewImageURL = options.previewImage?.tmpPath
+      ? options.previewImage.tmpPath
       : '/fileIcons/weblink.png'; //this.getFileIconURL(options.fileName!);
 
     Object.assign(this, options);
 
     this.on('mousedblclick', this.onDoubleClick.bind(this));
     this.objType = 'XURL';
-    this.objType = 'XURL';
+
     (this.cornerColor = 'white'),
       (this.cornerStrokeColor = 'gray'),
       (this.cornerSize = 15),
@@ -82,8 +82,9 @@ export class XURL extends FabricObject implements WidgetURLInterface {
     });
     this.width = 230;
     this.height = 248;
-    this.loadPreviewImage(this.previewImage.tmpPath, options.fileName!);
+    this.loadPreviewImage(previewImageURL!);
   }
+  url: string;
   updatedBy: string;
   updatedByName: string;
   lastEditedByName: string;
@@ -127,7 +128,7 @@ export class XURL extends FabricObject implements WidgetURLInterface {
     return super.toObject([...this.extendedProperties, ...propertiesToInclude]);
   }
   onDoubleClick() {
-    getFabricWindow().open(this.fileSrc.tmpPath, '_blank');
+    getFabricWindow().open(this.url, '_blank');
   }
 
   drawObject(ctx: CanvasRenderingContext2D) {
@@ -289,7 +290,7 @@ export class XURL extends FabricObject implements WidgetURLInterface {
     if (lineCount < 3) context.fillText(line, x, _y);
   }
 
-  async loadPreviewImage(previewImage: string, fileName: string) {
+  async loadPreviewImage(previewImage: string) {
     const url = previewImage;
 
     const loadedImg = await loadImage(url, {

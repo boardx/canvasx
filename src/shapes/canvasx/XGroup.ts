@@ -13,9 +13,15 @@ export class XGroup extends Group implements WidgetGroupInterface {
 
   constructor(objects: any, options: any) {
 
+
     super(objects, options);
     Object.assign(this, options);
     this.objType = 'XGroup';
+    this.cornerColor = 'white';
+    this.cornerSize = 10;
+    this.cornerStyle = 'circle';
+    this.transparentCorners = false;
+    this.cornerStrokeColor = 'gray';
   }
   updatedBy: string;
   updatedByName: string;

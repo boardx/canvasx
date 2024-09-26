@@ -3,22 +3,22 @@ import { FileObject } from './file';
 import { WidgetType } from './widget.type';
 export interface WidgetURLInterface extends WidgetBaseInterface {
   transcription: string;
-  vectorSrc: FileObject;
-  fileSrc: FileObject;
+  vectorSrc: FileObject | null;
+  url: string;
   fileName: string;
-  previewImage: FileObject;
+  previewImage: FileObject | null;
 }
 
 
 export class WidgetURLClass implements WidgetURLInterface {
   updatedBy: string = "";
   updatedByName: string = "";
-  createdByName: string="";
+  createdByName: string = "";
   transcription: string = '';
-  vectorSrc: FileObject = { id: '', path: '', tmpPath: '' };
-  fileSrc: FileObject = { id: '', path: '', tmpPath: '' };
+  vectorSrc: FileObject | null = null;
+  url: string  = "https://www.boardx.us";
   fileName: string = '';
-  previewImage: FileObject = { id: '', path: '', tmpPath: '' };
+  previewImage: FileObject | null = null;
   id: string = '';
   boardId: string = '';
   backgroundColor: string = '#FFFFFF';
@@ -34,7 +34,7 @@ export class WidgetURLClass implements WidgetURLInterface {
   selectable: boolean = true;
   top: number = 0;
   userId: string = '';
-  zIndex: number = Date.now() *100;
+  zIndex: number = Date.now() * 100;
   version: string = '1.0';
   updatedAt: number = Date.now();
   createdAt: number = Date.now();

@@ -11,7 +11,7 @@ export class WidgetCircleNotesClass implements WidgetCircleNotesInterface {
     fontFamily: string = 'Inter';
     fontSize: number = 12;
     fontWeight: string = '400';
-    lineHeight: number = 1.5;
+    lineHeight: number = 1.2;
     text: string = '';
     textAlign: string = 'center';
     editable: boolean = true;

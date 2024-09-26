@@ -1,7 +1,7 @@
-import   { WidgetBaseInterface,TOriginX, TOriginY } from './widget.entity.base';
-import {  WidgetType } from './widget.type';
-import {FileObject} from './file';
- 
+import { WidgetBaseInterface, TOriginX, TOriginY } from './widget.entity.base';
+import { WidgetType } from './widget.type';
+import { FileObject } from './file';
+
 export enum FileDocument {
   DOC = 'Word Document',
   DOCX = 'Word Document',
@@ -51,26 +51,26 @@ export enum FileEnum {
 }
 
 
-export   interface WidgetFileInterface extends WidgetBaseInterface {
+export interface WidgetFileInterface extends WidgetBaseInterface {
   fileName: string;
-  fileSrc: FileObject;
-  vectorSrc: FileObject;
+  fileSrc: FileObject | null;
+  vectorSrc: FileObject | null;
   transcription: string;
   fileObjectType: FileObjectType;
-  previewImage: FileObject;
+  previewImage: FileObject | null;
 }
 
 
 export class WidgetFileClass implements WidgetFileInterface {
   updatedBy: string = "";
   updatedByName: string = "";
-   createdByName: string="";
+  createdByName: string = "";
   fileName: string = '';
-  fileSrc: FileObject = { path: '', id: '', tmpPath: '' };
-  vectorSrc: FileObject = { path: '', id: '', tmpPath: '' };;
+  fileSrc: FileObject | null = null;
+  vectorSrc: FileObject | null = null;
   transcription: string = '';
-  fileObjectType: FileObjectType  = 'UNKNOWN';
-  previewImage: FileObject ={ path: '', id: '', tmpPath: '' };;
+  fileObjectType: FileObjectType = 'UNKNOWN';
+  previewImage: FileObject | null = null;
   id: string = '';
   boardId: string = '';
   backgroundColor: string = 'transparent';
@@ -89,7 +89,7 @@ export class WidgetFileClass implements WidgetFileInterface {
   zIndex: number = Date.now() * 100;
   version: string = '';
   updatedAt: number = Date.now();
-   createdAt: number = Date.now();
+  createdAt: number = Date.now();
   createdBy: string = '';
   visible: boolean = true;
 }
