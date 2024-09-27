@@ -24,7 +24,6 @@ class WidgetChartClass implements WidgetChartInterface {
   scaleY: number = 1;
   selectable: boolean = true;
   top: number = 0;
-  userId: string = '';
   zIndex: number = Date.now() *100;
   version: string = '';
   updatedAt: number = Date.now();

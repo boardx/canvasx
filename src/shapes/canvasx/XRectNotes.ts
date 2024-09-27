@@ -87,7 +87,7 @@ export class XRectNotes extends XTextbox implements WidgetRectNotesInterface {
     text: string,
     options: Partial<TClassProperties<XRectNotes>> = {}
   ) {
-    options.lastEditedByName = options.lastEditedByName ?? '';
+
     options.createdByName = options.createdByName ?? '';
     options.fontFamily = options.fontFamily ?? 'Inter';
     options.fontSize = options.fontSize ?? 12;
@@ -101,8 +101,6 @@ export class XRectNotes extends XTextbox implements WidgetRectNotesInterface {
     options.id = options.id ?? '';
     options.boardId = options.boardId ?? '';
     options.backgroundColor = options.backgroundColor ?? '#FCEC8A';
-    options.width = 230;
-    options.height = 138;
     options.left = options.left ?? 0;
     options.locked = options.locked ?? false;
     options.objType = options.objType ?? 'XRectNotes';
@@ -116,10 +114,16 @@ export class XRectNotes extends XTextbox implements WidgetRectNotesInterface {
     options.zIndex = options.zIndex ?? Date.now() * 100;
     options.version = options.version ?? '1.0';
     options.updatedAt = options.updatedAt ?? Date.now();
-    options.lastEditedBy = options.lastEditedBy ?? '';
+    options.updatedBy = options.updatedBy ?? '';
+    options.updatedByName = options.updatedByName ?? '';
     options.createdAt = options.createdAt ?? Date.now();
     options.createdBy = options.createdBy ?? '';
     options.visible = options.visible ?? true;
+
+    //fixed default value
+    options.perPixelTargetFind = false;
+    options.height = 138;
+
     super(text, options);
     this.maxHeight = 138;
     Object.assign(this, {

@@ -121,7 +121,7 @@ class XFrame extends FabricObject implements WidgetFrameInterface {
   }
   updatedBy: string;
   updatedByName: string;
-  lastEditedByName: string;
+
   createdByName: string;
   boardId: string;
   objType: WidgetType;
@@ -129,7 +129,7 @@ class XFrame extends FabricObject implements WidgetFrameInterface {
   zIndex: number;
   version: string;
   updatedAt: number;
-  lastEditedBy: string;
+
   createdAt: number;
   createdBy: string;
 

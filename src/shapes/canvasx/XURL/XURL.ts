@@ -87,7 +87,7 @@ export class XURL extends FabricObject implements WidgetURLInterface {
   url: string;
   updatedBy: string;
   updatedByName: string;
-  lastEditedByName: string;
+
   createdByName: string;
   vectorSrc: FileObject;
   fileSrc: FileObject;
@@ -99,7 +99,7 @@ export class XURL extends FabricObject implements WidgetURLInterface {
   zIndex: number;
   version: string;
   updatedAt: number;
-  lastEditedBy: string;
+
   createdAt: number;
   createdBy: string;
 

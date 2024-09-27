@@ -23,7 +23,6 @@ export class WidgetMarkdownClass implements WidgetBaseInterface {
   scaleY: number = 1;
   selectable: boolean = true;
   top: number = 0;
-  userId: string = '';
   zIndex: number = Date.now() *100;
   version: string = '1.0';
   updatedAt: number = Date.now();

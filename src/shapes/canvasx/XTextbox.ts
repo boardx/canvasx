@@ -126,7 +126,7 @@ export class XTextbox
   }
   updatedBy: string;
   updatedByName: string;
-  lastEditedByName: string;
+
   createdByName: string;
   maxHeight: number;
   fixedScaleChange: boolean;
@@ -136,7 +136,7 @@ export class XTextbox
   zIndex: number;
   version: string;
   updatedAt: number;
-  lastEditedBy: string;
+
   createdAt: number;
   createdBy: string;
   /* boardx extend function */

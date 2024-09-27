@@ -72,7 +72,7 @@ export class XImage<
   imageSrc: FileObject;
   version: string;
   updatedAt: number;
-  lastEditedBy: string;
+
   createdAt: number;
   createdBy: string;
   boardId: string;
@@ -99,7 +99,7 @@ export class XImage<
   updatedBy: string;
   updatedByName: string;
   markdownText: string;
-  lastEditedByName: string;
+
   createdByName: string;
 
 

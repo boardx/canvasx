@@ -113,7 +113,7 @@ export class XFile extends FabricObject implements WidgetFileInterface {
   }
   updatedBy: string;
   updatedByName: string;
-  lastEditedByName: string;
+
   createdByName: string;
   fileObjectType: FileObjectType;
 

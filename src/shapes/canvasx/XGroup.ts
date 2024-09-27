@@ -25,7 +25,7 @@ export class XGroup extends Group implements WidgetGroupInterface {
   }
   updatedBy: string;
   updatedByName: string;
-  lastEditedByName: string;
+
   createdByName: string;
   objectArr: any[];
   boardId: string;
@@ -34,7 +34,7 @@ export class XGroup extends Group implements WidgetGroupInterface {
   zIndex: number;
   version: string;
   updatedAt: number;
-  lastEditedBy: string;
+
   createdAt: number;
   createdBy: string;
 

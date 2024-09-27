@@ -85,8 +85,7 @@ export class WidgetFileClass implements WidgetFileInterface {
   scaleY: number = 1;
   selectable: boolean = true;
   top: number = 0;
-  userId: string = '';
-  zIndex: number = Date.now() * 100;
+   zIndex: number = Date.now() * 100;
   version: string = '';
   updatedAt: number = Date.now();
   createdAt: number = Date.now();

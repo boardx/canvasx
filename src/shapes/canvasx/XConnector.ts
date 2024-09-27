@@ -53,22 +53,28 @@ class XConnector extends Path implements WidgetConnectorInterface {
     toPoint: XY,
     control1: XY,
     control2: XY,
-    style: any = {},
     options: any = {}
   ) {
-    const path = getPath(fromPoint, toPoint, control1, control2);
+    const path = getPath(fromPoint, toPoint, control1, control2, options.pathType);
+
+
 
 
     super(path, options);
     // Object.assign(this, options);
+
+    //default values
+    this.perPixelTargetFind = true;
     this.cornerColor = 'white';
     this.cornerStyle = 'circle';
+    this.type = 'XConnector';
+    this.objType = 'XConnector';
     this.transparentCorners = false;
     this.cornerStrokeColor = 'gray';
     this.hasBorders = false;
-    this.type = 'XConnector';
-    this.objType = 'XConnector';
     this.objectCaching = false;
+
+
     this.pathType = options.pathType || 'curvePath';
     this.pathArrowTip = options.pathArrowTip || 'both';
     this.fromObjectId = options.fromObjectId;
@@ -78,9 +84,19 @@ class XConnector extends Path implements WidgetConnectorInterface {
     this.control1 = control1;
     this.control2 = control2;
     this.createdByName = options.createdByName;
-    this.lastEditedByName = options.lastEditedByName;
+    this.createdBy = options.createdBy;
+    this.createdAt = options.createdAt;
     this.boardId = options.boardId;
-    this.style = style;
+    this.style = options.style;
+    this.fill = options.fill || 'transparent';
+    this.stroke = options.stroke || '#000000';
+    this.createdAt = options.createdAt;
+    this.updatedBy = options.updatedBy;
+    this.updatedByName = options.updatedByName;
+    this.version = options.version;
+    this.zIndex = options.zIndex;
+
+    // Object.assign(this, options);
     this._setMovementLock();
     this.calcStartEndPath();
     this.controls = {
@@ -112,7 +128,7 @@ class XConnector extends Path implements WidgetConnectorInterface {
   }
   updatedBy: string;
   updatedByName: string;
-  lastEditedByName: string;
+
   createdByName: string;
   boardId: string;
   objType: WidgetType;
@@ -120,7 +136,7 @@ class XConnector extends Path implements WidgetConnectorInterface {
   zIndex: number;
   version: string;
   updatedAt: number;
-  lastEditedBy: string;
+
   createdAt: number;
   createdBy: string;
 

@@ -36,7 +36,7 @@ class XChart extends FabricObject implements WidgetChartInterface {
   }
   updatedBy: string;
   updatedByName: string;
-  lastEditedByName: string;
+
   createdByName: string;
   chartOptions: any;
   boardId: string;
@@ -45,7 +45,7 @@ class XChart extends FabricObject implements WidgetChartInterface {
   zIndex: number;
   version: string;
   updatedAt: number;
-  lastEditedBy: string;
+
   createdAt: number;
   createdBy: string;
 

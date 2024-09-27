@@ -104,21 +104,25 @@ export class XPath<
     { path: _, left, top, ...options }: Partial<any> = {}
   ) {
 
+    //fixed default value
+    options.perPixelTargetFind = true;
+
     super(options as Props);
     this._setPath(path || [], true);
     typeof left === 'number' && this.set('left', left);
     typeof top === 'number' && this.set('top', top);
+
 
     Object.assign(this, options);
     this.objType = 'XPath';
   }
   updatedBy: string;
   updatedByName: string;
-  lastEditedByName: string;
+
   createdByName: string;
   objType: WidgetType;
   updatedAt: number;
-  lastEditedBy: string;
+
   createdAt: number;
   createdBy: string;
 
