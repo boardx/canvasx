@@ -24,6 +24,7 @@ export type shapeType =
   | 'constellationRound';
 
 export class WidgetShapeNotesClass implements WidgetShapeNotesInterface {
+  fill: string="#eeeeee";
   updatedBy: string = "";
   updatedByName: string = "";
   createdByName: string="";

@@ -1,5 +1,5 @@
-import   {WidgetBaseInterface, TOriginX, TOriginY } from './widget.entity.base';
- 
+import { WidgetBaseInterface, TOriginX, TOriginY } from './widget.entity.base';
+import type { TFiller } from '../../../typedefs';
 import { xy } from './widget.entity.connector';
 import { WidgetType } from './widget.type';
 
@@ -11,8 +11,9 @@ export type Connector = {
 
 
 
-export   interface WidgetTextboxInterface extends WidgetBaseInterface {
+export interface WidgetTextboxInterface extends WidgetBaseInterface {
   fontFamily: string;
+  fill: string | TFiller | null;
   fontSize: number;
   fontWeight: string;
   lineHeight: number;
@@ -26,8 +27,8 @@ export   interface WidgetTextboxInterface extends WidgetBaseInterface {
 export class WidgetTextboxClass implements WidgetTextboxInterface {
   updatedBy: string = "";
   updatedByName: string = "";
- 
-  createdByName: string="";
+  fill: string = '#eeeeee';
+  createdByName: string = "";
   fontFamily: string = 'Inter';
   fontSize: number = 16;
   fontWeight: string = '400';
@@ -55,7 +56,7 @@ export class WidgetTextboxClass implements WidgetTextboxInterface {
   zIndex: number = 0;
   version: string = '1.0';
   updatedAt: number = Date.now();
- 
+
   createdAt: number = Date.now();
   createdBy: string = '';
   visible: boolean = true;

@@ -21,7 +21,6 @@ import { FileObject } from "../type/file";
 
 
 export type XFileProps = ImageProps & WidgetFileClass;
-
 const FILE_ICON_PATHS: Record<WidgetFileType, string> = {
   XFileWord: '/boardxstatic/fileIcons/word.png',
   XFileExcel: '/boardxstatic/fileIcons/excel.png',
@@ -33,7 +32,7 @@ const FILE_ICON_PATHS: Record<WidgetFileType, string> = {
   XFile: '/boardxstatic/fileIcons/file.png',
 };
 
-const FILE_TYPE_NAMES: Record<FileObjectType, string> = {
+export const FILE_TYPE_NAMES: Record<FileObjectType, string> = {
   DOC: 'Word Document',
   DOCX: 'Word Document',
   XLS: 'Excel Document',
@@ -55,6 +54,40 @@ const FILE_TYPE_NAMES: Record<FileObjectType, string> = {
   APE: 'Audio Document',
   UNKNOWN: 'Other Document',
 };
+
+export function getWidgetFileType(fileName: string): WidgetFileType {
+  const extension = fileName.split('.').pop()?.toUpperCase() as FileObjectType;
+  switch (extension) {
+    case 'DOC':
+    case 'DOCX':
+      return 'XFileWord';
+    case 'XLS':
+    case 'XLSX':
+      return 'XFileExcel';
+    case 'PPT':
+    case 'PPTX':
+      return 'XFilePPT';
+    case 'PDF':
+      return 'XFilePDF';
+    case 'ZIP':
+      return 'XFileZip';
+    case 'MP4':
+    case 'WEBM':
+      return 'XFileVideo';
+    case 'MP3':
+    case 'M4A':
+    case 'WAV':
+    case 'AAC':
+    case 'FLAC':
+    case 'OGG':
+    case 'AIFF':
+    case 'WMA':
+    case 'APE':
+      return 'XFileAudio';
+    default:
+      return 'XFile';
+  }
+}
 
 const VIDEO_FILE_EXTENSIONS = new Set([FileEnum.MP4, FileEnum.WEBM]);
 
@@ -104,10 +137,13 @@ export class XFile extends FabricObject implements WidgetFileInterface {
 
     super(options);
     this.objType = 'XFile';
-    this.initializeProperties(options);
+    // this.initializeProperties(options);
     this.initializeVisuals();
+    Object.assign(this, options);
+    this.fileObjectType = XFile.getFileType(options.fileName || '');
+    this.fill = options.backgroundColor || this.backgroundColor;
     this.loadPreviewImage(
-      this.getFileIconURL(XFile.objType),
+      this.getFileIconURL(options.objType as WidgetFileType),
       options.fileName!
     );
   }
@@ -117,16 +153,7 @@ export class XFile extends FabricObject implements WidgetFileInterface {
   createdByName: string;
   fileObjectType: FileObjectType;
 
-  private initializeProperties(options: Partial<XFileProps>) {
-    this.set('id', options.id || this.id);
-    this.set('fileName', options.fileName || this.fileName);
-    this.set('transcription', options.transcription || this.transcription);
-    this.set('vectorSrc', options.vectorSrc || this.vectorSrc);
-    this.set('fileSrc', options.fileSrc || this.fileSrc);
-    this.set('previewImage', options.previewImage || this.previewImage);
-    this.fileObjectType = XFile.getFileType(options.fileName || '');
-    this.fill = options.backgroundColor || this.backgroundColor;
-  }
+
 
   private initializeVisuals() {
     this.cornerColor = 'white';
@@ -241,10 +268,10 @@ export class XFile extends FabricObject implements WidgetFileInterface {
     const sanitizedTitle = this.sanitizeTitle(title);
     this.wrapText(ctx, sanitizedTitle, x + 15, y - 5, maxWidth - 20, 23);
 
-    const newUrl = this.getShortenedUrl();
-    ctx.font = '12px Inter';
-    ctx.fillStyle = 'rgba(35, 41, 48, 0.65)';
-    this.wrapText(ctx, newUrl, x + 15, y + 45, maxWidth - 20, 25);
+    // const newUrl = this.getShortenedUrl();
+    // ctx.font = '12px Inter';
+    // ctx.fillStyle = 'rgba(35, 41, 48, 0.65)';
+    // this.wrapText(ctx, newUrl, x + 15, y + 45, maxWidth - 20, 25);
   }
 
   private sanitizeTitle(title: string): string {
