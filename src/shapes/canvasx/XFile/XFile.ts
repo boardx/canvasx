@@ -133,11 +133,8 @@ export class XFile extends FabricObject implements WidgetFileInterface {
 
 
   constructor(options: Partial<XFileProps & { type: string }> = {}) {
-
-
     super(options);
     this.objType = 'XFile';
-    // this.initializeProperties(options);
     this.initializeVisuals();
     Object.assign(this, options);
     this.fileObjectType = XFile.getFileType(options.fileName || '');
@@ -146,7 +143,9 @@ export class XFile extends FabricObject implements WidgetFileInterface {
       this.getFileIconURL(options.objType as WidgetFileType),
       options.fileName!
     );
+    this.on("mousedblclick", this.onDoubleClick.bind(this)); // Attach event listener
   }
+
   updatedBy: string;
   updatedByName: string;
 
@@ -198,7 +197,7 @@ export class XFile extends FabricObject implements WidgetFileInterface {
   }
 
   onDoubleClick(): void {
-    getFabricWindow().open(this.fileSrc.tmpPath, '_blank');
+    getFabricWindow().open(this.fileSrc?.tmpPath, '_blank');
   }
 
   drawObject(ctx: CanvasRenderingContext2D): void {
@@ -218,17 +217,27 @@ export class XFile extends FabricObject implements WidgetFileInterface {
     ctx.stroke();
   }
 
-  private drawPreviewImage(ctx: CanvasRenderingContext2D): void {
-    const imgWidth = 230;
-    const imgHeight = 160;
 
+  private drawPreviewImage(ctx: CanvasRenderingContext2D): void {
     if (this._previewImage) {
+      // Calculate the available height for the image to avoid overlapping the title
+      const titleHeight = 90; // Total height reserved for the title and background
+      const availableHeight = this.height - titleHeight;
+
+      // Calculate image dimensions while maintaining aspect ratio
+      const imageAspectRatio = this._previewImage.width / this._previewImage.height;
+      const drawWidth = this.width;
+      const drawHeight = drawWidth / imageAspectRatio;
+
+      // Adjust if the calculated height exceeds the available height
+      const finalDrawHeight = Math.min(drawHeight, availableHeight);
+
       ctx.drawImage(
         this._previewImage,
         -this.width / 2,
         -this.height / 2,
-        imgWidth,
-        imgHeight
+        drawWidth,
+        finalDrawHeight
       );
     }
   }
