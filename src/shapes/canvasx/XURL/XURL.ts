@@ -52,7 +52,7 @@ export class XURL extends FabricObject implements WidgetURLInterface {
 
     const previewImageURL = options.previewImage?.tmpPath
       ? options.previewImage.tmpPath
-      : '/fileIcons/weblink.png'; //this.getFileIconURL(options.fileName!);
+      : '/boardxstatic/fileIcons/weblink.png'; //this.getFileIconURL(options.fileName!);
 
     Object.assign(this, options);
 

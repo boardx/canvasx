@@ -1,5 +1,4 @@
 import { WidgetBaseInterface, TOriginX, TOriginY } from './widget.entity.base';
-import type { TFiller } from '../../../typedefs';
 import { xy } from './widget.entity.connector';
 import { WidgetType } from './widget.type';
 
@@ -13,7 +12,7 @@ export type Connector = {
 
 export interface WidgetTextboxInterface extends WidgetBaseInterface {
   fontFamily: string;
-  fill: string | TFiller | null;
+  fill: string | any | null;
   fontSize: number;
   fontWeight: string;
   lineHeight: number;
