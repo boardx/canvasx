@@ -49,7 +49,7 @@ export class XURL extends FabricObject implements WidgetURLInterface {
     super(options);
 
     const previewImageURL = options.previewImage?.tmpPath
-      ? options.previewImage.tmpPath
+      ? options.previewImage?.tmpPath
       : '/boardxstatic/fileIcons/weblink.png';
 
     Object.assign(this, options);
@@ -204,19 +204,19 @@ export class XURL extends FabricObject implements WidgetURLInterface {
     ctx.fillStyle = '#190FA1';
 
     // Handle null or empty title
-    if (!title) {
-      const firstChar = this.fileSrc.tmpPath.indexOf('.');
-      const lastChar = this.fileSrc.tmpPath.indexOf('.', firstChar + 1);
-      title = this.fileSrc.tmpPath.substring(firstChar + 1, lastChar);
+    if (!title && this.fileSrc?.tmpPath) {
+      const firstChar = this.fileSrc?.tmpPath.indexOf('.');
+      const lastChar = this.fileSrc?.tmpPath.indexOf('.', firstChar + 1);
+      title = this.fileSrc?.tmpPath.substring(firstChar + 1, lastChar);
     }
 
     // Title rendering
     this.wrapText(ctx, title, x + 15, y - 5, maxWidth - 20, 23);
 
     // URL rendering
-    const newurl = this.fileSrc
-      ? `${this.fileSrc.tmpPath.split('/')[0]}/${this.fileSrc.tmpPath.split('/')[1]
-      }/${this.fileSrc.tmpPath.split('/')[2]}`
+    const newurl = this.fileSrc && this.fileSrc?.tmpPath
+      ? `${this.fileSrc?.tmpPath.split('/')[0]}/${this.fileSrc.tmpPath.split('/')[1]
+      }/${this.fileSrc?.tmpPath.split('/')[2]}`
       : '';
     ctx.font = '12px Inter';
     ctx.fillStyle = 'rgba(35, 41, 48, 0.65)';
