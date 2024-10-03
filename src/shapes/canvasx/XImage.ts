@@ -118,18 +118,52 @@ export class XImage<
 
 
   /**
+   * Renders the image on the canvas context, correctly handling scaling and cropping.
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  _render(ctx: CanvasRenderingContext2D) {
-    ctx.imageSmoothingEnabled = this.imageSmoothing;
-    if (this.isMoving !== true && this.resizeFilter && this._needsResize()) {
-      this.applyResizeFilters();
+  _renderFill(ctx: CanvasRenderingContext2D) {
+    const elementToDraw = this._element;
+    if (!elementToDraw) {
+      return;
     }
-    this._stroke(ctx);
-    this._renderPaintInOrder(ctx);
-    //this.resizeImageAccordingToZoomAndOnScreen();
+
+    // Get the object's dimensions
+    const w = this.width,
+      h = this.height,
+      // Crop values cannot be less than 0
+      cropX = Math.max(this.cropX, 0),
+      cropY = Math.max(this.cropY, 0),
+      // Get the natural dimensions of the image element
+      elWidth =
+        (elementToDraw as HTMLImageElement).naturalWidth || elementToDraw.width,
+      elHeight =
+        (elementToDraw as HTMLImageElement).naturalHeight || elementToDraw.height,
+      // Calculate source width and height, ensuring we don't exceed image bounds
+      sX = cropX,
+      sY = cropY,
+      sW = Math.min(w, elWidth - cropX),
+      sH = Math.min(h, elHeight - cropY),
+      // Destination coordinates (centered)
+      x = -w / 2,
+      y = -h / 2,
+      destW = w,
+      destH = h;
+
+    // Draw the image onto the canvas context
+    ctx.drawImage(
+      elementToDraw,
+      sX,
+      sY,
+      sW,
+      sH,
+      x,
+      y,
+      destW,
+      destH
+    );
   }
+
 
   /**
    * Decide if the object should cache or not. Create its own cache level
