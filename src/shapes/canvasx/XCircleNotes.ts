@@ -1,6 +1,6 @@
 import { TClassProperties } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
-import { XTextbox } from './XTextbox';
+import { XTextbase } from './XTextbase';
 import { createRectNotesDefaultControls } from '../../controls/X_commonControls';
 
 import { EntityKeys, WidgetCircleNotesInterface } from './type/widget.entity.circlenote';
@@ -48,7 +48,7 @@ export interface CircleNotesProps {
  * user can only change width. Height is adjusted automatically based on the
  * wrapping of lines.
  */
-export class XCircleNotes extends XTextbox implements WidgetCircleNotesInterface {
+export class XCircleNotes extends XTextbase implements WidgetCircleNotesInterface {
   /**selectable
    * Minimum width of textbox, in pixels.
    * @type Number
@@ -102,7 +102,7 @@ export class XCircleNotes extends XTextbox implements WidgetCircleNotesInterface
    */
   declare splitByGrapheme: boolean;
 
-  static textLayoutProperties = [...XTextbox.textLayoutProperties, 'width'];
+  static textLayoutProperties = [...XTextbase.textLayoutProperties, 'width'];
 
   static ownDefaults: Record<string, any> = circleNotesDefaultValues;
 

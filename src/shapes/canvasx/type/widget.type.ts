@@ -30,9 +30,10 @@ export type WidgetType =
   | 'XFilePDF'
   | 'XFileZip'
   | 'XFileVideo'
-  | 'XFileAudio';
+  | 'XFileAudio'
+  | 'XTextbase';
 
- 
+
 
 export type WidgetFileType =
   | 'XFile'

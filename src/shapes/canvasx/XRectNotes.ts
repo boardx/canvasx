@@ -1,5 +1,5 @@
 import { classRegistry } from '../../ClassRegistry';
-import { XTextbox } from './XTextbox';
+import { XTextbase } from './XTextbase';
 import type { TClassProperties, TOriginX, TOriginY } from '../../typedefs';
 import { createRectNotesDefaultControls } from '../../controls/X_commonControls';
 
@@ -9,11 +9,9 @@ import { WidgetRectNotesInterface, EntityKeys } from './type/widget.entity.rectn
 export const rectNotesDefaultValues: Partial<TClassProperties<XRectNotes>> = {
   minWidth: 20,
   dynamicMinWidth: 2,
-
   splitByGrapheme: true,
   height: 138,
   maxHeight: 138,
-
   width: 230,
   cornerStrokeColor: 'gray',
   cornerStyle: 'circle',
@@ -28,7 +26,7 @@ export const rectNotesDefaultValues: Partial<TClassProperties<XRectNotes>> = {
  * wrapping of lines.
  */
 ///@ts-ignore
-export class XRectNotes extends XTextbox implements WidgetRectNotesInterface {
+export class XRectNotes extends XTextbase implements WidgetRectNotesInterface {
   /**selectable
    * Minimum width of textbox, in pixels.
    * @type Number
@@ -72,7 +70,7 @@ export class XRectNotes extends XTextbox implements WidgetRectNotesInterface {
    */
   declare splitByGrapheme: boolean;
 
-  static textLayoutProperties = [...XTextbox.textLayoutProperties, 'width'];
+  static textLayoutProperties = [...XTextbase.textLayoutProperties, 'width'];
 
   static ownDefaults: Record<string, any> = rectNotesDefaultValues;
 
@@ -119,10 +117,12 @@ export class XRectNotes extends XTextbox implements WidgetRectNotesInterface {
     options.createdAt = options.createdAt ?? Date.now();
     options.createdBy = options.createdBy ?? '';
     options.visible = options.visible ?? true;
+    options.splitByGrapheme = true;
 
     //fixed default value
     options.perPixelTargetFind = false;
     options.height = 138;
+    options.oneLine = false;
 
     super(text, options);
     this.maxHeight = 138;
@@ -132,9 +132,10 @@ export class XRectNotes extends XTextbox implements WidgetRectNotesInterface {
         // mr: { /* add your desired value here */ },
       },
     });
-    Object.assign(this, options);
+    // Object.assign(this, options);
 
-
+    this.splitByGrapheme = true;
+    this.dirty = true;
     this.objType = 'XRectNotes';
     // this.initializeEvent();
   }
@@ -181,45 +182,45 @@ export class XRectNotes extends XTextbox implements WidgetRectNotesInterface {
     return this.height;
   }
 
-  /**
-   * Generate an object that translates the style object so that it is
-   * broken up by visual lines (new lines and automatic wrapping).
-   * The original text styles object is broken up by actual lines (new lines only),
-   * which is only sufficient for Text / IText
-   * @private
-   */
-  _generateStyleMap(textInfo: any) {
-    let realLineCount = 0;
-    let realLineCharCount = 0;
-    let charCount = 0;
-    const map: any = {};
+  // /**
+  //  * Generate an object that translates the style object so that it is
+  //  * broken up by visual lines (new lines and automatic wrapping).
+  //  * The original text styles object is broken up by actual lines (new lines only),
+  //  * which is only sufficient for Text / IText
+  //  * @private
+  //  */
+  // _generateStyleMap(textInfo: any) {
+  //   let realLineCount = 0;
+  //   let realLineCharCount = 0;
+  //   let charCount = 0;
+  //   const map: any = {};
 
-    for (let i = 0; i < textInfo.graphemeLines.length; i++) {
-      if (textInfo.graphemeText[charCount] === '\n' && i > 0) {
-        realLineCharCount = 0;
-        charCount++;
-        realLineCount++;
-      } else if (
-        !this.splitByGrapheme &&
-        this._reSpaceAndTab.test(textInfo.graphemeText[charCount]) &&
-        i > 0
-      ) {
-        // this case deals with space's that are removed from end of lines when wrapping
-        realLineCharCount++;
-        charCount++;
-      }
+  //   for (let i = 0; i < textInfo.graphemeLines.length; i++) {
+  //     if (textInfo.graphemeText[charCount] === '\n' && i > 0) {
+  //       realLineCharCount = 0;
+  //       charCount++;
+  //       realLineCount++;
+  //     } else if (
+  //       !this.splitByGrapheme &&
+  //       this._reSpaceAndTab.test(textInfo.graphemeText[charCount]) &&
+  //       i > 0
+  //     ) {
+  //       // this case deals with space's that are removed from end of lines when wrapping
+  //       realLineCharCount++;
+  //       charCount++;
+  //     }
 
-      map[i] = {
-        line: realLineCount,
-        offset: realLineCharCount,
-      };
+  //     map[i] = {
+  //       line: realLineCount,
+  //       offset: realLineCharCount,
+  //     };
 
-      charCount += textInfo.graphemeLines[i].length;
-      realLineCharCount += textInfo.graphemeLines[i].length;
-    }
+  //     charCount += textInfo.graphemeLines[i].length;
+  //     realLineCharCount += textInfo.graphemeLines[i].length;
+  //   }
 
-    return map;
-  }
+  //   return map;
+  // }
 
 
   getObject() {
@@ -286,31 +287,31 @@ export class XRectNotes extends XTextbox implements WidgetRectNotesInterface {
     return value.split(this._wordJoiners);
   }
 
-  /**
-   * Wraps a line of text using the width of the Textbox and a context.
-   * @param {Array} line The grapheme array that represent the line
-   * @param {Number} lineIndex
-   * @param {Number} desiredWidth width you want to wrap the line to
-   * @param {Number} reservedSpace space to remove from wrapping for custom functionalities
-   * @returns {Array} Array of line(s) into which the given text is wrapped
-   * to.
-   */
+  // /**
+  //  * Wraps a line of text using the width of the Textbox and a context.
+  //  * @param {Array} line The grapheme array that represent the line
+  //  * @param {Number} lineIndex
+  //  * @param {Number} desiredWidth width you want to wrap the line to
+  //  * @param {Number} reservedSpace space to remove from wrapping for custom functionalities
+  //  * @returns {Array} Array of line(s) into which the given text is wrapped
+  //  * to.
+  //  */
 
-  graphemeSplitForRectNotes(textstring: string): string[] {
-    const graphemes = [];
-    const words = textstring.split(/\b/);
-    for (let i = 0; i < words.length; i++) {
-      // 检查单词是否全为拉丁字母，长度不大于16
-      if (/^[a-zA-Z]{1,16}$/.test(words[i])) {
-        graphemes.push(words[i]);
-      } else {
-        for (let j = 0; j < words[i].length; j++) {
-          graphemes.push(words[i][j]);
-        }
-      }
-    }
-    return graphemes;
-  }
+  // graphemeSplitForRectNotes(textstring: string): string[] {
+  //   const graphemes = [];
+  //   const words = textstring.split(/\b/);
+  //   for (let i = 0; i < words.length; i++) {
+  //     // 检查单词是否全为拉丁字母，长度不大于16
+  //     if (/^[a-zA-Z]{1,16}$/.test(words[i])) {
+  //       graphemes.push(words[i]);
+  //     } else {
+  //       for (let j = 0; j < words[i].length; j++) {
+  //         graphemes.push(words[i][j]);
+  //       }
+  //     }
+  //   }
+  //   return graphemes;
+  // }
 
   /**
    * Detect if the text line is ended with an hard break
