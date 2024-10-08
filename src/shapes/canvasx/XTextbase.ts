@@ -8,7 +8,7 @@ import { Textbox } from '../Textbox';
 import { WidgetType } from './type/widget.type';
 import { WidgetTextboxInterface, EntityKeys } from './type/widget.entity.textbox';
 
-import { isTransformCentered, getLocalPoint } from '../../controls/util';
+
 import { Point } from '../../Point';
 import { XConnector } from './XConnector';
 import { FabricObject } from '../Object/Object';
@@ -250,33 +250,7 @@ export class XTextbase
     return new Point(controlX, controlY);
   }
 
-  /**
-   * Unlike superclass's version of this function, Textbox does not update
-   * its width.
-   * @private
-   * @override
-   */
-  initDimensions() {
-    if (!this.initialized) {
-      return;
-    }
-    this.isEditing && this.initDelayedCursor();
-    this._clearCache();
-    // clear dynamicMinWidth as it will be different after we re-wrap line
-    this.dynamicMinWidth = 0;
-    // wrap lines
-    this._styleMap = this._generateStyleMap(this._splitText());
-    // if after wrapping, the width is smaller than dynamicMinWidth, change the width and re-wrap
-    if (this.dynamicMinWidth > this.width) {
-      this._set('width', this.dynamicMinWidth);
-    }
-    if (this.textAlign.indexOf('justify') !== -1) {
-      // once text is measured we need to make space fatter to make justified text.
-      this.enlargeSpaces();
-    }
-    // clear cache and re-calculate height
-    this.height = this.calcTextHeight();
-  }
+
 
   /**
    * Generate an object that translates the style object so that it is
@@ -807,36 +781,7 @@ export class XTextbase
     ctx.restore();
   }
 
-  changeWidth(eventData: any, transform: any, x: any, y: any) {
-    var target = transform.target,
-      localPoint = getLocalPoint(
-        transform,
-        transform.originX,
-        transform.originY,
-        x,
-        y
-      ),
-      strokePadding =
-        target.strokeWidth / (target.strokeUniform ? target.scaleX : 1),
-      multiplier = isTransformCentered(transform) ? 2 : 1,
-      oldWidth = target.width,
-      newWidth =
-        Math.abs((localPoint.x * multiplier) / target.scaleX) - strokePadding,
-      shapeScaleX =
-        Math.abs(target.aCoords['tl'].x - target.aCoords['tr'].x) / 138;
-    target.set('shapeScaleX', shapeScaleX);
-    target.set('width', Math.max(newWidth, 0));
 
-    target.initDimensions();
-
-    target.set('dirty', true);
-
-    if (target.objType === 'XTextbase' || target.objType === 'XText') {
-      target.set('fixedScaleChange', false);
-    }
-
-    return oldWidth !== newWidth;
-  }
 
   resetResizeControls() {
     const self = this;

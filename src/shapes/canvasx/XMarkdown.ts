@@ -1,5 +1,5 @@
 import { classRegistry } from '../../ClassRegistry';
-import { XTextbox } from '../canvasx/XTextbox';
+import { XTextbase } from '../canvasx/XTextbase';
 import html2canvas from 'html2canvas';
 import { FabricImage } from '../../shapes/Image';
 import hljs from 'highlight.js'; // https://highlightjs.org
@@ -15,7 +15,7 @@ hljs.registerLanguage('javascript', javascript);
 
 
 
-class XMarkdown extends XTextbox implements WidgetMarkdownInterface {
+class XMarkdown extends XTextbase implements WidgetMarkdownInterface {
   public markdownText: string;
   isEditing: boolean = false;
   private renderedImage: FabricImage | null = null;

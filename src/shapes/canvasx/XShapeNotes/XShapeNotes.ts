@@ -1,7 +1,7 @@
 import { classRegistry } from '../../../ClassRegistry';
 import { getFabricDocument } from '../../../env';
 import { TClassProperties, TFiller } from '../../../typedefs';
-import { XTextbox } from '../XTextbox';
+import { XTextbase } from '../XTextbase';
 
 import { shapeList } from './types';
 import { shapeType } from './types';
@@ -39,7 +39,7 @@ export const XShapeNotesDefaultValues: Partial<TClassProperties<XShapeNotes>> =
 };
 
 
-export class XShapeNotes extends XTextbox implements WidgetShapeNotesInterface {
+export class XShapeNotes extends XTextbase implements WidgetShapeNotesInterface {
   static type: WidgetType = 'XShapeNotes';
   static objType: WidgetType = 'XShapeNotes';
 
@@ -55,8 +55,8 @@ export class XShapeNotes extends XTextbox implements WidgetShapeNotesInterface {
 
     super(text, options);
     this.bgShape = options.shapeName ? getShapeInfo(options.shapeName) : null;
-    this.width = (options.width || 200) * (options.scaleX || 1);
-    this.height = (options.height || 200) * (options.scaleY || 1);
+    // this.width = (options.width || 200) * (options.scaleX || 1);
+    // this.height = (options.height || 200) * (options.scaleY || 1);
     this.scaleX = 1;
     this.scaleY = 1;
     this.id = options.id || '';
