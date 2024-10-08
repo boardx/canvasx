@@ -702,8 +702,33 @@ export class XTextbase
       }
     });
 
+
+    this.on('moving', (e: any) => {
+      this.moveOrScaleHandler(e);
+    });
+
+    this.on('scaling', (e: any) => {
+      this.moveOrScaleHandler(e);
+    });
+    self.on(EventName.MODIFIED, () => {
+      self.checkTextboxChange();
+
+      // canvas.requestRenderAll();
+    });
+    self.on(EventName.CHANGED, () => {
+      if (self.styles[0]) {
+        self.styles = {};
+
+        // self.canvas.requestRenderAll();
+      }
+    });
+
+
     // Other event listeners remain unchanged...
   }
+
+
+
 
 
   drawObject(ctx: CanvasRenderingContext2D) {

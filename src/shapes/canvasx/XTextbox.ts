@@ -108,7 +108,7 @@ export class XTextbox
 
         super(text, options);
         this.initDimensions();
-        this.initializeEvent();
+
         delete options.height;
         Object.assign(this, options);
         this.objType = 'XTextbox';
