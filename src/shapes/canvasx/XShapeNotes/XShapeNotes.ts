@@ -66,7 +66,7 @@ export class XShapeNotes extends XTextbase implements WidgetShapeNotesInterface 
     this.fontSize = options.fontSize || 14;
     this.fontFamily = options.fontFamily || 'Inter';
     this.fontWeight = options.fontWeight || 'normal';
-    this.lineHeight = options.lineHeight || 1.5;
+    this.lineHeight = 1.2;
     this.text = text;
     this.minWidth = 20;
     this.minHeight = 20;

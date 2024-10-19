@@ -90,7 +90,7 @@ export class XRectNotes extends XTextbase implements WidgetRectNotesInterface {
     options.fontFamily = options.fontFamily ?? 'Inter';
     options.fontSize = options.fontSize ?? 12;
     options.fontWeight = options.fontWeight ?? "400";
-    options.lineHeight = options.lineHeight ?? 1.2;
+    options.lineHeight = 1.2;
     options.text = options.text ?? '';
     options.textAlign = options.textAlign ?? 'center';
     options.editable = options.editable ?? true;
