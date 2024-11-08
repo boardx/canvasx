@@ -9,7 +9,6 @@ import { WidgetType } from './type/widget.type';
 import { Point } from '../../Point';
 import { WidgetTextInterface } from './type/widget.entity.text';
 
-
 // Default values for the textbox
 export const textboxDefaultValues: Partial<TClassProperties<XTextbase>> = {
     minWidth: 20,
@@ -38,10 +37,7 @@ export const XTextboxProps: Partial<TClassProperties<XTextbase>> = {};
  * user can only change width. Height is adjusted automatically based on the
  * wrapping of lines.
  */
-export class XTextbox
-    extends XTextbase
-    implements WidgetTextInterface {
-
+export class XTextbox extends XTextbase implements WidgetTextInterface {
     // Property declarations
     declare minWidth: number;
     declare tempTop: number;
@@ -132,8 +128,6 @@ export class XTextbox
         });
 
         this.setCoords();
-
-
     }
 
     /**
@@ -157,8 +151,6 @@ export class XTextbox
         });
 
         this.setCoords();
-
-
     }
 
     /**
@@ -191,6 +183,12 @@ export class XTextbox
         this._clearCache();
         // Clear dynamicMinWidth as it will be different after we re-wrap line
         this.dynamicMinWidth = 0;
+
+        // Check if text contains Chinese characters
+        if (/[\u3400-\u9FBF]/.test(this.text)) {
+            this.splitByGrapheme = true;
+        }
+
         // Wrap lines
         this._styleMap = this._generateStyleMap(this._splitText());
         // If after wrapping, the width is smaller than dynamicMinWidth, change the width and re-wrap
@@ -243,8 +241,6 @@ export class XTextbox
         return oldWidth !== newWidth;
     }
 }
-
-
 
 // Register the XTextbox class with the class registry
 classRegistry.setClass(XTextbox);
