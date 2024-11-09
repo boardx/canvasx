@@ -14,7 +14,6 @@ import { XConnector } from './XConnector';
 import { FabricObject } from '../Object/Object';
 
 
-import { GraphemeData } from '../Textbox';
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
 // regexes, list of properties that are not suppose to change by instances, magic consts.
 // this will be a separated effort
@@ -345,113 +344,6 @@ export class XTextbase
     return true;
   }
 
-  /**
-   * Helper function to measure a string of text, given its lineIndex and charIndex offset
-   * It gets called when charBounds are not available yet.
-   * Override if necessary
-   * Use with {@link Textbox#wordSplit}
-   *
-   * @param {CanvasRenderingContext2D} ctx
-   * @param {String} text
-   * @param {number} lineIndex
-   * @param {number} charOffset
-   * @returns {number}
-   */
-  _measureWord(word: any, lineIndex: number, charOffset = 0): number {
-    let width = 0,
-      prevGrapheme;
-    const skipLeft = true;
-    for (let i = 0, len = word.length; i < len; i++) {
-      const box = this._getGraphemeBox(
-        word[i],
-        lineIndex,
-        i + charOffset,
-        prevGrapheme,
-        skipLeft
-      );
-      width += box.kernedWidth;
-      prevGrapheme = word[i];
-    }
-    return width;
-  }
-
-  /**
-   * Override this method to customize word splitting
-   * Use with {@link Textbox#_measureWord}
-   * @param {string} value
-   * @returns {string[]} array of words
-   */
-  wordSplit(value: string): string[] {
-    return value.split(this._wordJoiners);
-  }
-
-  /**
-   * Wraps a line of text using the width of the Textbox and a context.
-   * @param {Array} line The grapheme array that represent the line
-   * @param {Number} lineIndex
-   * @param {Number} desiredWidth width you want to wrap the line to
-   * @param {Number} reservedSpace space to remove from wrapping for custom functionalities
-   * @returns {Array} Array of line(s) into which the given text is wrapped
-   * to.
-   */
-  graphemeSplitForRectNotes(textstring: string): string[] {
-    const graphemes = [];
-    const words = textstring.split(/\b/);
-    for (let i = 0; i < words.length; i++) {
-      // 检查单词是否全为拉丁字母，长度不大于16
-      if (/^[a-zA-Z]{1,16}$/.test(words[i])) {
-        graphemes.push(words[i]);
-      } else {
-        for (let j = 0; j < words[i].length; j++) {
-          graphemes.push(words[i][j]);
-        }
-      }
-    }
-    return graphemes;
-  }
-
-
-
-  /**
- * For each line of text terminated by an hard line stop,
- * measure each word width and extract the largest word from all.
- * The returned words here are the one that at the end will be rendered.
- * @param {string[]} lines the lines we need to measure
- *
- */
-  getGraphemeDataForRender(lines: string[]): GraphemeData {
-    const splitByGrapheme = this.splitByGrapheme,
-      infix = splitByGrapheme ? '' : ' ';
-
-    let largestWordWidth = 0;
-
-    const data = lines.map((line, lineIndex) => {
-      let offset = 0;
-      const wordsOrGraphemes = splitByGrapheme
-        ? this.graphemeSplitForRectNotes(line)
-        : this.wordSplit(line);
-
-      if (wordsOrGraphemes.length === 0) {
-        return [{ word: [], width: 0 }];
-      }
-
-      return wordsOrGraphemes.map((word: string) => {
-        // if using splitByGrapheme words are already in graphemes.
-        const graphemeArray = splitByGrapheme
-          ? [word]
-          : this.graphemeSplit(word);
-        const width = this._measureWord(graphemeArray, lineIndex, offset);
-        largestWordWidth = Math.max(width, largestWordWidth);
-        offset += graphemeArray.length + infix.length;
-        return { word: graphemeArray, width };
-      });
-    });
-
-    return {
-      wordsData: data,
-      largestWordWidth,
-    };
-  }
 
 
   // _wrapLine(
@@ -566,52 +458,7 @@ export class XTextbase
     return 1;
   }
 
-  /**
-   * Gets lines of text to render in the Textbox. This function calculates
-   * text wrapping on the fly every time it is called.
-   * @param {String} text text to split
-   * @returns {Array} Array of lines in the Textbox.
-   * @override
-   */
-  _splitTextIntoLines(text: string) {
-    const newText = super._splitTextIntoLines(text);
-    if (!this.fromCopy) {
-      if (
-        (this.objType === 'XText' || this.objType === 'XTextbase') &&
-        this.textLines &&
-        this.textLines.length > 1 &&
-        this.isEditing
-      ) {
-        this.oneLine = false;
-      } else {
-        this.oneLine = true;
-      }
-    } else {
-      this.oneLine = false;
-    }
-    if (
-      (this.objType === 'XText' || this.objType === 'XTextbase') &&
-      newText &&
-      newText.lines &&
-      this.oneLine &&
-      this.isEditing
-    ) {
-      if (newText.lines[0].length > 1) {
-        this.width =
-          this._measureWord(newText.lines[0], 0, 0) > this.width
-            ? this._measureWord(newText.lines[0], 0, 0) + 10
-            : this.width;
-      }
-    }
-    const graphemeLines = this._wrapText(newText.lines, this.width);
-    const lines = new Array(graphemeLines.length);
-    for (let i = 0; i < graphemeLines.length; i++) {
-      lines[i] = graphemeLines[i].join('');
-    }
-    newText.lines = lines;
-    newText.graphemeLines = graphemeLines;
-    return newText;
-  }
+
 
   getMinWidth() {
     return Math.max(this.minWidth, this.dynamicMinWidth);
