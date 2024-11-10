@@ -344,89 +344,46 @@ export class XTextbase
     return true;
   }
 
+  /**
+   * Helper function to measure a string of text, given its lineIndex and charIndex offset
+   * It gets called when charBounds are not available yet.
+   * Override if necessary
+   * Use with {@link Textbox#wordSplit}
+   *
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {String} text
+   * @param {number} lineIndex
+   * @param {number} charOffset
+   * @returns {number}
+   */
+  _measureWord(word: any, lineIndex: number, charOffset = 0): number {
+    let width = 0,
+      prevGrapheme;
+    const skipLeft = true;
+    for (let i = 0, len = word.length; i < len; i++) {
+      const box = this._getGraphemeBox(
+        word[i],
+        lineIndex,
+        i + charOffset,
+        prevGrapheme,
+        skipLeft
+      );
+      width += box.kernedWidth;
+      prevGrapheme = word[i];
+    }
+    return width;
+  }
 
+  /**
+   * Override this method to customize word splitting
+   * Use with {@link Textbox#_measureWord}
+   * @param {string} value
+   * @returns {string[]} array of words
+   */
+  wordSplit(value: string): string[] {
+    return value.split(this._wordJoiners);
+  }
 
-  // _wrapLine(
-  //   _line: any,
-  //   lineIndex: number,
-  //   desiredWidth: number,
-  //   reservedSpace = 0
-  // ): any {
-  //   const additionalSpace = this._getWidthOfCharSpacing(),
-  //     splitByGrapheme = this.splitByGrapheme,
-  //     graphemeLines = [],
-  //     words: any = splitByGrapheme
-  //       ? this.graphemeSplitForRectNotes(_line)
-  //       : this.wordSplit(_line),
-  //     infix = splitByGrapheme ? '' : ' ';
-
-  //   let lineWidth = 0,
-  //     line: any[] = [],
-  //     // spaces in different languages?
-  //     offset = 0,
-  //     infixWidth = 0,
-  //     largestWordWidth = 0,
-  //     lineJustStarted = true;
-  //   // fix a difference between split and graphemeSplit
-  //   if (words.length === 0) {
-  //     words.push([]);
-  //   }
-  //   desiredWidth -= reservedSpace;
-  //   // measure words
-  //   const data = words.map((word: any) => {
-  //     // if using splitByGrapheme words are already in graphemes.
-  //     word = splitByGrapheme ? word : this.graphemeSplitForRectNotes(word);
-  //     const width = this._measureWord(word, lineIndex, offset);
-  //     largestWordWidth = Math.max(width, largestWordWidth);
-  //     offset += word.length + 1;
-  //     return { word: word, width: width };
-  //   });
-  //   const maxWidth = Math.max(
-  //     desiredWidth,
-  //     largestWordWidth,
-  //     this.dynamicMinWidth
-  //   );
-  //   // layout words
-  //   offset = 0;
-  //   let i;
-  //   for (i = 0; i < words.length; i++) {
-  //     const word = data[i].word;
-  //     const wordWidth = data[i].width;
-  //     offset += word.length;
-
-  //     lineWidth += infixWidth + wordWidth - additionalSpace;
-  //     if (lineWidth > maxWidth && !lineJustStarted) {
-  //       graphemeLines.push(line);
-  //       line = [];
-  //       lineWidth = wordWidth;
-  //       lineJustStarted = true;
-  //     } else {
-  //       lineWidth += additionalSpace;
-  //     }
-
-  //     if (!lineJustStarted && !splitByGrapheme) {
-  //       line.push(infix);
-  //     }
-  //     if (word.length > 1) {
-  //       line = line.concat(word.split(''));
-  //     } else {
-  //       line = line.concat(word);
-  //     }
-
-  //     infixWidth = splitByGrapheme
-  //       ? 0
-  //       : this._measureWord([infix], lineIndex, offset);
-  //     offset++;
-  //     lineJustStarted = false;
-  //   }
-
-  //   i && graphemeLines.push(line);
-
-  //   if (largestWordWidth + reservedSpace > this.dynamicMinWidth) {
-  //     this.dynamicMinWidth = largestWordWidth - additionalSpace + reservedSpace;
-  //   }
-  //   return graphemeLines;
-  // }
 
   /**
    * Detect if the text line is ended with an hard break
@@ -458,7 +415,57 @@ export class XTextbase
     return 1;
   }
 
+  /**
+   * Gets lines of text to render in the Textbox. This function calculates
+   * text wrapping on the fly every time it is called.
+   * @param {String} text text to split
+   * @returns {Array} Array of lines in the Textbox.
+   * @override
+   */
+  _splitTextIntoLines(text: string) {
+    const newText = super._splitTextIntoLines(text);
+    // Check if text contains Chinese characters
+    if (/[\u3400-\u9FBF]/.test(this.text)) {
+      this.splitByGrapheme = true;
+    }
 
+    if (!this.fromCopy) {
+      if (
+        (this.objType === 'XText' || this.objType === 'XTextbase') &&
+        this.textLines &&
+        this.textLines.length > 1 &&
+        this.isEditing
+      ) {
+        this.oneLine = false;
+      } else {
+        this.oneLine = true;
+      }
+    } else {
+      this.oneLine = false;
+    }
+    if (
+      (this.objType === 'XText' || this.objType === 'XTextbase') &&
+      newText &&
+      newText.lines &&
+      this.oneLine &&
+      this.isEditing
+    ) {
+      if (newText.lines[0].length > 1) {
+        this.width =
+          this._measureWord(newText.lines[0], 0, 0) > this.width
+            ? this._measureWord(newText.lines[0], 0, 0) + 10
+            : this.width;
+      }
+    }
+    const graphemeLines = this._wrapText(newText.lines, this.width);
+    const lines = new Array(graphemeLines.length);
+    for (let i = 0; i < graphemeLines.length; i++) {
+      lines[i] = graphemeLines[i].join('');
+    }
+    newText.lines = lines;
+    newText.graphemeLines = graphemeLines;
+    return newText;
+  }
 
   getMinWidth() {
     return Math.max(this.minWidth, this.dynamicMinWidth);
