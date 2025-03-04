@@ -77,6 +77,7 @@ export class XTextbox extends XTextbase implements WidgetTextInterface {
         };
     }
 
+
     /**
      * Constructor to initialize the textbox with default origin
      * @param text - The initial text content
@@ -98,12 +99,26 @@ export class XTextbox extends XTextbase implements WidgetTextInterface {
         // Lock scaling flip and rotation to maintain aspect
         this.lockScalingFlip = true;
         this.lockRotation = true;
-
+        // Setup custom resize controls
+        this.setupCustomResizeControls();
         // Bind event listeners for editing
         this.on('editing:entered', this.onEditingEntered.bind(this));
         this.on('editing:exited', this.onEditingExited.bind(this));
     }
+    /**
+     * Set up custom resize controls that use our implementation
+     */
+    setupCustomResizeControls() {
+        // Override the action handler for 'mr' (middle right) control
+        if (this.controls && this.controls.mr) {
+            this.controls.mr.actionHandler = this.handleWidthChange.bind(this);
+        }
 
+        // Override the action handler for 'ml' (middle left) control
+        if (this.controls && this.controls.ml) {
+            this.controls.ml.actionHandler = this.handleWidthChange.bind(this);
+        }
+    }
     /**
      * Event handler for entering edit mode
      */
@@ -207,11 +222,15 @@ export class XTextbox extends XTextbase implements WidgetTextInterface {
         }
     }
 
+
     /**
-     * Override changeWidth to handle custom width changes
+     * Handler for width changes that maintains top-left position
      */
-    changeWidth(eventData: any, transform: any, x: any, y: any) {
-        const target = transform.target;
+    handleWidthChange(eventData: any, transform: any, x: number, y: number) {
+        // Store original top-left position
+        const oldBoundingRect = this.getBoundingRect();
+
+        // Calculate new width based on mouse position
         const localPoint = getLocalPoint(
             transform,
             transform.originX,
@@ -219,26 +238,44 @@ export class XTextbox extends XTextbase implements WidgetTextInterface {
             x,
             y
         );
+
         const strokePadding =
-            target.strokeWidth / (target.strokeUniform ? target.scaleX : 1);
+            this.strokeWidth / (this.strokeUniform ? this.scaleX : 1);
         const multiplier = isTransformCentered(transform) ? 2 : 1;
-        const oldWidth = target.width;
+        const oldWidth = this.width;
+
+        // Calculate and set new width
         const newWidth =
-            Math.abs((localPoint.x * multiplier) / target.scaleX) - strokePadding;
-        const shapeScaleX =
-            Math.abs(target.aCoords['tl'].x - target.aCoords['tr'].x) / 138;
-        target.set('shapeScaleX', shapeScaleX);
-        target.set('width', Math.max(newWidth, 0));
+            Math.abs((localPoint.x * multiplier) / this.scaleX) - strokePadding;
 
-        target.initDimensions();
+        // Record original left/top before width change
+        const originalLeft = this.left;
+        const originalTop = this.top;
 
-        target.set('dirty', true);
+        // Set new width and update dimensions
+        this.set('width', Math.max(newWidth, this.getMinWidth()));
 
-        if (target.objType === 'XTextbase' || target.objType === 'XText') {
-            target.set('fixedScaleChange', false);
-        }
+        // Recalculate text dimensions and height
+        this.initDimensions();
+        this.set('dirty', true);
 
-        return oldWidth !== newWidth;
+        // After dimensions update, get new bounding rectangle
+        const newBoundingRect = this.getBoundingRect();
+
+        // Calculate position adjustment to keep top-left fixed
+        const dx = newBoundingRect.left - oldBoundingRect.left;
+        const dy = newBoundingRect.top - oldBoundingRect.top;
+
+        // Apply position adjustment
+        this.set({
+            left: originalLeft - dx,
+            top: originalTop - dy
+        });
+
+        // Update coordinates
+        this.setCoords();
+
+        return oldWidth !== this.width;
     }
 }
 
