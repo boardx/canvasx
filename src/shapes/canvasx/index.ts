@@ -13,3 +13,4 @@ export { XMarkdown } from './XMarkdown';
 export { XChart } from './XChart';
 export { XFrame } from './XFrame';
 export { XPath } from './XPath';
+export { XTextbase } from './XTextbase';
