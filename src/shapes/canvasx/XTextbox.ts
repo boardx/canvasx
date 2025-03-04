@@ -118,6 +118,13 @@ export class XTextbox extends XTextbase implements WidgetTextInterface {
         if (this.controls && this.controls.ml) {
             this.controls.ml.actionHandler = this.handleWidthChange.bind(this);
         }
+
+
+    }
+
+    // reserve for external interface
+    handleWidthChange2(eventData: any, transform: any, x: number, y: number) {
+
     }
     /**
      * Event handler for entering edit mode
@@ -274,6 +281,7 @@ export class XTextbox extends XTextbase implements WidgetTextInterface {
 
         // Update coordinates
         this.setCoords();
+        this.handleWidthChange2(eventData, transform, x, y);
 
         return oldWidth !== this.width;
     }
